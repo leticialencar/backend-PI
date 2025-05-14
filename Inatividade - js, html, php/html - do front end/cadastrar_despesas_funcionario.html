@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>CashHive System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/cadastrar_despesas_funcionario.css">
+  <link rel="stylesheet" href="../css/modalsair.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+</head>
+<body>
+
+<header class="container-header">
+  <div class="logo">
+    <img src="/img/logo.png" alt="Logo CashHive">
+  </div>
+  <div class="user">
+    <p>Usuário Fulano de Tal (00.623.904/0001-73)</p>
+  </div>
+</header>
+
+<div class="main-container">
+  <aside class="menu">
+    <nav class="nav">
+      <ul>
+        <li>
+          <img src="/img/homeicon.svg" alt="Início">
+          <a href="homepage.html">Página inicial</a>
+        </li>
+        <li>
+          <img src="/img/profileicon.svg" alt="Perfil">
+          <a href="profile.html">Perfil</a>
+        </li>
+        <li>
+          <details class="submenu">
+            <summary>
+              <img src="/img/financeicon.svg" alt="Financeiro">
+              Financeiro
+            </summary>
+            <ul>
+              <li><a href="#">Receitas</a></li>
+              <li><a href="cadastrar_receitas.html">Cadastro de Receitas</a></li>
+              <li><a href="#">Despesas</a></li>
+              <li><a href="cadastrar_despesas_funcionario.html">Cadastro de Despesas</a></li>
+            </ul>
+          </details>
+        </li>
+        <li class="logout">
+          <img src="/img/logouticon.svg" alt="Sair">
+          <button class="open-modal" data-modal="modal-sair">Sair</button>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="nav-category">
+    <nav class="nav-options">
+      <ul>
+        <li class="active"><a href="cadastrar_despesas_funcionario.html">Funcionário</a></li>
+        <li><a href="cadastrar_despesas_produtos.html">Produtos</a></li>
+        <li><a href="cadastrar_despesas_variados.html">Variados</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <main class="main">
+    <!-- Modal de Sair -->
+    <div class="modal-overlay hidden" id="modal-sair">
+      <div class="modal-box">
+        <button class="modal-close close-modal close-modal-sair" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="modal-subject">
+          <div class="modal-header">
+            <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
+          </div>
+          <div class="modal-form">
+            <form>
+              <div class="sim-btn">
+                <button type="button" id="btn-sim">Sim</button>
+              </div>
+              <div class="nao-btn">
+                <button type="button" id="btn-nao">Não</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Excluir -->
+    <div class="modal-overlay hidden" id="modal-excluir-receita">
+      <div class="modal-box">
+        <button class="modal-close fechar-modal-excluir" type="button" aria-label="Fechar modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="modal-subject">
+          <div class="modal-header">
+            <p class="modal-title">Deseja mesmo <span>excluir</span> essa despesa?</p>
+          </div>
+          <div class="modal-form">
+            <form>
+              <div class="sim-btn">
+                <button type="button" id="confirmar-exclusao">Sim</button>
+              </div>
+              <div class="nao-btn">
+                <button type="button" id="cancelar-exclusao">Não</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-receitas">
+      <div class="form-title">
+        <h2>Cadastrar Despesas</h2>
+        <a href="despesas.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
+      </div>
+
+      <form id="form-despesas">
+        <div class="input-group">
+          <div class="input-box">
+            <label for="data-pagamento">Data pagamento</label>
+            <input type="date" id="data-pagamento" required>
+          </div>
+
+          <div class="input-box">
+            <label for="salario">Salário</label>
+            <input type="text" id="salario" required>
+          </div>
+
+          <div class="input-box">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" required>
+          </div>
+
+          <div class="input-box">
+            <label for="total">TOTAL</label>
+            <input type="text" id="total" >
+          </div>
+
+          <div class="input-box">
+            <label for="funcao">Função</label>
+            <input type="text" id="funcao" required>
+              
+       
+          </div>
+
+          <div class="input-box">
+            <label for="idade">Idade</label>
+            <input type="number" id="idade" required>
+          </div>
+        </div>
+
+        <div class="criar-btn">
+         <button type="submit" class="btn-cadastrar">Cadastrar</button>
+          <button type="button" class="btn-excluir abrir-modal-excluir" data-modal="modal-excluir-receita">Excluir</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Modal sair
+  document.querySelectorAll(".open-modal").forEach(button => {
+    button.addEventListener("click", () => {
+      const modalId = button.getAttribute("data-modal");
+      document.getElementById(modalId).classList.remove("hidden");
+    });
+  });
+
+  document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
+    button.addEventListener("click", () => {
+      button.closest(".modal-overlay").classList.add("hidden");
+    });
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target.classList.contains("modal-overlay")) {
+      e.target.classList.add("hidden");
+    }
+  });
+
+  // Modal excluir com validação
+  const botaoAbrirModalExcluir = document.querySelector(".abrir-modal-excluir");
+  botaoAbrirModalExcluir.addEventListener("click", (e) => {
+    e.preventDefault();
+    const inputs = document.querySelectorAll(".input-group input, .input-group select");
+    let isFormValid = true;
+
+    inputs.forEach(input => {
+      if (!input.value.trim()) {
+        isFormValid = false;
+      }
+    });
+
+    if (isFormValid) {
+      document.getElementById("modal-excluir-receita").classList.remove("hidden");
+    } else {
+      alert("Por favor, preencha todos os campos antes de excluir.");
+    }
+  });
+
+  // Validação do formulário no envio
+  const form = document.getElementById("form-despesas");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault(); // Evita que o formulário seja enviado
+
+    const inputs = document.querySelectorAll(".input-group input, .input-group select");
+    let isFormValid = true;
+
+    inputs.forEach(input => {
+      if (!input.value.trim()) {
+        isFormValid = false;
+        input.style.borderColor = "red"; // Marca o campo com borda vermelha caso esteja vazio
+      } else {
+        input.style.borderColor = ""; // Remove a borda vermelha se o campo for preenchido
+      }
+    });
+
+    if (isFormValid) {
+      alert("Cadastro realizado com sucesso!");
+    } else {
+      alert("Por favor, preencha todos os campos antes de cadastrar.");
+    }
+  });
+
+  // Cálculo automático do total
+  const salario = document.getElementById("salario");
+  const idade = document.getElementById("idade");
+  const total = document.getElementById("total");
+
+  function calcularTotal() {
+    const salarioValor = parseFloat(salario.value);
+    const idadeValor = parseInt(idade.value);
+    if (!isNaN(salarioValor) && !isNaN(idadeValor)) {
+      total.value = (salarioValor).toFixed(2);
+    } else {
+      total.value = "";
+    }
+  }
+
+  salario.addEventListener("input", calcularTotal);
+  idade.addEventListener("input", calcularTotal);
+
+</script>
+
+<script>
+        window.addEventListener('load', function() {
+            const script = document.createElement('script');
+            script.src = '/backend/js/session-manager.js'; // Ensure correct path
+            document.body.appendChild(script);
+        });
+</script>
+
+
+
+
+
+</body>
+</html>
