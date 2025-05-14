@@ -1,0 +1,161 @@
+body{
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #FFFFFF;
+}
+
+.container{
+  width: 70%;
+  height: 60vh;
+  display: flex;
+  box-shadow: 5px 5px 10px rgba(20, 39, 71, 0.212);
+  border-radius: 16px;
+}
+
+.left{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  background-color: #142747;
+  border-radius: 16px 0px 0px 16px;
+  color: #F8F8F8;
+  padding: 1rem;
+}
+
+.left-box{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 64px;
+  margin-left: 40px;
+}
+
+.img-logo{
+  margin-top: 40px;
+}
+
+
+.left-text{
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+}
+
+.left-title h1{
+  display: flex;
+  flex-direction: column;
+  font-size: 40px;
+  gap: 8px;
+}
+
+.left-title span{
+  font-weight: 700;
+}
+
+.left-subtitle{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 24px;
+  font-weight: 100;
+}
+
+
+.right{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #F8F8F8;
+  border-radius: 0px 16px 16px 0px;
+  color: #142747;
+  padding: 3rem;
+}
+
+.form-header{
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.form-title h2{
+  font-weight: 700;
+  font-size: 32px;
+}
+
+.input-group{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.input-box{
+  display: flex;
+}
+
+.icon-back{
+  width: 72px;
+  background-color: #ECB22C;
+  border-radius: 8px 0px 0px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon{
+  width: 40px;
+  height: 40px;
+}
+
+.input-box input{
+  border: none;
+  border-radius: 0px 8px 8px 0px;
+  background-color: #FFFFFF;
+  font-size: 16px;
+  width: 264px;
+  padding: 1rem;
+  color: #BCBCBC;
+}
+
+.login-options{
+  display: flex;
+  margin-top: 24px;
+}
+
+.help-link {
+  text-decoration: none;
+  font-weight: 500;
+  font-style: italic;
+  color: #142747;
+}
+ 
+.login-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.login-btn button{
+  background: #0a1d3e;
+  color: #F8F8F8;
+  font-weight: 700;
+  width: 364px;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+} 
+
+.login-btn button:hover{
+  transform: scale(1.05);
+  transition: 0.3s;
+}

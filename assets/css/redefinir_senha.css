@@ -1,0 +1,185 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f5;
+}
+
+.container-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: 70px;
+    background-color: #0e2442;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.user p {
+    font-size: 14px;
+    font-style: italic;
+    margin: 0;
+}
+
+.menu {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    background-color: #0e2442;
+    padding: 20px 0;
+}
+
+.nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav li {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.nav li:hover {
+    background-color: #1d3557;
+    cursor: pointer;
+}
+
+.submenu summary {
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.submenu ul {
+    padding-left: 30px;
+    margin-top: 5px;
+}
+
+.submenu ul li a {
+    font-size: 14px;
+    color: #dcdcdc;
+    text-decoration: none;
+}
+
+.logout {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logout button {
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+    font-size: 16px;
+    border: none;
+}
+
+.logout:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* REDEFINIÇÃO DE SENHA - FORM */
+
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 120px;
+    margin-right: 300px;
+}
+  
+.form-container h2 {
+    font-size: 32px;
+    margin-bottom: 32px;
+    color: #000000;
+    font-weight: 700;
+}
+
+.form-box{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+  
+.form-group label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    text-align: left;
+}
+  
+.form-group input {
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #142747;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 500px;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+    color: #000000be;
+}
+  
+.form-buttons {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+}
+  
+.form-buttons button {
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 180px;
+    height: 40px;
+    text-align: center;
+}
+  
+.open-modal2 {
+    background-color: #142747;
+    color: #F8F8F8;
+}
+  
+.btn-voltar {
+    background-color: #93A2B7;
+    color: #F8F8F8;
+}
+   
+
+

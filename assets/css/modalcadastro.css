@@ -1,0 +1,148 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-box {
+    font-family: "Inter", sans-serif;
+    background: #FFFFFF;
+    color: #000000;
+    padding: 24px;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 1000px;
+    height: auto;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: transparent;
+    border: none;
+    color: #2A3645;
+    cursor: pointer;
+}
+
+.modal-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #142747;
+}
+
+.modal-form-new-user {
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 1rem 0;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    width: 48%; 
+    margin-bottom: 1.1rem; 
+}
+
+.input-box label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    text-align: left;
+}
+
+.input-box input,
+.input-box select {
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #142747;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-box input::placeholder {
+    color: #000000be;
+}
+
+/* Botão de Criar Conta */
+.criar-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.criar-btn button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 250px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    background-color: #142747;
+    color: #F8F8F8;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.criar-btn button:hover {
+    background-color: #1c3a5c;
+}
+
+/* Responsividade para telas pequenas (celular) */
+@media (max-width: 768px) {
+    .input-box {
+        width: 100%; /* Fica 1 input por linha em telas menores */
+    }
+    .modal-box {
+        padding: 16px;
+    }
+    .modal-title {
+        font-size: 24px;
+    }
+}
+
+#modal-cadastro {
+    /* Estilos específicos para o modal de cadastro */
+}
+
+#modal-cadastro .modal-box {
+    /* Estilos para a caixa do modal de cadastro */
+}
+
+#modal-cadastro .modal-title {
+    /* Estilos para o título do modal de cadastro */
+}
+
+#modal-cadastro .criar-btn button {
+    /* Estilos para o botão de criar conta */
+}

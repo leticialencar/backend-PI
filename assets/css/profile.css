@@ -1,0 +1,279 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f5;
+}
+
+.container-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: 70px;
+    background-color: #0e2442;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 5x;
+}
+
+.logo img {
+    height: 50px;
+    margin-left: 20px;
+
+}
+.user p {
+    font-size: 14px;
+    font-style: italic;
+    margin: 0;
+}
+
+.menu {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    background-color: #0e2442;
+    padding: 20px 0;
+}
+
+.nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav li {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.nav li:hover {
+    background-color: #1d3557;
+    cursor: pointer;
+}
+
+.submenu summary {
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.submenu ul {
+    padding-left: 30px;
+    margin-top: 5px;
+}
+
+.submenu ul li a {
+    font-size: 14px;
+    color: #dcdcdc;
+    text-decoration: none;
+}
+.submenu ul li a:hover {
+    text-decoration: underline;
+}
+.logout {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logout button {
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+    font-size: 16px;
+    border: none;
+}
+
+.logout:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.perfil-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e355c;
+    padding: 0 20px;
+    height: 60px;
+    width: 65%;
+    margin: 100px auto 0 auto; /* Centraliza horizontalmente e define topo */
+    margin-left: calc(250px + ((100% - 250px - 60%) / 2)); /* Compensa a sidebar */
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box;
+  }
+
+.perfil-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+}
+
+.perfil-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+/* Main content */
+.main {
+ padding: 38px;
+  width: 60%;
+  background: white;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.6);
+  margin-left: calc(250px + ((100% - 250px - 60%) / 2));
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  box-shadow: 0 6px 10px rgba(96, 122, 158, 0.6);
+    
+}
+
+.header-card {
+    display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0a214c;
+  color: white;
+  height: 60px;
+  border-radius: 8px 8px 0 0;
+  padding: 0 20px;
+  margin-top: 50px;
+  width: 62%;
+  margin-left: calc(250px + ((100% - 250px - 60%) / 2));
+  font-size: 16px;
+}
+
+.card {
+    background: white;
+    padding: 35px;
+    width: 60%;
+    box-shadow: 0 6px 10px rgba(96, 122, 158, 0.6);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    margin-left: calc(250px + ((100% - 250px - 60%) / 2));
+}
+
+
+
+.left-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+   
+}
+  
+
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+input[type="text"], input[type="email"] {
+    padding: 10px;
+    border: 1px solid #0a214c;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.btn {
+    background-color: #0a214c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background-color: #142747;
+}
+
+.add-user-btn, .open-modal {
+    background-color: #f5c037;
+    color: black;
+    font-size: 14px;
+    width: 25%;
+    height: 30px;
+    border-radius: 5px;
+    border-style: none;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.add-user-btn a{
+    text-decoration: none;
+    color: black;
+}
+
+.btn-yellow:hover {
+    background-color: #e0b030;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.actions button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-edit {
+    background-color: #1a3769;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #16305c;
+}
+
+.btn-deactivate {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-deactivate:hover {
+    background-color: #c0392b;
+}

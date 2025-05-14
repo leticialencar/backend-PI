@@ -1,0 +1,455 @@
+CREATE TABLE IF NOT EXISTS AUDITORIA (
+    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
+    tabela_afetada VARCHAR(100),
+    operacao VARCHAR(10), -- INSERT, UPDATE, DELETE
+    data_operacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    chave_primaria TEXT,
+    dados_anteriores TEXT,
+    dados_novos TEXT
+);
+
+tabela usuarios --------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_usuario_insert$$
+CREATE TRIGGER trg_usuario_insert
+AFTER INSERT ON USUARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('USUARIO', 'INSERT', NEW.id_usuario,
+    CONCAT('nome=', NEW.nome_usuario, ', cpf=', NEW.cpf_usuario, ', cnpj=', NEW.cnpj_usuario, ', email=', NEW.email_usuario));
+END$$
+
+DROP TRIGGER IF EXISTS trg_usuario_update$$
+CREATE TRIGGER trg_usuario_update
+AFTER UPDATE ON USUARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('USUARIO', 'UPDATE', NEW.id_usuario,
+    CONCAT('nome=', OLD.nome_usuario, ', cpf=', OLD.cpf_usuario, ', cnpj=', OLD.cnpj_usuario, ', email=', OLD.email_usuario),
+    CONCAT('nome=', NEW.nome_usuario, ', cpf=', NEW.cpf_usuario, ', cnpj=', NEW.cnpj_usuario, ', email=', NEW.email_usuario));
+END$$
+
+DROP TRIGGER IF EXISTS trg_usuario_delete$$
+CREATE TRIGGER trg_usuario_delete
+AFTER DELETE ON USUARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('USUARIO', 'DELETE', OLD.id_usuario,
+    CONCAT('nome=', OLD.nome_usuario, ', cpf=', OLD.cpf_usuario, ', cnpj=', OLD.cnpj_usuario, ', email=', OLD.email_usuario));
+END$$
+
+DELIMITER ;
+
+tabela endereco --------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_endereco_insert$$
+CREATE TRIGGER trg_endereco_insert
+AFTER INSERT ON ENDERECO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('ENDERECO', 'INSERT', NEW.id_endereco,
+    CONCAT('rua=', NEW.rua, ', bairro=', NEW.bairro, ', cidade=', NEW.cidade, ', estado=', NEW.estado));
+END$$
+
+DROP TRIGGER IF EXISTS trg_endereco_update$$
+CREATE TRIGGER trg_endereco_update
+AFTER UPDATE ON ENDERECO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('ENDERECO', 'UPDATE', NEW.id_endereco,
+    CONCAT('rua=', OLD.rua, ', bairro=', OLD.bairro, ', cidade=', OLD.cidade, ', estado=', OLD.estado),
+    CONCAT('rua=', NEW.rua, ', bairro=', NEW.bairro, ', cidade=', NEW.cidade, ', estado=', NEW.estado));
+END$$
+
+DROP TRIGGER IF EXISTS trg_endereco_delete$$
+CREATE TRIGGER trg_endereco_delete
+AFTER DELETE ON ENDERECO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('ENDERECO', 'DELETE', OLD.id_endereco,
+    CONCAT('rua=', OLD.rua, ', bairro=', OLD.bairro, ', cidade=', OLD.cidade, ', estado=', OLD.estado));
+END$$
+
+DELIMITER ;
+
+tabela telefone ------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_telefone_insert$$
+CREATE TRIGGER trg_telefone_insert
+AFTER INSERT ON TELEFONE
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('TELEFONE', 'INSERT', NEW.id_telefone,
+    CONCAT('ddd=', NEW.ddd, ', numero=', NEW.num_telefone));
+END$$
+
+DROP TRIGGER IF EXISTS trg_telefone_update$$
+CREATE TRIGGER trg_telefone_update
+AFTER UPDATE ON TELEFONE
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('TELEFONE', 'UPDATE', NEW.id_telefone,
+    CONCAT('ddd=', OLD.ddd, ', numero=', OLD.num_telefone),
+    CONCAT('ddd=', NEW.ddd, ', numero=', NEW.num_telefone));
+END$$
+
+DROP TRIGGER IF EXISTS trg_telefone_delete$$
+CREATE TRIGGER trg_telefone_delete
+AFTER DELETE ON TELEFONE
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('TELEFONE', 'DELETE', OLD.id_telefone,
+    CONCAT('ddd=', OLD.ddd, ', numero=', OLD.num_telefone));
+END$$
+
+DELIMITER ;
+
+tabela cargo -----------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_cargo_insert$$
+CREATE TRIGGER trg_cargo_insert
+AFTER INSERT ON CARGO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('CARGO', 'INSERT', NEW.id_cargo,
+    CONCAT('cargo=', NEW.nome_cargo));
+END$$
+
+DROP TRIGGER IF EXISTS trg_cargo_update$$
+CREATE TRIGGER trg_cargo_update
+AFTER UPDATE ON CARGO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('CARGO', 'UPDATE', NEW.id_cargo,
+    CONCAT('cargo=', OLD.nome_cargo),
+    CONCAT('cargo=', NEW.nome_cargo));
+END$$
+
+DROP TRIGGER IF EXISTS trg_cargo_delete$$
+CREATE TRIGGER trg_cargo_delete
+AFTER DELETE ON CARGO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('CARGO', 'DELETE', OLD.id_cargo,
+    CONCAT('cargo=', OLD.nome_cargo));
+END$$
+
+DELIMITER ;
+
+
+tabela categoria -------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS rg_categoria_receita_insert$$
+CREATE TRIGGER trg_categoria_receita_insert
+AFTER INSERT ON CATEGORIA_RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('CATEGORIA_RECEITA', 'INSERT', NEW.id_categoria,
+    CONCAT('categoria=', NEW.nome_categoria));
+END$$
+
+DROP TRIGGER IF EXISTS trg_categoria_receita_update$$
+CREATE TRIGGER trg_categoria_receita_update
+AFTER UPDATE ON CATEGORIA_RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('CATEGORIA_RECEITA', 'UPDATE', NEW.id_categoria,
+    CONCAT('categoria=', OLD.nome_categoria),
+    CONCAT('categoria=', NEW.nome_categoria));
+END$$
+
+DROP TRIGGER IF EXISTS trg_categoria_receita_delete$$
+CREATE TRIGGER trg_categoria_receita_delete
+AFTER DELETE ON CATEGORIA_RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('CATEGORIA_RECEITA', 'DELETE', OLD.id_categoria,
+    CONCAT('categoria=', OLD.nome_categoria));
+END$$
+
+DELIMITER ;
+
+tabela receita ---------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_receita_insert$$
+CREATE TRIGGER trg_receita_insert
+AFTER INSERT ON RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('RECEITA', 'INSERT', NEW.id_venda,
+    CONCAT('cliente=', NEW.nome_cliente, ', produto=', NEW.nome_produto, ', total=', NEW.total_receita));
+END$$
+
+DROP TRIGGER IF EXISTS trg_receita_update$$
+CREATE TRIGGER trg_receita_update
+AFTER UPDATE ON RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('RECEITA', 'UPDATE', NEW.id_venda,
+    CONCAT('cliente=', OLD.nome_cliente, ', produto=', OLD.nome_produto, ', total=', OLD.total_receita),
+    CONCAT('cliente=', NEW.nome_cliente, ', produto=', NEW.nome_produto, ', total=', NEW.total_receita));
+END$$
+
+DROP TRIGGER IF EXISTS trg_receita_delete$$
+CREATE TRIGGER trg_receita_delete
+AFTER DELETE ON RECEITA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('RECEITA', 'DELETE', OLD.id_venda,
+    CONCAT('cliente=', OLD.nome_cliente, ', produto=', OLD.nome_produto, ', total=', OLD.total_receita));
+END$$
+
+DELIMITER ;
+
+tabela despesa funcionario -------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_funcionario_insert$$
+CREATE TRIGGER trg_despesa_funcionario_insert
+AFTER INSERT ON DESPESA_FUNCIONARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_FUNCIONARIO', 'INSERT', NEW.id_despesa_func,
+    CONCAT('nome_despesa=', NEW.nome_despesa, ', salario=', NEW.salario, ', total=', NEW.total_despesa));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_funcionario_update$$
+CREATE TRIGGER trg_despesa_funcionario_update
+AFTER UPDATE ON DESPESA_FUNCIONARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_FUNCIONARIO', 'UPDATE', NEW.id_despesa_func,
+    CONCAT('nome_despesa=', OLD.nome_despesa, ', salario=', OLD.salario, ', total=', OLD.total_despesa),
+    CONCAT('nome_despesa=', NEW.nome_despesa, ', salario=', NEW.salario, ', total=', NEW.total_despesa));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_funcionario_delete$$
+CREATE TRIGGER trg_despesa_funcionario_delete
+AFTER DELETE ON DESPESA_FUNCIONARIO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_FUNCIONARIO', 'DELETE', OLD.id_despesa_func,
+    CONCAT('nome_despesa=', OLD.nome_despesa, ', salario=', OLD.salario, ', total=', OLD.total_despesa));
+END$$
+
+DELIMITER ;
+
+
+tabela despesa produto -----------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_produto_insert$$
+CREATE TRIGGER trg_despesa_produto_insert
+AFTER INSERT ON DESPESA_PRODUTO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_PRODUTO', 'INSERT', NEW.id_despesa_prod,
+    CONCAT('produto=', NEW.nome_produto, ', qtd=', NEW.qtd_produto, ', total=', NEW.total_despesa));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_produto_update$$
+CREATE TRIGGER trg_despesa_produto_update
+AFTER UPDATE ON DESPESA_PRODUTO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_PRODUTO', 'UPDATE', NEW.id_despesa_prod,
+    CONCAT('produto=', OLD.nome_produto, ', qtd=', OLD.qtd_produto, ', total=', OLD.total_despesa),
+    CONCAT('produto=', NEW.nome_produto, ', qtd=', NEW.qtd_produto, ', total=', NEW.total_despesa));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_produto_delete$$
+CREATE TRIGGER trg_despesa_produto_delete
+AFTER DELETE ON DESPESA_PRODUTO
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_PRODUTO', 'DELETE', OLD.id_despesa_prod,
+    CONCAT('produto=', OLD.nome_produto, ', qtd=', OLD.qtd_produto, ', total=', OLD.total_despesa));
+END$$
+
+DELIMITER ;
+
+tabela despesa energia -----------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_insert$$
+CREATE TRIGGER trg_despesa_energia_insert
+AFTER INSERT ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_ENERGIA', 'INSERT', NEW.id_despesa_ener,
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_update$$
+CREATE TRIGGER trg_despesa_energia_update
+AFTER UPDATE ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_ENERGIA', 'UPDATE', NEW.id_despesa_ener,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor),
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_delete$$
+CREATE TRIGGER trg_despesa_energia_delete
+AFTER DELETE ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_ENERGIA', 'DELETE', OLD.id_despesa_ener,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor));
+END$$
+
+DELIMITER ;
+
+tabela despesa agua --------------------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_insert$$
+CREATE TRIGGER trg_despesa_energia_insert
+AFTER INSERT ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_ENERGIA', 'INSERT', NEW.id_despesa_ener,
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_update$$
+CREATE TRIGGER trg_despesa_energia_update
+AFTER UPDATE ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_ENERGIA', 'UPDATE', NEW.id_despesa_ener,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor),
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_energia_delete$$
+CREATE TRIGGER trg_despesa_energia_delete
+AFTER DELETE ON DESPESA_ENERGIA
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_ENERGIA', 'DELETE', OLD.id_despesa_ener,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor));
+END$$
+
+DELIMITER ;
+
+tabela despesa internet ---------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_internet_insert$$
+CREATE TRIGGER trg_despesa_internet_insert
+AFTER INSERT ON DESPESA_INTERNET
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_INTERNET', 'INSERT', NEW.id_despesa_internet,
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_internet_update$$
+CREATE TRIGGER trg_despesa_internet_update
+AFTER UPDATE ON DESPESA_INTERNET
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_INTERNET', 'UPDATE', NEW.id_despesa_internet,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor),
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_internet_delete$$
+CREATE TRIGGER trg_despesa_internet_delete
+AFTER DELETE ON DESPESA_INTERNET
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_INTERNET', 'DELETE', OLD.id_despesa_internet,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor));
+END$$
+
+DELIMITER ;
+
+tabela despesa variados ---------------------------------------------------------------------------------
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_despesa_variados_insert$$
+CREATE TRIGGER trg_despesa_variados_insert
+AFTER INSERT ON DESPESA_VARIADOS
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_novos)
+  VALUES ('DESPESA_VARIADOS', 'INSERT', NEW.id_despesa_variados,
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_variados_update$$
+CREATE TRIGGER trg_despesa_variados_update
+AFTER UPDATE ON DESPESA_VARIADOS
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores, dados_novos)
+  VALUES ('DESPESA_VARIADOS', 'UPDATE', NEW.id_despesa_variados,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor),
+    CONCAT('descricao=', NEW.descricao, ', valor=', NEW.valor));
+END$$
+
+DROP TRIGGER IF EXISTS trg_despesa_variados_delete$$
+CREATE TRIGGER trg_despesa_variados_delete
+AFTER DELETE ON DESPESA_VARIADOS
+FOR EACH ROW
+BEGIN
+  INSERT INTO AUDITORIA (tabela_afetada, operacao, chave_primaria, dados_anteriores)
+  VALUES ('DESPESA_VARIADOS', 'DELETE', OLD.id_despesa_variados,
+    CONCAT('descricao=', OLD.descricao, ', valor=', OLD.valor));
+END$$
+
+DELIMITER ;

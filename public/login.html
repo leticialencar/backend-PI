@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="left">
+            <div class="left-box">
+                <div class="img-logo">
+                    <img src="../assets/img/logo.png" alt="Logo">
+                </div>
+
+                <div class="left-text">
+                    <div class="left-title">
+                        <h1>Bem-vindo ao <br> <span>CashHive System!</span></h1>
+                    </div>
+    
+                    <div class="left-subtitle">
+                        <p>Transforme seus gastos em</p>
+                        <p>estratégias inteligentes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right">
+            <form action="../src/login/login.php" method="POST">
+                <div class="form-header">
+                    <div class="form-title">
+                        <h2>Login</h2>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-box">
+                        <div class="icon-back">
+                            <img class="icon" src="../assets/img/icons8-customer-100.png">
+                        </div>
+                        <input id="cnpj-cpf" name="login" type="text" placeholder="Digite seu CNPJ ou CPF" required>
+                    </div>
+
+                    <div class="input-box">
+                        <div class="icon-back">
+                            <img class="icon" src="../assets/img/icons8-lock-100.png">
+                        </div>
+                        <input id="senha" name="senha" type="password" placeholder="Digite sua senha" required>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <div class="help-link">
+                        <a class="help-link" href="#">Precisa de ajuda?</a> <!--lembrar de colocar o link depois-->
+                    </div>
+                </div>
+
+                <div class="login-btn" id="login-btn-container">
+                    <button type="submit">Entrar</button>
+                </div>
+
+            </form>
+    
+        </div>
+
+    </div>
+
+    <script src="../assets/js/login.js"></script>
+    
+</body>
+
+</html>

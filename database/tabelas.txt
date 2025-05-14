@@ -1,0 +1,108 @@
+CREATE TABLE USUARIO (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome_usuario VARCHAR(100) NOT NULL,
+    cpf_usuario VARCHAR(14),
+    cnpj_usuario VARCHAR(18),
+    senha_usuario VARCHAR(10) NOT NULL,
+    email_usuario VARCHAR(320) NOT NULL,
+    data_adicao DATE NOT NULL
+);
+
+CREATE TABLE ENDERECO (
+    id_endereco INT AUTO_INCREMENT PRIMARY KEY,
+    cep VARCHAR(10),
+    rua VARCHAR(255),
+    bairro VARCHAR(255),
+    cidade VARCHAR(255),
+    estado VARCHAR(2),
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES USUARIO(id_usuario)
+);
+
+CREATE TABLE TELEFONE (
+    id_telefone INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    num_telefone VARCHAR(9) NOT NULL,
+    ddd VARCHAR(2) NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES USUARIO(id_usuario)
+);
+
+CREATE TABLE CARGO (
+    id_cargo INT AUTO_INCREMENT PRIMARY KEY,
+    nome_cargo VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE CATEGORIA_RECEITA (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nome_categoria VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE RECEITA (
+    id_venda INT AUTO_INCREMENT PRIMARY KEY,
+    data_venda DATE NOT NULL,
+    nome_cliente VARCHAR(100) NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    qtd_produto INT NOT NULL,
+    val_unitario DECIMAL(10, 2) NOT NULL,
+    id_categoria INT,
+    total_receita DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES CATEGORIA_RECEITA(id_categoria)
+);
+
+CREATE TABLE PGTO_RECEITA (
+    id_pgto_receita INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE DESPESA_FUNCIONARIO (
+    id_despesa_func INT AUTO_INCREMENT PRIMARY KEY,
+    id_cargo INT,
+    nome_despesa VARCHAR(255) NOT NULL,
+    data_pagamento DATE NOT NULL,
+    salario DECIMAL(10, 2) NOT NULL,
+    data_nasc DATE NOT NULL,
+    total_despesa DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_cargo) REFERENCES CARGO(id_cargo)
+);
+
+CREATE TABLE DESPESA_PRODUTO (
+    id_despesa_prod INT AUTO_INCREMENT PRIMARY KEY,
+    data_compra DATE NOT NULL,
+    nome_produto VARCHAR(100) NOT NULL,
+    qtd_produto INT NOT NULL,
+    val_unitario DECIMAL(10, 2) NOT NULL,
+    total_despesa DECIMAL(10, 2) NOT NULL,
+    validade DATE
+);
+
+CREATE TABLE DESPESA_ENERGIA (
+    id_despesa_ener INT AUTO_INCREMENT PRIMARY KEY,
+    data_conta DATE NOT NULL,
+    data_pagamento DATE NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE DESPESA_AGUA (
+    id_despesa_agua INT AUTO_INCREMENT PRIMARY KEY,
+    data_conta DATE NOT NULL,
+    data_pagamento DATE NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE DESPESA_INTERNET (
+    id_despesa_internet INT AUTO_INCREMENT PRIMARY KEY,
+    data_conta DATE NOT NULL,
+    data_pagamento DATE NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE DESPESA_VARIADOS (
+    id_despesa_variados INT AUTO_INCREMENT PRIMARY KEY,
+    data_conta DATE NOT NULL,
+    data_pagamento DATE NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL
+);
