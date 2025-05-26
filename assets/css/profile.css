@@ -1,7 +1,8 @@
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: #f4f6f5;
+    color: #000000;
 }
 
 .container-header {
@@ -16,14 +17,13 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 0 5x;
+    padding: 0 20px;
 }
 
 .logo img {
     height: 50px;
-    margin-left: 20px;
-
 }
+
 .user p {
     font-size: 14px;
     font-style: italic;
@@ -44,19 +44,23 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex; /* Garante que os itens fiquem em linha */
+    flex-direction: column; /* Alinha os itens verticalmente */
+    gap: 5px; /* Reduzido o espaço entre os itens */
 }
 
 .nav li {
-    padding: 12px 20px;
+    padding: 10px 15px; /* Ajustado o padding interno */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px; /* Espaço entre o ícone e o texto */
 }
 
 .nav li a {
     color: white;
     text-decoration: none;
     font-size: 16px;
+    width: 100%; /* Garante que o link ocupe toda a largura do item */
 }
 
 .nav li:hover {
@@ -76,6 +80,13 @@ body {
 .submenu ul {
     padding-left: 30px;
     margin-top: 5px;
+}
+.submenu ul li {
+  padding: 5px 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .submenu ul li a {
@@ -101,11 +112,6 @@ body {
     text-decoration: none;
     font-size: 16px;
     border: none;
-}
-
-.logout:hover {
-    font-weight: bold;
-    cursor: pointer;
 }
 
 .perfil-header {
@@ -136,14 +142,14 @@ body {
 }
 /* Main content */
 .main {
- padding: 38px;
-  width: 60%;
-  background: white;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.6);
-  margin-left: calc(250px + ((100% - 250px - 60%) / 2));
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  box-shadow: 0 6px 10px rgba(96, 122, 158, 0.6);
+    padding: 38px;
+    width: 60%;
+    background: white;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.6);
+    margin-left: calc(250px + ((100% - 250px - 60%) / 2));
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 6px 10px rgba(96, 122, 158, 0.6);
     
 }
 
@@ -151,7 +157,7 @@ body {
     display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0a214c;
+  background-color: #283F5D;
   color: white;
   height: 60px;
   border-radius: 8px 8px 0 0;
@@ -186,6 +192,7 @@ body {
   
 
 
+
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -203,7 +210,7 @@ input[type="text"], input[type="email"] {
 }
 
 .btn {
-    background-color: #0a214c;
+    background-color: #283F5D;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -211,6 +218,7 @@ input[type="text"], input[type="email"] {
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-size: 14px;
+    width: 80px;
 }
 
 .btn:hover {
@@ -269,11 +277,12 @@ table th, table td {
     background-color: #16305c;
 }
 
-.btn-deactivate {
+.btn-desativar-conta {
     background-color: #e74c3c;
     color: white;
 }
 
-.btn-deactivate:hover {
+.btn-desativar-conta:hover {
     background-color: #c0392b;
 }
+

@@ -1,7 +1,8 @@
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: #f4f6f5;
+    color: #000000;
 }
 
 .container-header {
@@ -43,19 +44,23 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex; /* Garante que os itens fiquem em linha */
+    flex-direction: column; /* Alinha os itens verticalmente */
+    gap: 5px; /* Reduzido o espaço entre os itens */
 }
 
 .nav li {
-    padding: 12px 20px;
+    padding: 10px 15px; /* Ajustado o padding interno */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px; /* Espaço entre o ícone e o texto */
 }
 
 .nav li a {
     color: white;
     text-decoration: none;
     font-size: 16px;
+    width: 100%; /* Garante que o link ocupe toda a largura do item */
 }
 
 .nav li:hover {
@@ -76,11 +81,21 @@ body {
     padding-left: 30px;
     margin-top: 5px;
 }
+.submenu ul li {
+  padding: 5px 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 .submenu ul li a {
     font-size: 14px;
     color: #dcdcdc;
     text-decoration: none;
+}
+.submenu ul li a:hover {
+    text-decoration: underline;
 }
 
 .logout {
@@ -100,10 +115,7 @@ body {
     border: none;
 }
 
-.logout:hover {
-    font-weight: bold;
-    cursor: pointer;
-}
+
 
 /* REDEFINIÇÃO DE SENHA - FORM */
 

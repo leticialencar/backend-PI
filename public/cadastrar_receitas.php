@@ -1,0 +1,374 @@
+<?php
+require __DIR__ . '/../config/config.php';
+
+$conn = Conexao::getConn();
+
+$queryCat = $conn->query("SELECT id_categoria, nome_categoria FROM categoria_receita");
+$categorias = $queryCat->fetchAll(PDO::FETCH_ASSOC);
+
+$queryProd = $conn->query("SELECT id_produto, nome_produto FROM produtos");
+$produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
+
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>CashHive System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/reset.css">
+  <link rel="stylesheet" href="../assets/css/cadastrar_receitas.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../assets/css/modal_excluir_receita.css">
+  <link rel="stylesheet" href="../assets/css/modalsair.css">
+  
+
+</head>
+<body>
+
+    <header class="container-header">
+        <div class="logo">
+            <img src="../assets/img/logo.png" alt="Logo CashHive">
+        </div>
+        <div class="user">
+            <p id="user-info">Carregando usuário...</p>
+            <script src="../assets/js/get-username.js" defer></script>
+        </div>
+    </header>
+
+    <aside class="menu">
+        <nav class="nav">
+            <ul>
+                <li>
+                    <img src="../assets/img/homeicon.svg" alt="Início">
+                    <a href="../public/homepage.php">Página inicial</a>
+                </li>
+                <li>
+                    <img src="../assets/img/profileicon.svg" alt="Perfil">
+                    <a href="../public/profile.php">Perfil</a>
+                </li>
+                <li>
+                    <details class="submenu">
+                        <summary>
+                            <img src="../assets/img/financeicon.svg" alt="Financeiro">
+                            Financeiro
+                        </summary>
+                        <ul>
+                            <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
+                            <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+                            <li><a href="cadastrar_receitas.html">Cadastro de Receitas</a></li>
+                            <li><a href="despesas_fixas.html">Despesas</a></li>
+                            <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li class="logout">
+                    <img src="../assets/img/logouticon.svg" alt="Sair">
+                    <button class="open-modal" data-modal="modal-sair">Sair</button>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-container">
+        <!-- Modal de Sair -->
+        <div class="modal-overlay hidden" id="modal-sair">
+            <div class="modal-box">
+                <button class="modal-close close-modal close-modal-sair" type="button">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="modal-subject">
+                    <div class="modal-header">
+                        <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
+                    </div>
+
+                    <div class="modal-form">
+                        <form>
+                            <div class="sim-btn">
+                                <a href="login.html"><button type="button" id="btn-sim">Sim</button></a>
+                            </div>
+                            <div class="nao-btn">
+                                <button type="button" id="btn-nao">Não</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-receitas">
+            <form action="../src/receitas/salvar-receita.php" method="post" id="form-receita">
+                <div class="form-title" >
+                    <h2>Cadastrar Receitas</h2>
+                     <a href="receitas_kibon.html"><button type="button" class="ver-receitas">Ver receitas</button></a>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-box">
+                        <label for="data-venda">Data da venda</label>
+                        <input type="date" id="data-venda" name="data-venda" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="nome-cliente">Nome do Cliente</label>
+                        <input type="text" id="nome-cliente" name="nome-cliente" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="nome-produto">Produto</label>
+                        <select id="nome-produto" name="nome-produto" required>
+                            <option value="">Selecione</option>
+                            <?php foreach ($produtos as $prod): ?>
+                                <option value="<?= $prod['id_produto'] ?>">
+                                    <?= htmlspecialchars($prod['nome_produto']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="valor-unitario">Valor Unitário</label>
+                        <input type="number" id="valor-unitario" name="valor-unitario" step="0.01" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                        <option value="">Selecione</option>
+                        <?php foreach ($categorias as $cat): ?>
+                            <option value="<?= $cat['id_categoria'] ?>"><?= htmlspecialchars($cat['nome_categoria']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="pagamento">Forma de Pagamento</label>
+                        <select id="pagamento" name="pagamento" required>
+                            <option value="">Selecione</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="cartao">Cartão</option>
+                            <option value="pix">PIX</option>
+                        </select>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidade" name="quantidade" required>
+                    </div>
+
+                    <div class="input-box">
+                        <label for="total">TOTAL</label>
+                        <input type="text" id="total" name="total" readonly>
+                    </div>
+                </div>
+
+                <div class="criar-btn">
+                    <button type="submit" class="btn-cadastrar">Cadastrar</button>
+                    <button class="btn-excluir abrir-modal-excluir" data-modal="modal-excluir-receita">Excluir</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="success-popup" style="display: none; position: fixed; top: 20px; right: 20px;background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 1000;">Receita salva com sucesso!</div>
+
+    </main>
+
+    <div class="modal-overlay hidden" id="modal-excluir-receita">
+
+        <div class="modal-box">
+    
+            <button class="modal-close fechar-modal-excluir" type="button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+    
+            <div class="modal-subject">
+                <div class="modal-header">
+                    <p class="modal-title">Deseja mesmo <span>excluir</span> essa receita?</p>
+                </div>
+    
+                <div class="modal-form">
+                    <form action="#">
+                        <div class="sim-btn">
+                            <button type="button" id="confirmar-exclusao">Sim</button>
+                        </div>
+    
+                        <div class="nao-btn">
+                            <button type="button" id="cancelar-exclusao">Não</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    
+        </div>
+    
+    </div>
+    <div class="modal-overlay hidden" id="modal-1">
+        <div class="modal-box">
+            <button class="modal-close close-modal" type="button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+    
+            <div class="modal-subject">
+                <div class="modal-header">
+                    <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
+                </div>
+    
+                <div class="modal-form">
+                    <form action="#">
+                        <div class="sim-btn">
+                            <a href="../public/login.html"><button type="button">Sim</button></a>
+                        </div>
+                        <div class="nao-btn">
+                            <button type="button" class="close-modal">Não</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Abre o modal ao clicar no botão com data-modal
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                const modalId = button.getAttribute("data-modal");
+                document.getElementById(modalId).classList.remove("hidden");
+            });
+        });
+    
+        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
+        document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".modal-overlay").classList.add("hidden");
+            });
+        });
+    
+        // Fecha ao clicar fora da caixa
+        window.addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) {
+                e.target.classList.add("hidden");
+            }
+        });
+
+        // Verifica se o formulário está preenchido antes de abrir o modal de exclusão
+        const botaoAbrirModalExcluir = document.querySelector(".abrir-modal-excluir");
+        botaoAbrirModalExcluir.addEventListener("click", (e) => {
+            e.preventDefault(); // Evita o comportamento padrão do botão
+            const inputs = document.querySelectorAll(".input-receitas input, .input-receitas select");
+            let isFormValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isFormValid = false;
+                }
+            });
+
+            if (isFormValid) {
+                const modalExcluirReceita = document.getElementById("modal-excluir-receita");
+                modalExcluirReceita.classList.remove("hidden");
+            } else {
+                alert("Por favor, preencha todos os campos antes de excluir.");
+            }
+        });
+
+        // Verifica se o formulário está preenchido antes de permitir o cadastro
+        const form = document.querySelector("form");
+        form.addEventListener("submit", (e) => {
+            e.preventDefault(); // Evita o envio do formulário se não estiver válido
+            const inputs = document.querySelectorAll(".input-group input, .input-group select");
+            let isFormValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isFormValid = false;
+                    input.style.borderColor = "red"; // Destaca o campo vazio
+                    input.setAttribute("title", "Este campo é obrigatório"); // Adiciona um tooltip para o usuário
+                } else {
+                    input.style.borderColor = ""; // Remove o destaque se preenchido
+                    input.removeAttribute("title"); // Remove o tooltip
+                }
+            });
+
+            if (isFormValid) {
+                alert("Cadastro realizado com sucesso!");
+                // Remova o comentário abaixo para enviar o formulário apenas se estiver válido
+                // form.submit();
+            } else {
+                alert("Por favor, preencha todos os campos antes de cadastrar.");
+            }
+        });
+
+        // Calcula o total automaticamente
+        document.getElementById("quantidade").addEventListener("input", calculateTotal);
+        document.getElementById("valor-unitario").addEventListener("input", calculateTotal);
+
+        function calculateTotal() {
+            const quantidade = parseFloat(document.getElementById("quantidade").value) || 0;
+            const valorUnitario = parseFloat(document.getElementById("valor-unitario").value) || 0;
+            const total = quantidade * valorUnitario;
+
+            const totalInput = document.getElementById("total");
+            totalInput.value = total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL"
+            });
+        }
+    </script>
+
+    <div id="success-popup" style="
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    z-index: 1000;
+">
+    Receita salva com sucesso!
+</div>
+
+<script>
+    document.getElementById('form-receita').addEventListener('submit', async function(event) {
+        event.preventDefault(); // impede o redirecionamento
+
+        const form = event.target;
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: formData
+            });
+
+            if (response.ok) {
+                showSuccessPopup();
+                form.reset(); // limpa o formulário
+            } else {
+                alert('Erro ao salvar a receita!');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro ao enviar os dados!');
+        }
+    });
+
+    function showSuccessPopup() {
+        const popup = document.getElementById('success-popup');
+        popup.style.display = 'block';
+
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 2000); // desaparece após 2 segundos
+    }
+</script>
+
+</body>
+</html>
+

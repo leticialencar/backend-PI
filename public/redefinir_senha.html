@@ -28,18 +28,17 @@
             <script src="../assets/js/get-username.js" defer></script>
         </div>
     </header>
-
     <div class="main-container">
         <aside class="menu">
             <nav class="nav">
                 <ul>
                     <li>
                         <img src="../assets/img/homeicon.svg" alt="Início">
-                        <a href="#">Página inicial</a>
+                        <a href="../public/homepage.php">Página inicial</a>
                     </li>
                     <li>
                         <img src="../assets/img/profileicon.svg" alt="Perfil">
-                        <a href="../public/profile.html">Perfil</a>
+                        <a href="../public/profile.php">Perfil</a>
                     </li>
                     <li>
                         <details class="submenu">
@@ -48,10 +47,11 @@
                                 Financeiro
                             </summary>
                             <ul>
-                                <li><a href="#">Receitas</a></li>
-                                <li><a href="#">Cadastro de Receitas</a></li>
-                                <li><a href="#">Despesas</a></li>
-                                <li><a href="#">Cadastro de Despesas</a></li>
+                                <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
+                                <li><a href="receitas_kibon.html">Receitas</a></li>
+                                <li><a href="cadastrar_receitas.html">Cadastro de Receitas</a></li>
+                                <li><a href="despesas_fixas.html">Despesas</a></li>
+                                <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
                             </ul>
                         </details>
                     </li>
@@ -70,24 +70,27 @@
 
               <h2>Redefinição de senha</h2>
 
-              <form>
+              <form action="../src/profile/reset-password.php" method="POST">
                 <div class="form-box">
+                    <div class="form-group">
+                        <label for="senha-antiga">Senha anterior</label>
+                        <input type="password" id="senha-antiga" name="senha_antiga" placeholder="Digite a senha anterior" required>
+                    </div>
 
                     <div class="form-group">
                         <label for="nova-senha">Nova senha</label>
-                        <input type="password" id="nova-senha" placeholder="Crie uma senha" required>
+                        <input type="password" id="nova-senha" name="nova_senha" placeholder="Crie uma senha" required>
                     </div>
 
                     <div class="form-group">
                         <label for="repetir-senha">Repetir senha</label>
-                        <input type="password" id="repetir-senha" placeholder="Repita a senha criada" required>
+                        <input type="password" id="repetir-senha" name="repetir_senha" placeholder="Repita a senha criada" required>
                     </div>
-
                 </div>
 
                 <div class="form-buttons">
                     <button class="open-modal2" data-modal-2="meuModal2">Salvar</button>
-                  <a href="../public/profile.html"><button type="button" class="btn-voltar">Voltar</button></a>
+                  <a href="../public/profile.php"><button type="button" class="btn-voltar">Voltar</button></a>
                 </div>
 
               </form>
@@ -118,11 +121,11 @@
                     <form action="#">
                         
                         <div class="sim-btn">
-                            <a href="../public/login.html"><button type="button">Sim</button></a>
+                            <a href="login.html"><button type="button">Sim</button></a>
                         </div>
 
                         <div class="nao-btn">
-                            <a href="../public/redefinir_senha.html"><button type="button">Não</button></a>
+                            <a href="redefinir_senha.html"><button type="button">Não</button></a>
                         </div>
 
                     </form>
@@ -141,8 +144,7 @@
             <div class="modal2-form">
                 <form>
                     <div class="modal2-btn-sim">
-                        <a href="recoverpassword.html"><button type="button">Sim</button></a>
-                        
+                        <button type="submit">Sim</button>
                     </div>
                     <div class="modal2-btn-nao">
                         <button type="button">Não</button>
@@ -154,6 +156,7 @@
     
 
     <script>
+        // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
@@ -161,12 +164,14 @@
             });
         });
     
+        // Fecha o modal ao clicar no botão de fechar
         document.querySelectorAll(".close-modal").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
     
+        // Fecha ao clicar fora da caixa
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
@@ -177,9 +182,24 @@
     <script>
 
         document.querySelectorAll(".open-modal2").forEach(button => {
-            button.addEventListener("click", () => {
-                const modalId = button.getAttribute("data-modal-2");
-                document.getElementById(modalId).classList.remove("hidden");
+            button.addEventListener("click", (e) => {
+                e.preventDefault(); // Prevent default button behavior
+                const novaSenha = document.getElementById("nova-senha").value.trim();
+                const repetirSenha = document.getElementById("repetir-senha").value.trim();
+                const minLength = 8; // Minimum password length
+
+                if (novaSenha && repetirSenha) {
+                    if (novaSenha.length < minLength || repetirSenha.length < minLength) {
+                        alert(`A senha deve ter pelo menos ${minLength} caracteres.`);
+                    } else if (novaSenha === repetirSenha) {
+                        const modalId = button.getAttribute("data-modal-2");
+                        document.getElementById(modalId).classList.remove("hidden");
+                    } else {
+                        alert("As senhas não coincidem. Por favor, tente novamente.");
+                    }
+                } else {
+                    alert("Por favor, preencha todos os campos.");
+                }
             });
         });
       

@@ -1,0 +1,304 @@
+<?php
+session_start();
+include __DIR__ . '/../config/config.php';
+
+$user_id = $_SESSION['id_usuario'] ?? null;
+
+if (!$user_id) {
+    header('Location: login.html');
+    exit;
+}
+
+$conn = Conexao::getConn();
+
+$sql = "SELECT 
+    u.nome_usuario, u.cpf_usuario, u.cnpj_usuario, u.email_usuario, u.tipo_usuario,
+    e.cep, e.rua, e.bairro, e.cidade, e.estado,
+    t.num_telefone, t.ddd
+    FROM USUARIO u
+    LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
+    LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
+    WHERE u.id_usuario = :user_id
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$usuario) {
+    die("Usuário não encontrado.");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>CashHive System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/reset.css">
+  <link rel="stylesheet" href="../assets/css/profile.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../assets/css/modalsair.css">
+  <link rel="stylesheet" href="../assets/css/modalcadastro.css">
+  <link rel="stylesheet" href="../assets/css/modalcadastro.css">
+</head>
+<body>
+
+    <header class="container-header">
+        <div class="logo">
+            <img src="../assets/img/logo.png" alt="Logo CashHive">
+        </div>
+        <div class="user">
+            <p id="user-info">Carregando usuário...</p>
+            <script src="../assets/js/get-username.js" defer></script>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="menu">
+            <nav class="nav">
+                <ul>
+                    <li>
+                        <img src="../assets/img/homeicon.svg" alt="Início">
+                        <a href="../public/homepage.php">Página inicial</a>
+                    </li>
+                    <li class="active">
+                        <img src="../assets/img/profileicon.svg" alt="Perfil">
+                        <a href="../public/profile.php">Perfil</a>
+                    </li>
+                    <li>
+                        <details class="submenu">
+                            <summary>
+                                <img src="../assets/img/financeicon.svg" alt="Financeiro">
+                                Financeiro
+                            </summary>
+                            <ul>
+                                <li><a href="receitas_kibon.html">Receitas</a></li>
+                                <li><a href="cadastrar_receitas.php">Cadastro de Receitas</a></li>
+                                <li><a href="despesas_funcionario.html">Despesas</a></li>
+                                <li><a href="cadastrar_despesas_funcionario.html">Cadastro de Despesas</a></li>
+                            </ul>
+                        </details>
+                    </li>
+                    <li class="logout">
+                        <img src="../assets/img/logouticon.svg" alt="Sair">
+                        <button class="open-modal" data-modal="modal-sair">Sair</button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <div class="perfil-header">
+            <div class="perfil-title">
+              <img src="../assets/img/profileicon.svg" alt="Ícone Perfil">
+              <h3>Editar meu perfil</h3>
+            </div>
+             <button class="add-user-btn"><a href="redefinir_senha.html">Alterar senha</a></button>
+          </div>
+          <main class="main">
+            <form id="form-dados" class="form-grid" method="post" action="../src/profile/save-profile.php">
+              <input id="nome" name="nome" type="text" placeholder="*Nome" required value="<?= htmlspecialchars($usuario['nome_usuario'] ?? '') ?>">
+              <input id="cidade" name="cidade" type="text" placeholder="Cidade" value="<?= htmlspecialchars($usuario['cidade'] ?? '') ?>">
+              <input id="cpf" name="cpf" type="text" placeholder="CPF" value="<?= htmlspecialchars(($usuario['tipo_usuario'] === 'admin' ? $usuario['cnpj_usuario'] : $usuario['cpf_usuario']) ?? '') ?>">
+              <input id="estado" name="estado" type="text" placeholder="Estado" value="<?= htmlspecialchars($usuario['estado'] ?? '') ?>">
+              <input id="cep" name="cep" type="text" placeholder="CEP" value="<?= htmlspecialchars($usuario['cep'] ?? '') ?>">
+              <input name="telefone" type="text" placeholder="Telefone" inputmode="numeric"  title="Por favor, insira apenas números." pattern="\d*" value="<?= htmlspecialchars($usuario['num_telefone'] ?? '') ?>">
+              <input id="rua" name="rua" type="text" placeholder="Rua" value="<?= htmlspecialchars($usuario['rua'] ?? '') ?>">
+              <input name="ddd" type="text" placeholder="DDD" inputmode="numeric" title="Por favor, insira apenas números." pattern="\d*" value="<?= htmlspecialchars($usuario['ddd'] ?? '') ?>">
+              <input id="bairro" name="bairro" type="text" placeholder="Bairro" value="<?= htmlspecialchars($usuario['bairro'] ?? '') ?>">
+              <input name="email" type="email" placeholder="Email" value="<?= htmlspecialchars($usuario['email_usuario'] ?? '') ?>">
+              <button type="submit" class="btn">Salvar</button>
+            </form>
+
+            <div id="mensagem"></div>
+
+          </main>
+
+    <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
+      $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao FROM USUARIO";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      ?>
+    <div class="header-card">
+    <div class="left-content">
+        <img src="../assets/img/profileicon.svg" alt="Ícone usuário" />
+        <span>Adicionar usuário</span>
+    </div>
+    <button class="open-modal" data-modal="modal-cadastro">Adicionar novo usuário</button>
+</div>
+
+<div class="card">
+    <?php if (count($usuarios) > 0): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($usuarios as $usuario): ?>
+                    <tr>
+                        <td><?= date('d/m/Y', strtotime($usuario['data_adicao'])); ?></td>
+                        <td><?= htmlspecialchars($usuario['nome_usuario']); ?></td>
+                        <td><?= htmlspecialchars($usuario['email_usuario']); ?></td>
+                        <td class="actions">
+                            <button class="btn-edit" data-id="<?= $usuario['id_usuario']; ?>">Editar</button>
+                            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1" data-id="<?= $usuario['id_usuario']; ?>">Desativar</button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>Nenhum usuário cadastrado.</p>
+    <?php endif; ?>
+</div>
+
+<?php endif; ?>
+
+  <!-- Modal de Sair -->
+  <div class="modal-overlay hidden" id="modal-sair">
+    <div class="modal-box">
+      <button class="modal-close close-modal" type="button">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-subject">
+        <div class="modal-header">
+          <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
+        </div>
+
+        <div class="modal-form">
+          <form action="#">
+            <div class="sim-btn">
+              <a href="/html/login.html"><button type="button">Sim</button></a>
+            </div>
+            <div class="nao-btn">
+              <button type="button" class="close-modal">Não</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal de Cadastro -->
+<div class="modal-overlay hidden" id="modal-cadastro">
+  <div class="modal-box">
+      <button class="modal-close close-modal close-modal-cadastro" type="button">
+          <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-subject">
+          <div class="modal-header">
+              <p class="modal-title">Cadastre um novo usuário</p>
+          </div>
+
+          <div class="modal-form-new-user">
+              <form action="../src/profile/register-user.php">
+                  <div class="input-group">
+                      <div class="input-box">
+                          <label for="nome">Nome</label>
+                          <input type="text" id="nome" name="nome" placeholder="Digite o nome do novo usuário" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="sobrenome">Sobrenome</label>
+                          <input type="text" id="sobrenome" name="sobrenome" placeholder="Digite o sobrenome do novo usuário" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="cpf">CPF</label>
+                          <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="email">E-mail</label>
+                          <input type="email" id="email" name="email" placeholder="Digite o e-mail do novo usuário" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="cargo">Cargo</label>
+                          <select id="cargo" name="cargo" required>
+                              <option value="">Selecione o cargo</option>
+                              <option value="admin">Administrador</option>
+                              <option value="gerente">Gerente</option>
+                              <option value="analista">Analista</option>
+                          </select>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="nivel">Nível de permissão</label>
+                          <select id="nivel" name="nivel" required>
+                              <option value="">Selecione o nível de permissão</option>
+                              <option value="1">Nível 1</option>
+                              <option value="2">Nível 2</option>
+                              <option value="3">Nível 3</option>
+                          </select>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="senha">Senha</label>
+                          <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="repetir_senha">Repetir senha</label>
+                          <input type="password" id="repetir_senha" name="repetir_senha" placeholder="Repita a senha criada" required>
+                      </div>
+                  </div>
+
+                  <div class="criar-btn">
+                      <button type="submit">Criar Conta</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Modal Desativar Conta -->
+<div class="modal-overlay-desativar hidden" id="modal-1">
+  <div class="modal-box-desativar">
+      <button class="modal-close-desativar js-close-modal-desativar" type="button">
+          <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-subject-desativar">
+          <div class="modal-header-desativar">
+              <p class="modal-title-desativar">Deseja mesmo <span>desativar</span> a conta deste usuário?</p>
+          </div>
+
+          <div class="modal-form-desativar">
+              <form action="#">
+                  <div class="sim-btn-desativar">
+                      <button type="button">Sim</button>
+                  </div>
+                  <div class="nao-btn-desativar">
+                      <button type="button">Não</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+  <script src="../assets/js/cep-enter-prevent.js"></script>
+  <script src="../assets/js/cep.js"></script>
+  <script src="../assets/js/user-update.js"></script>
+  <script src="../assets/js/user-insert.js"></script>
+  <script src="../assets/js/modal-close.js"></script>
+  <script src="../assets/js/form-handler.js"></script>
+  <script src="../assets/js/update-username.js"></script>
+
+</body>
+</html>

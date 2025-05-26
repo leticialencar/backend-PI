@@ -3,7 +3,7 @@ CREATE TABLE USUARIO (
     nome_usuario VARCHAR(100) NOT NULL,
     cpf_usuario VARCHAR(14),
     cnpj_usuario VARCHAR(18),
-    senha_usuario VARCHAR(10) NOT NULL,
+    senha_usuario VARCHAR(255) NOT NULL,
     email_usuario VARCHAR(320) NOT NULL,
     data_adicao DATE NOT NULL
 );
@@ -30,6 +30,11 @@ CREATE TABLE TELEFONE (
 CREATE TABLE CARGO (
     id_cargo INT AUTO_INCREMENT PRIMARY KEY,
     nome_cargo VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE produtos (
+    id_produto INT AUTO_INCREMENT PRIMARY KEY,
+    nome_produto VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE CATEGORIA_RECEITA (

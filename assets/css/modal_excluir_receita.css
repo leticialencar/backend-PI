@@ -1,0 +1,111 @@
+.modal-excluir-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-excluir-overlay:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-excluir-box {
+    font-family: "Inter", sans-serif;
+    background: #FFFFFF;
+    color: #000000;
+    padding: 24px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-excluir-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    background: transparent;
+    border: none;
+    color: #2A3645;
+    cursor: pointer;
+}
+
+.modal-excluir-subject {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-excluir-title {
+ text-align: center;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    color: #142747
+}
+
+.modal-excluir-title span {
+    font-weight: 700;
+}
+
+.modal-excluir-form {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.modal-excluir-sim-btn button,
+.modal-excluir-nao-btn button {
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.modal-excluir-sim-btn button {
+    background-color: #142747;
+}
+
+.modal-excluir-sim-btn button:hover {
+    background-color: #0e2442;
+}
+
+.modal-excluir-nao-btn button {
+    background-color: #93A2B7;
+}
+
+.modal-excluir-nao-btn button:hover {
+    background-color: #7a8fa6;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

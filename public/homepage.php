@@ -1,3 +1,5 @@
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -6,6 +8,7 @@
     <title>CashHive System - Página Inicial</title>
     <link rel="stylesheet" href="../assets/css/reset.css">
     <link rel="stylesheet" href="../assets/css/homepage.css">
+    <link rel="stylesheet" href="../assets/css/toast.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -29,11 +32,11 @@
                 <ul>
                     <li>
                         <img src="../assets/img/homeicon.svg" alt="Início">
-                        <a href="homepage.html">Página inicial</a>
+                        <a href="../public/homepage.php">Página inicial</a>
                     </li>
                     <li>
                         <img src="../assets/img/profileicon.svg" alt="Perfil">
-                        <a href="../public/profile.html">Perfil</a>
+                        <a href="../public/profile.php">Perfil</a>
                     </li>
                     <li>
                         <details class="submenu">
@@ -42,8 +45,9 @@
                                 Financeiro
                             </summary>
                             <ul>
+                                <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
                                 <li><a href="#">Receitas</a></li>
-                                <li><a href="#">Cadastro de Receitas</a></li>
+                                <li><a href="../public/cadastrar_receitas.html">Cadastro de Receitas</a></li>
                                 <li><a href="#">Despesas</a></li>
                                 <li><a href="#">Cadastro de Despesas</a></li>
                             </ul>
@@ -97,8 +101,12 @@
             </div>
         </div>
     </div>
+
+    <div id="session-expired-toast" class="toast hidden">
+    Sua sessão expirou! Faça o login novamente.
+    </div>
+
     <script>
-        // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
@@ -106,14 +114,12 @@
             });
         });
     
-        // Fecha o modal ao clicar no botão de fechar
         document.querySelectorAll(".close-modal").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
-    
-        // Fecha ao clicar fora da caixa
+
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
@@ -121,6 +127,35 @@
         });
     </script>
     
+    <!--- script para inatividade --->
     
+    <script>
+    const tempoInatividade = 10000;
+    let timeout;
+
+    function mostrarToastESair() {
+        const toast = document.getElementById("session-expired-toast");
+        toast.classList.remove("hidden");
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            toast.classList.add("hidden");
+            window.location.href = '../public/login.html';
+        }, 3000);
+    }
+
+    function iniciarTemporizador() {
+        clearTimeout(timeout);
+        timeout = setTimeout(mostrarToastESair, tempoInatividade);
+    }
+
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evento => {
+        document.addEventListener(evento, iniciarTemporizador);
+    });
+
+    iniciarTemporizador();
+    </script>
+
 </body>
 </html>

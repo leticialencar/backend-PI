@@ -1,15 +1,12 @@
 <?php
 
-$host = "localhost";
-$usuario = "root";
-$senha = "";
-$banco = "cashhive_system";
+class Conexao {
+    private static $instance;
 
-$mysqli = new mysqli($host, $usuario, $senha, $banco);
-
-if ($mysqli->connect_error) {
-    die("Erro na conexão com o banco de dados: " . $mysqli->connect_error);
-}
-else{
-    //echo "Banco de dados iniciado com sucesso! Pode mexer :)";
+    public static function getConn(){
+        if(!isset(self::$instance)){
+            self::$instance = new \PDO ('mysql:host=localhost;dbname=cashhive_system','root','');
+        }
+        return self::$instance;
+    }
 }
