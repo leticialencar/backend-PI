@@ -59,7 +59,7 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
                         </summary>
                         <ul>
                             <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
-                            <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+                            <li><a href="../public/receitas_kibon.php">Receitas</a></li>
                             <li><a href="cadastrar_receitas.html">Cadastro de Receitas</a></li>
                             <li><a href="despesas_fixas.html">Despesas</a></li>
                             <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
@@ -105,7 +105,7 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
             <form action="../src/receitas/salvar-receita.php" method="post" id="form-receita">
                 <div class="form-title" >
                     <h2>Cadastrar Receitas</h2>
-                     <a href="receitas_kibon.html"><button type="button" class="ver-receitas">Ver receitas</button></a>
+                     <a href="../public/receitas_kibon.php"><button type="button" class="ver-receitas">Ver receitas</button></a>
                 </div>
 
                 <div class="input-group">
@@ -174,7 +174,13 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
             </form>
         </div>
 
-        <div id="success-popup" style="display: none; position: fixed; top: 20px; right: 20px;background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 1000;">Receita salva com sucesso!</div>
+        <div id="success-popup" 
+     style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 1000; 
+            opacity: 0; 
+            transform: translateY(-20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;">
+  Receita salva com sucesso!
+</div>
 
     </main>
 
@@ -319,24 +325,9 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
 
-    <div id="success-popup" style="
-    display: none;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    z-index: 1000;
-">
-    Receita salva com sucesso!
-</div>
-
 <script>
     document.getElementById('form-receita').addEventListener('submit', async function(event) {
-        event.preventDefault(); // impede o redirecionamento
+        event.preventDefault();
 
         const form = event.target;
         const formData = new FormData(form);
@@ -349,9 +340,7 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
 
             if (response.ok) {
                 showSuccessPopup();
-                form.reset(); // limpa o formulário
-            } else {
-                alert('Erro ao salvar a receita!');
+                form.reset();
             }
         } catch (error) {
             console.error('Erro:', error);
@@ -362,12 +351,68 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
     function showSuccessPopup() {
         const popup = document.getElementById('success-popup');
         popup.style.display = 'block';
+        void popup.offsetWidth; // força reflow
+        popup.style.opacity = '1';
+        popup.style.transform = 'translateY(0)';
 
         setTimeout(() => {
-            popup.style.display = 'none';
-        }, 2000); // desaparece após 2 segundos
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(-20px)';
+
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500);
+        }, 5000);
     }
 </script>
+
+<script>
+document.getElementById('form-receita').addEventListener('submit', function(event) {
+    const valorUnitario = parseFloat(document.getElementById('valor-unitario').value);
+    const quantidade = parseInt(document.getElementById('quantidade').value);
+
+    if (valorUnitario < 0 || quantidade < 0) {
+        event.preventDefault();
+        showToast('Os valores de "Valor Unitário" e "Quantidade" não podem ser negativos!');
+    }
+});
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.innerText = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.background = '#e74c3c';
+    toast.style.color = '#fff';
+    toast.style.padding = '15px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    toast.style.zIndex = '9999';
+    toast.style.fontFamily = 'Arial, sans-serif';
+
+    document.body.appendChild(toast);
+
+    // animação de entrada
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    }, 100);
+
+    // animação de saída e remoção
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 500);
+    }, 5000); // fica visível por 3 segundos
+}
+</script>
+
 
 </body>
 </html>

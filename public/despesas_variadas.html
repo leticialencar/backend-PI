@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>CashHive System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/despesas_variadas.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../css/modalsair.css">
+</head>
+<body>
+
+<header class="container-header">
+    <div class="logo">
+        <img src="/img/logo.png" alt="Logo CashHive">
+    </div>
+    <div class="user">
+        <p>Usuário Fulano de Tal (00.623.904/0001-73)</p>
+    </div>
+</header>
+
+<div class="main-container">
+    <aside class="menu">
+        <nav class="nav">
+            <ul>
+                <li>
+                    <img src="/img/homeicon.svg" alt="Início">
+                    <a href="homepage.html">Página inicial</a>
+                </li>
+                <li>
+                    <img src="/img/profileicon.svg" alt="Perfil">
+                    <a href="profile.html">Perfil</a>
+                </li>
+                <li>
+                    <details class="submenu">
+                        <summary>
+                            <img src="/img/financeicon.svg" alt="Financeiro">
+                            Financeiro
+                        </summary>
+                        <ul>
+                            <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
+                            <li><a href="receitas_kibon.html">Receitas</a></li>
+                            <li><a href="receitas.html">Cadastro de Receitas</a></li>
+                            <li><a href="despesas_fixas.html">Despesas</a></li>
+                            <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
+                        </ul>
+                    </details>
+                </li>
+                <li class="logout">
+                    <img src="/img/logouticon.svg" alt="Sair">
+                    <button class="open-modal" data-modal="modal-sair">Sair</button>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="nav-category">
+        <nav class="nav-options">
+            <ul>
+                <li><a href="despesas_fixas.html">Fixos</a></li>
+                <li><a href="despesa_produto.html">Produto</a></li>
+                <li  class="active"><a href="despesas_variadas.html">Variado</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Div de Filtros -->
+    <div class="nav-filter-category">
+        <div class="filters">
+            <input type="date" id="data-filter" name="data">
+
+            <select id="produto-filter" name="produto">
+                <option value="produto">Janeiro</option>
+                <option value="produto1"></option>
+                <option value="produto2"></option>
+                <option value="produto3"></option>
+            </select>
+
+            <select id="categoria-filter" name="categoria">
+                <option value="categoria">Valor</option>
+                <option value="categoria1"></option>
+                <option value="categoria2"></option>
+                <option value="categoria3"></option>
+            </select>
+
+            <select id="quandtidade-filter" name="quantidade">
+                <option value="quantidade">Variados</option>
+                <option value="quantidade1"></option>
+                <option value="quantidade2"></option>
+                <option value="quantidade3"></option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tabela de Receitas -->
+    <main class="main-tabela">
+        <table class="tabela-receitas">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Variado</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As linhas da tabela serão preenchidas dinamicamente pelo backend -->
+                <tr>
+                    <td>03/02/2025</td>
+                    <td>Copo descartável</td>
+                    <td>Acabou no estoque</td>
+                    <td>R$ 250,00</td>
+                </tr>
+                <!-- As outras linhas virão do banco de dados -->
+            </tbody>
+        </table>
+    </main>
+
+    <div class="final-tabela">
+        <div class="acoes">
+            <div class="botoes">
+            <p>* Selecionar pra excluir</p>
+            <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
+            </div>
+        </div>
+        <div class="total-gasto-box">
+            <p class="total-gasto">TOTAL GASTO: R$ 3000,00</p>
+        </div>
+    </div>
+
+
+
+    <!-- Modal de Sair -->
+    <div class="modal-overlay hidden" id="modal-sair">
+        <div class="modal-box">
+            <button class="modal-close close-modal close-modal-sair" type="button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="modal-subject">
+                <div class="modal-header">
+                    <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
+                </div>
+
+                <div class="modal-form">
+                    <form>
+                        <div class="sim-btn">
+                            <a href="login.html"><button type="button" id="btn-sim">Sim</button></a>
+                        </div>
+                        <div class="nao-btn">
+                            <button type="button" id="btn-nao">Não</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+      // Abre o modal ao clicar no botão com data-modal
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                const modalId = button.getAttribute("data-modal");
+                document.getElementById(modalId).classList.remove("hidden");
+            });
+        });
+    
+        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
+        document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".modal-overlay").classList.add("hidden");
+            });
+        });
+    
+        // Fecha ao clicar fora da caixa
+        window.addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) {
+                e.target.classList.add("hidden");
+            }
+        });
+</script>
+    
+</body>
+</html>
