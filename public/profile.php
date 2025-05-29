@@ -46,7 +46,6 @@ if (!$usuario) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="../assets/css/modalsair.css">
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
-  <link rel="stylesheet" href="../assets/css/modalcadastro.css">
 </head>
 <body>
 
@@ -120,7 +119,7 @@ if (!$usuario) {
           </main>
 
     <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
-      $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao FROM USUARIO";
+     $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao FROM USUARIO WHERE ativo = 1";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -299,6 +298,7 @@ if (!$usuario) {
   <script src="../assets/js/modal-close.js"></script>
   <script src="../assets/js/form-handler.js"></script>
   <script src="../assets/js/update-username.js"></script>
+  <script src="../assets/js/user-deactivate.js"></script>
 
 </body>
 </html>
