@@ -42,7 +42,7 @@
               Financeiro
             </summary>
             <ul>
-              <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
+              <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
               <li><a href="../public/receitas_kibon.html">Receitas</a></li>
               <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
               <li><a href="despesas_fixas.html">Despesas</a></li>
@@ -123,45 +123,46 @@
         <a href="despesas_funcionario.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
       </div>
 
-      <form id="form-despesas">
+      <form id="form-despesas" method="POST" action="../src/despesas/cadastrar-despesa-fixa.php">
         <div class="input-group">
           <div class="input-box">
             <label for="data-pagamento">Data pagamento</label>
-            <input type="date" id="data-pagamento" required>
+            <input type="date" id="data-pagamento" name="data_pagamento" required>
           </div>
 
           <div class="input-box">
             <label for="data-pagamento">Data de Vencimento</label>
-            <input type="date" id="data-pagamento" required>
+            <input type="date" id="data-pagamento" name="data_vencimento" required>
           </div>
 
           <div class="input-box">
             <label for="nome">Categoria</label>
-            <select>
+            <select name="categoria" required>
               <option value="">Selecione</option>
               <option value="agua">Água</option>
               <option value="energia">Energia</option>
-            </select required>
+            </select>
           </div>
 
           <div class="input-box">
             <label for="total">Valor</label>
-            <input type="text" id="total">
+            <input type="number" id="total" name="valor" min="0.01" step="0.01" required>
           </div>
 
           <div class="input-box">
             <label for="nome">Forma de pagamento</label>
-            <select>
+            <select name="forma_pagamento" required>
               <option value="">Selecione</option>
-              <option value="agua">Pix</option>
-              <option value="energia">Á vista</option>
-            </select required>
+              <option value="pix">Pix</option>
+              <option value="a vista">Á vista</option>
+            </select>
           </div>
 
           <div class="input-box">
             <label for="total">Observações</label>
-            <input type="text" id="total">
+            <input type="text" id="total" name="observacoes">
           </div>
+        </div>
 
         <div class="criar-btn">
           <button type="submit" class="btn-cadastrar">Cadastrar</button>
@@ -213,45 +214,34 @@
     }
   });
 
-  // Validação do formulário no envio
-  const form = document.getElementById("form-despesas");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault(); // Evita que o formulário seja enviado
+  const valorInput = document.getElementById('total');
 
-    const inputs = document.querySelectorAll(".input-group input, .input-group select");
-    let isFormValid = true;
+  valorInput.addEventListener('input', () => {
+    valorInput.setCustomValidity('');
+  });
 
-    inputs.forEach(input => {
-      if (!input.value.trim()) {
-        isFormValid = false;
-        input.style.borderColor = "red"; // Marca o campo com borda vermelha caso esteja vazio
-      } else {
-        input.style.borderColor = ""; // Remove a borda vermelha se o campo for preenchido
-      }
-    });
-
-    if (isFormValid) {
-      alert("Cadastro realizado com sucesso!");
+  valorInput.addEventListener('invalid', () => {
+    if (valorInput.validity.valueMissing) {
+      valorInput.setCustomValidity('Por favor, informe o valor da despesa.');
+    } else if (valorInput.validity.rangeUnderflow) {
+      valorInput.setCustomValidity('O valor deve ser maior que zero.');
+    } else if (valorInput.validity.stepMismatch) {
+      valorInput.setCustomValidity('O valor deve ser um número com até duas casas decimais.');
     } else {
-      alert("Por favor, preencha todos os campos antes de cadastrar.");
+      valorInput.setCustomValidity('Valor inválido.');
     }
   });
 
-  // Cálculo automático do total
-  const salario = document.getElementById("salario");
-  const idade = document.getElementById("idade");
-  const total = document.getElementById("total");
+  document.getElementById('form-despesas').addEventListener('submit', function(e) {
+  const dataPagamento = document.querySelector('input[name="data_pagamento"]').value;
+  const dataVencimento = document.querySelector('input[name="data_vencimento"]').value;
 
-  function calcularTotal() {
-    const salarioValor = parseFloat(salario.value);
-    if (!isNaN(salarioValor)) {
-      total.value = salarioValor.toFixed(2);
-    } else {
-      total.value = "";
-    }
+  if (dataVencimento < dataPagamento) {
+    e.preventDefault(); // Impede o envio do form
+    alert('A data de vencimento não pode ser menor do que a data de pagamento.');
   }
+});
 
-  salario.addEventListener("input", calcularTotal);
 </script>
 
 </body>

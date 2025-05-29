@@ -116,3 +116,35 @@ CREATE TABLE DESPESA_VARIADOS (
     descricao VARCHAR(255) NOT NULL,
     valor DECIMAL(10, 2) NOT NULL
 );
+
+CREATE TABLE FUNCIONARIO (
+    id_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    nome_funcionario VARCHAR(100) NOT NULL,
+    cpf_funcionario VARCHAR(14) NOT NULL UNIQUE,
+    rg_funcionario VARCHAR(20) NOT NULL,
+    id_cargo INT,
+    data_admissao DATE NOT NULL,
+    salario DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_cargo) REFERENCES CARGO(id_cargo)
+);
+
+CREATE TABLE endereco_funcionario (
+    id_endereco_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    cep_funcionario VARCHAR(10),
+    rua_funcionario VARCHAR(255),
+    numero_funcionario VARCHAR(10),
+    bairro_funcionario VARCHAR(255),
+    cidade_funcionario VARCHAR(255),
+    estado_funcionario VARCHAR(2),
+    id_funcionario INT,
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIO(id_funcionario)
+);
+
+CREATE TABLE telefone_funcionario (
+    id_telefone_funcionario INT AUTO_INCREMENT PRIMARY KEY,
+    id_funcionario INT,
+    num_telefone_funcionario VARCHAR(9) NOT NULL,
+    ddd_funcionario VARCHAR(2) NOT NULL,
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIO(id_funcionario)
+);
+

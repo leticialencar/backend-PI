@@ -45,7 +45,7 @@
                                 Financeiro
                             </summary>
                             <ul>
-                                <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
+                                <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
                                 <li><a href="../public/receitas_kibon.html">Receitas</a></li>
                                 <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
                                 <li><a href="#">Despesas</a></li>

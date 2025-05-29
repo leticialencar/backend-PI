@@ -1,3 +1,17 @@
+<?php
+require __DIR__ . '/../config/config.php';
+
+$conn = Conexao::getConn();
+
+try {
+    $stmt = $conn->query("SELECT id_cargo, nome_cargo FROM CARGO");
+    $cargos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar cargos: " . $e->getMessage();
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -86,9 +100,11 @@
                 <input name="ddd" type="text" placeholder="Bairro">
                 <select  id="cargo" name="cargo">
                     <option value="cargo">Cargo</option>
-                    <option value="gerente">Gerente</option>
-                    <option value="vendedor">Vendedor</option>
-                    <option value="caixa">Caixa</option>
+                    <?php foreach ($cargos as $cargo): ?>
+                    <option value="<?= htmlspecialchars($cargo['id_cargo']) ?>">
+                        <?= htmlspecialchars($cargo['nome_cargo']) ?>
+                    </option>
+                <?php endforeach; ?>
                 </select>
                 <input name="data" type="email" placeholder="Data de admissão">
                  <input name="ddd" type="text" placeholder="Contato">
@@ -424,7 +440,6 @@
                     if (response.ok) {
                         const novoUsuario = await response.json();
 
-                        // Adiciona o novo usuário à tabela
                         const novaLinha = document.createElement("tr");
                         novaLinha.innerHTML = `
           <td>${new Date().toLocaleDateString()}</td>

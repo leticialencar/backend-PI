@@ -79,6 +79,7 @@ if (!$usuario) {
                                 Financeiro
                             </summary>
                             <ul>
+                                <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
                                 <li><a href="receitas_kibon.html">Receitas</a></li>
                                 <li><a href="cadastrar_receitas.php">Cadastro de Receitas</a></li>
                                 <li><a href="despesas_funcionario.html">Despesas</a></li>
