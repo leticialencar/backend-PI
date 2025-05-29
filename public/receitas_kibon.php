@@ -1,3 +1,5 @@
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -149,44 +151,44 @@
         </thead>
         <tbody>
           <?php
-require __DIR__ . '/../config/config.php';
+          require __DIR__ . '/../config/config.php';
 
-$conn = Conexao::getConn();
+          $conn = Conexao::getConn();
 
-$sql = "SELECT r.data_venda, r.nome_cliente, p.descricao AS pagamento, r.nome_produto, c.nome_categoria, r.qtd_produto, r.val_unitario, r.total_receita
-    FROM RECEITA r
-    LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
-    LEFT JOIN PGTO_RECEITA p ON r.id_pgto_receita = p.id_pgto_receita
-    ORDER BY r.data_venda DESC
-";
+          $sql = "SELECT r.data_venda, r.nome_cliente, p.descricao AS pagamento, r.nome_produto, c.nome_categoria, r.qtd_produto, r.val_unitario, r.total_receita
+              FROM RECEITA r
+              LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+              LEFT JOIN PGTO_RECEITA p ON r.id_pgto_receita = p.id_pgto_receita
+              ORDER BY r.data_venda DESC
+          ";
 
-$stmt = $conn->query($sql);
+          $stmt = $conn->query($sql);
 
-if ($stmt) {
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          if ($stmt) {
+              $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (count($rows) > 0) {
-        foreach ($rows as $row) {
-            echo "<tr>";
-            echo "<td>" . date("d/m/Y", strtotime($row['data_venda'])) . "</td>";
-            echo "<td>" . htmlspecialchars($row['nome_cliente']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['pagamento']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['nome_produto']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['nome_categoria']) . "</td>";
-            echo "<td>" . intval($row['qtd_produto']) . "</td>";
-            echo "<td>R$ " . number_format($row['val_unitario'], 2, ',', '.') . "</td>";
-            echo "<td>R$ " . number_format($row['total_receita'], 2, ',', '.') . "</td>";
-            echo "</tr>";
-        }
-    } else {
-        echo "<tr><td colspan='8'>Nenhum dado encontrado</td></tr>";
-    }
-} else {
-    echo "<tr><td colspan='8'>Erro na consulta SQL</td></tr>";
-}
+              if (count($rows) > 0) {
+                  foreach ($rows as $row) {
+                      echo "<tr>";
+                      echo "<td>" . date("d/m/Y", strtotime($row['data_venda'])) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['nome_cliente']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['pagamento']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['nome_produto']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['nome_categoria']) . "</td>";
+                      echo "<td>" . intval($row['qtd_produto']) . "</td>";
+                      echo "<td>R$ " . number_format($row['val_unitario'], 2, ',', '.') . "</td>";
+                      echo "<td>R$ " . number_format($row['total_receita'], 2, ',', '.') . "</td>";
+                      echo "</tr>";
+                  }
+              } else {
+                  echo "<tr><td colspan='8'>Nenhum dado encontrado</td></tr>";
+              }
+          } else {
+              echo "<tr><td colspan='8'>Erro na consulta SQL</td></tr>";
+          }
 
-$conn = null;
-?>
+          $conn = null;
+          ?>
         </tbody>
       </table>
     </main>
@@ -229,6 +231,11 @@ $conn = null;
       </div>
     </div>
   </div>
+
+  <div id="session-expired-toast" class="toast hidden">
+    Sua sessão expirou! Faça o login novamente.
+  </div>
+
   <script>
     document.querySelectorAll(".open-modal").forEach((button) => {
       button.addEventListener("click", () => {
@@ -249,5 +256,8 @@ $conn = null;
       }
     });
   </script>
+
+  <script src="../assets/js/inatividade.js"></script>
+
 </body>
 </html>
