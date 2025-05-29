@@ -85,30 +85,6 @@ CREATE TABLE DESPESA_PRODUTO (
     validade DATE
 );
 
-CREATE TABLE DESPESA_ENERGIA (
-    id_despesa_ener INT AUTO_INCREMENT PRIMARY KEY,
-    data_conta DATE NOT NULL,
-    data_pagamento DATE NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL
-);
-
-CREATE TABLE DESPESA_AGUA (
-    id_despesa_agua INT AUTO_INCREMENT PRIMARY KEY,
-    data_conta DATE NOT NULL,
-    data_pagamento DATE NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL
-);
-
-CREATE TABLE DESPESA_INTERNET (
-    id_despesa_internet INT AUTO_INCREMENT PRIMARY KEY,
-    data_conta DATE NOT NULL,
-    data_pagamento DATE NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
-    valor DECIMAL(10, 2) NOT NULL
-);
-
 CREATE TABLE DESPESA_VARIADOS (
     id_despesa_variados INT AUTO_INCREMENT PRIMARY KEY,
     data_conta DATE NOT NULL,
@@ -148,3 +124,18 @@ CREATE TABLE telefone_funcionario (
     FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIO(id_funcionario)
 );
 
+CREATE TABLE DESPESAS_FIXAS (
+    id_despesa INT AUTO_INCREMENT PRIMARY KEY,
+    categoria VARCHAR(50) NOT NULL, -- Ex: 'Água', 'Energia', 'Internet'
+    data_conta DATE NOT NULL,
+    data_pagamento DATE NOT NULL,
+    descricao VARCHAR(255) NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    id_forma_pagamento INT,
+    FOREIGN KEY (id_forma_pagamento) REFERENCES FORMAS_PAGAMENTO(id_forma_pagamento)
+);
+
+CREATE TABLE FORMAS_PAGAMENTO (
+    id_forma_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+    descricao VARCHAR(50) NOT NULL
+);

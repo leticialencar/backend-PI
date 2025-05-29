@@ -1,5 +1,6 @@
-<?php
-session_start();
+<?php 
+include '../src/login/verify-session.php'; 
+
 include __DIR__ . '/../config/config.php';
 
 $user_id = $_SESSION['id_usuario'] ?? null;
@@ -15,10 +16,10 @@ $sql = "SELECT
     u.nome_usuario, u.cpf_usuario, u.cnpj_usuario, u.email_usuario, u.tipo_usuario,
     e.cep, e.rua, e.bairro, e.cidade, e.estado,
     t.num_telefone, t.ddd
-    FROM USUARIO u
-    LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
-    LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
-    WHERE u.id_usuario = :user_id
+FROM USUARIO u
+LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
+LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
+WHERE u.id_usuario = :user_id
 ";
 
 $stmt = $conn->prepare($sql);
@@ -40,6 +41,7 @@ if (!$usuario) {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/reset.css">
   <link rel="stylesheet" href="../assets/css/profile.css">
+  <link rel="stylesheet" href="../assets/css/toast.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -293,13 +295,39 @@ if (!$usuario) {
   </div>
 </div>
 
-  <script src="../assets/js/cep-enter-prevent.js"></script>
-  <script src="../assets/js/cep.js"></script>
-  <script src="../assets/js/user-update.js"></script>
-  <script src="../assets/js/user-insert.js"></script>
-  <script src="../assets/js/modal-close.js"></script>
-  <script src="../assets/js/form-handler.js"></script>
-  <script src="../assets/js/update-username.js"></script>
+<div id="session-expired-toast" class="toast hidden">
+    Sua sessão expirou! Faça o login novamente.
+    </div>
+
+    <script>
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                const modalId = button.getAttribute("data-modal");
+                document.getElementById(modalId).classList.remove("hidden");
+            });
+        });
+    
+        document.querySelectorAll(".close-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".modal-overlay").classList.add("hidden");
+            });
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) {
+                e.target.classList.add("hidden");
+            }
+        });
+    </script>
+  
+    <script src="../assets/js/inatividade.js"></script>
+    <script src="../assets/js/cep-enter-prevent.js"></script>
+    <script src="../assets/js/cep.js"></script>
+    <script src="../assets/js/user-update.js"></script>
+    <script src="../assets/js/user-insert.js"></script>
+    <script src="../assets/js/modal-close.js"></script>
+    <script src="../assets/js/form-handler.js"></script>
+    <script src="../assets/js/update-username.js"></script>
 
 </body>
 </html>

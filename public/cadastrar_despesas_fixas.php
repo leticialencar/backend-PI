@@ -1,3 +1,14 @@
+<?php
+require __DIR__ . '/../config/config.php';
+$conn = Conexao::getConn();
+
+$sql = "SELECT id_forma_pagamento, descricao FROM formas_pagamento ORDER BY descricao";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -120,13 +131,13 @@
     <div class="input-receitas">
       <div class="form-title">
         <h2>Cadastrar Despesas</h2>
-        <a href="despesas_funcionario.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
+        <a href="../public/despesas_fixas.php"><button type="button" class="ver-despesas">Ver Despesas</button></a>
       </div>
 
       <form id="form-despesas" method="POST" action="../src/despesas/cadastrar-despesa-fixa.php">
         <div class="input-group">
           <div class="input-box">
-            <label for="data-pagamento">Data pagamento</label>
+            <label for="data-pagamento">Data Pagamento</label>
             <input type="date" id="data-pagamento" name="data_pagamento" required>
           </div>
 
@@ -139,8 +150,9 @@
             <label for="nome">Categoria</label>
             <select name="categoria" required>
               <option value="">Selecione</option>
-              <option value="agua">Água</option>
-              <option value="energia">Energia</option>
+              <option value="Água">Água</option>
+              <option value="Energia">Energia</option>
+              <option value="Internet">Internet</option>
             </select>
           </div>
 
@@ -150,12 +162,15 @@
           </div>
 
           <div class="input-box">
-            <label for="nome">Forma de pagamento</label>
-            <select name="forma_pagamento" required>
-              <option value="">Selecione</option>
-              <option value="pix">Pix</option>
-              <option value="a vista">Á vista</option>
-            </select>
+          <label for="nome">Forma de pagamento</label>
+          <select name="forma_pagamento" required>
+            <option value="">Selecione</option>
+            <?php foreach($formas_pagamento as $forma): ?>
+              <option value="<?= htmlspecialchars($forma['id_forma_pagamento']) ?>">
+                <?= htmlspecialchars($forma['descricao']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
           </div>
 
           <div class="input-box">

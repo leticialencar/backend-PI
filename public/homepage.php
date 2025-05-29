@@ -45,11 +45,11 @@
                                 Financeiro
                             </summary>
                             <ul>
-                                <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
-                                <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+                                <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
+                                <li><a href="../public/receitas_kibon.php">Receitas</a></li>
                                 <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
-                                <li><a href="#">Despesas</a></li>
-                                <li><a href="#">Cadastro de Despesas</a></li>
+                                <li><a href="../public/despesas_fixas.php">Despesas</a></li>
+                                <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
                             </ul>
                         </details>
                     </li>
@@ -126,36 +126,8 @@
             }
         });
     </script>
-    
-    <!--- script para inatividade --->
-    
-    <script>
-    const tempoInatividade = 10000;
-    let timeout;
 
-    function mostrarToastESair() {
-        const toast = document.getElementById("session-expired-toast");
-        toast.classList.remove("hidden");
-        toast.classList.add("show");
-
-        setTimeout(() => {
-            toast.classList.remove("show");
-            toast.classList.add("hidden");
-            window.location.href = '../public/login.html';
-        }, 3000);
-    }
-
-    function iniciarTemporizador() {
-        clearTimeout(timeout);
-        timeout = setTimeout(mostrarToastESair, tempoInatividade);
-    }
-
-    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evento => {
-        document.addEventListener(evento, iniciarTemporizador);
-    });
-
-    iniciarTemporizador();
-    </script>
+    <script src="../assets/js/inatividade.js"></script>
 
 </body>
 </html>
