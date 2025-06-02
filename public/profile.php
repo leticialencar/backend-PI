@@ -80,7 +80,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
 </head>
 <script>
-document.getElementById('confirmarDesativacao').addEventListener('click', function () {
+    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
     fetch('desativar_conta.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
