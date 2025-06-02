@@ -110,11 +110,11 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                                 Financeiro
                             </summary>
                             <ul>
-                                <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
-                                <li><a href="receitas_kibon.html">Receitas</a></li>
-                                <li><a href="cadastrar_receitas.php">Cadastro de Receitas</a></li>
-                                <li><a href="despesas_funcionario.html">Despesas</a></li>
-                                <li><a href="cadastrar_despesas_funcionario.html">Cadastro de Despesas</a></li>
+                                <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
+                                <li><a href="../public/receitas_kibon.php">Receitas</a></li>
+                                <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
+                                <li><a href="../public/despesas_fixas.php">Despesas</a></li>
+                                <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
                             </ul>
                         </details>
                     </li>
