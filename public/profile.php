@@ -359,6 +359,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
     <script src="../assets/js/modal-close.js"></script>
     <script src="../assets/js/form-handler.js"></script>
     <script src="../assets/js/update-username.js"></script>
+    <script src="../assets/js/user-deactivate.js"></script>
 
 </body>
 </html>
