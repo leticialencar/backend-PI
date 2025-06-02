@@ -1,40 +1,75 @@
-<?php 
-include '../src/login/verify-session.php'; 
-
+<?php
+// include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 $conn = Conexao::getConn();
 
-$sql = "SELECT df.data_pagamento, df.categoria, fp.descricao AS forma_pagamento, df.data_conta, df.valor, df.descricao FROM despesas_fixas df LEFT JOIN formas_pagamento fp ON fp.id_forma_pagamento = df.id_forma_pagamento";
+$dataPagamentos  = $conn->query("SELECT DISTINCT data_pagamento FROM despesas_fixas ORDER BY data_pagamento")->fetchAll(PDO::FETCH_COLUMN);
+$categorias = $conn->query("SELECT DISTINCT categoria FROM despesas_fixas ORDER BY categoria")->fetchAll(PDO::FETCH_COLUMN);
+$formasPagamento = $conn->query("SELECT DISTINCT descricao FROM formas_pagamento ORDER BY descricao")->fetchAll(PDO::FETCH_COLUMN);
+$datasVencimento = $conn->query("SELECT DISTINCT data_conta FROM despesas_fixas ORDER BY data_conta")->fetchAll(PDO::FETCH_COLUMN);
+$valores = $conn->query("SELECT DISTINCT valor FROM despesas_fixas ORDER BY valor")->fetchAll(PDO::FETCH_COLUMN);
+
+$filtroDataPagamento  = $_GET['pagamento']        ?? '';  
+$filtroCategoria      = $_GET['categoria']        ?? '';
+$filtroFormaPagamento = $_GET['formadepagamento'] ?? '';
+$filtroDataVencimento = $_GET['vencimento']       ?? '';
+$filtroValor          = $_GET['valor-unit']       ?? '';
+
+function normalizaData(string $date): ?string
+{
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return $date;
+    }
+    $d = DateTime::createFromFormat('d/m/Y', $date);
+    return $d ? $d->format('Y-m-d') : null;
+}
+
+$sql = "SELECT df.data_pagamento,
+               df.categoria,
+               fp.descricao AS forma_pagamento,
+               df.data_conta,
+               df.valor,
+               df.descricao
+        FROM despesas_fixas df
+        LEFT JOIN formas_pagamento fp
+               ON fp.id_forma_pagamento = df.id_forma_pagamento
+        WHERE 1 = 1";
+$params = [];
+
+if ($filtroDataPagamento !== '') {
+    $dataSql = normalizaData($filtroDataPagamento);
+    if ($dataSql) {
+        $sql .= " AND df.data_pagamento = :data_pagamento";
+        $params[':data_pagamento'] = $dataSql;
+    }
+}
+
+if ($filtroCategoria !== '') {
+    $sql .= " AND df.categoria = :categoria";
+    $params[':categoria'] = $filtroCategoria;
+}
+
+if ($filtroFormaPagamento !== '') {
+    $sql .= " AND fp.descricao = :forma_pagamento";
+    $params[':forma_pagamento'] = $filtroFormaPagamento;
+}
+
+if ($filtroDataVencimento !== '') {
+    $dataVencSql = normalizaData($filtroDataVencimento);
+    if ($dataVencSql) {
+        $sql .= " AND df.data_conta = :data_conta";
+        $params[':data_conta'] = $dataVencSql;
+    }
+}
+
+if ($filtroValor !== '') {
+    $sql .= " AND df.valor = :valor";
+    $params[':valor'] = $filtroValor;
+}
 
 $stmt = $conn->prepare($sql);
-$stmt->execute();
+$stmt->execute($params);
 $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$sqlClientes = "SELECT DISTINCT data_pagamento FROM despesas_fixas ORDER BY data_pagamento";
-$stmtClientes = $conn->prepare($sqlClientes);
-$stmtClientes->execute();
-$dataPagamentos = $stmtClientes->fetchAll(PDO::FETCH_COLUMN);
-
-$sqlCategorias = "SELECT DISTINCT categoria FROM despesas_fixas ORDER BY categoria";
-$stmtCategorias = $conn->prepare($sqlCategorias);
-$stmtCategorias->execute();
-$categorias = $stmtCategorias->fetchAll(PDO::FETCH_COLUMN);
-
-$sqlFormasPagamento = "SELECT DISTINCT descricao FROM formas_pagamento ORDER BY descricao";
-$stmtFormasPagamento = $conn->prepare($sqlFormasPagamento);
-$stmtFormasPagamento->execute();
-$formasPagamento = $stmtFormasPagamento->fetchAll(PDO::FETCH_COLUMN);
-
-$sqlDatasVencimento = "SELECT DISTINCT data_conta FROM despesas_fixas ORDER BY data_conta";
-$stmtDatasVencimento = $conn->prepare($sqlDatasVencimento);
-$stmtDatasVencimento->execute();
-$datasVencimento = $stmtDatasVencimento->fetchAll(PDO::FETCH_COLUMN);
-
-$sqlValores = "SELECT DISTINCT valor FROM despesas_fixas ORDER BY valor";
-$stmtValores = $conn->prepare($sqlValores);
-$stmtValores->execute();
-$valores = $stmtValores->fetchAll(PDO::FETCH_COLUMN);
-
 ?>
 
 <!DOCTYPE html>
@@ -109,30 +144,31 @@ $valores = $stmtValores->fetchAll(PDO::FETCH_COLUMN);
   </div>
 
   <div class="nav-filter-category">
+    <form id="filtro-form" method="GET">
         <div class="filters">
-
-            <select id="cliente-filter" name="cliente">
+            
+            <select id="pagamento-filter" name="pagamento">
             <option value="">Data de Pagamento</option>
             <?php foreach ($dataPagamentos as $data): ?>
                 <option value="<?= htmlspecialchars($data) ?>"><?= date('d/m/Y', strtotime($data)) ?></option>
             <?php endforeach; ?>
             </select>
 
-            <select id="pagamento-filter" name="pagamento">
+            <select id="categoria-filter" name="categoria">
                 <option value="">Categoria</option>
                 <?php foreach ($categorias as $categoria): ?>
                     <option value="<?= htmlspecialchars($categoria) ?>"><?= htmlspecialchars($categoria) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select id="produto-filter" name="produto">
+            <select id="formadepagamento-filter" name="formadepagamento">
                 <option value="">Forma de pagamento</option>
                 <?php foreach ($formasPagamento as $forma): ?>
                     <option value="<?= htmlspecialchars($forma) ?>"><?= htmlspecialchars($forma) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select id="quandtidade-filter" name="quantidade">
+            <select id="vencimento-filter" name="vencimento">
                 <option value="">Data de Vencimento</option>
                 <?php foreach ($datasVencimento as $data): ?>
                     <option value="<?= htmlspecialchars($data) ?>"><?= date('d/m/Y', strtotime($data)) ?></option>
@@ -146,6 +182,7 @@ $valores = $stmtValores->fetchAll(PDO::FETCH_COLUMN);
                 <?php endforeach; ?>
             </select>
       </div>
+    </form>
     </div>
 
   <main class="main-tabela">
@@ -199,8 +236,6 @@ $valores = $stmtValores->fetchAll(PDO::FETCH_COLUMN);
     </p>
 </div>
     </div>
-
-   
 
     <!-- Modal de Sair -->
     <div class="modal-overlay hidden" id="modal-sair">
@@ -275,8 +310,16 @@ $valores = $stmtValores->fetchAll(PDO::FETCH_COLUMN);
             }
         });
     </script>
+
+    <script>
+      document.querySelectorAll('#filtro-form select').forEach(select => {
+        select.addEventListener('change', () => {
+          document.getElementById('filtro-form').submit();
+        });
+      });
+    </script>
     
-    <script src="../assets/js/inatividade.js"></script>
+    <script src="../assets/js/filtro-despesas.js"></script>
 
 </body>
 </html>

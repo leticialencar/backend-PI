@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload(); // recarrega a página
+                location.reload();
             } else {
                 alert(data.error || 'Erro ao desativar usuário.');
             }

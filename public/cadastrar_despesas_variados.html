@@ -62,9 +62,9 @@
     <div class="nav-category">
         <nav class="nav-options">
             <ul>
-                <li><a href="cadastrar_despesas_fixas.html">Fixos</a></li>
+                <li><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
                 <li><a href="cadastrar_despesas_produtos.html">Produtos</a></li>
-                <li class="active"><a href="cadastrar_despesas_variados.html">Variados</a></li>
+                <li class="active"><a href="../public/cadastrar_despesas_variados.html">Variados</a></li>
             </ul>
         </nav>
     </div>
@@ -100,7 +100,7 @@
                 <a href="despesas_variadas.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
             </div>
 
-            <form>
+            <form action="../src/despesas/cadastrar-despesa-variados.php" method="POST">
                 <div class="input-group">
                     <div class="input-box">
                         <label for="data-conta">Data da Conta</label>
@@ -111,12 +111,12 @@
                         <input type="text" id="descricao" name="descricao" required>
                     </div>
                     <div class="input-box">
-                        <label for="variado">Categoria</label>
+                        <label for="variado">Variado</label>
                         <input type="text" id="variado" name="variado" required>
                     </div>
                     <div class="input-box">
                         <label for="valor">Valor</label>
-                        <input type="number" id="valor" name="valor" step="0.01" required>
+                        <input type="number" id="valor" name="valor" step="0.01" min="0" required>
                     </div>
                 </div>
 
@@ -216,6 +216,81 @@
         }
     });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector(".input-receitas form");
+    
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const inputs = form.querySelectorAll("input");
+        let isFormValid = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isFormValid = false;
+                input.style.borderColor = "red";
+            } else {
+                input.style.borderColor = "";
+            }
+        });
+
+        if (!isFormValid) {
+            exibirMensagem("Por favor, preencha todos os campos antes de cadastrar.", "erro");
+            return;
+        }
+
+        const formData = new FormData(form);
+
+        fetch('../src/despesas/cadastrar-despesa-variados.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                exibirMensagem(result.message, "sucesso");
+                form.reset(); 
+            } else {
+                exibirMensagem('Erro: ' + result.message, "erro");
+            }
+        })
+        .catch(error => {
+            exibirMensagem('Erro na requisição: ' + error, "erro");
+        });
+    });
+
+    function exibirMensagem(mensagem, tipo) {
+        let msg = document.createElement('div');
+        msg.textContent = mensagem;
+        msg.style.position = 'fixed';
+        msg.style.top = '20px';
+        msg.style.right = '20px';
+        msg.style.padding = '10px 20px';
+        msg.style.borderRadius = '5px';
+        msg.style.color = '#fff';
+        msg.style.fontSize = '14px';
+        msg.style.zIndex = 9999;
+        msg.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+        msg.style.opacity = '0.9';
+
+        if (tipo === 'sucesso') {
+            msg.style.backgroundColor = 'green';
+        } else {
+            msg.style.backgroundColor = 'red';
+        }
+
+        document.body.appendChild(msg);
+
+        setTimeout(() => {
+            msg.remove();
+        }, 3000);
+    }
+});
+</script>
+
+
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$tempoInatividade = 1800;
+$tempoInatividade = 2000000;
 
 if (isset($_SESSION['ULTIMA_ATIVIDADE'])) {
     $inativo = time() - $_SESSION['ULTIMA_ATIVIDADE'];

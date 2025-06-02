@@ -1,4 +1,4 @@
-const tempoInatividade = 10000;
+const tempoInatividade = 2000000;
 let timeout;
 
 function mostrarToastESair() {

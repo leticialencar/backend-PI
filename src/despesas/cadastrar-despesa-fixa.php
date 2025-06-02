@@ -10,7 +10,7 @@ $valor = $_POST['valor'];
 $forma_pagamento_id = $_POST['forma_pagamento'];
 $observacoes = $_POST['observacoes'];
 
-$categorias_validas = ['agua', 'energia', 'internet'];
+$categorias_validas = ['Água', 'Energia', 'Internet'];
 if (!in_array($categoria, $categorias_validas)) {
     die('Categoria inválida!');
 }

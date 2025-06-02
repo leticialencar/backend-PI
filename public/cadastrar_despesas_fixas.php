@@ -134,7 +134,7 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a href="../public/despesas_fixas.php"><button type="button" class="ver-despesas">Ver Despesas</button></a>
       </div>
 
-      <form id="form-despesas" method="POST" action="../src/despesas/cadastrar-despesa-fixa.php">
+      <form id="form-despesas" method="POST">
         <div class="input-group">
           <div class="input-box">
             <label for="data-pagamento">Data Pagamento</label>
@@ -187,6 +187,8 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   </main>
 </div>
+
+<div id="mensagem-sucesso" style="display:none; color: green; margin-top: 1rem;"></div>
 
 <script>
   // Modal sair
@@ -256,6 +258,47 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
     alert('A data de vencimento não pode ser menor do que a data de pagamento.');
   }
 });
+
+document.getElementById('form-despesas').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const dataPagamento = this.querySelector('input[name="data_pagamento"]').value;
+  const dataVencimento = this.querySelector('input[name="data_vencimento"]').value;
+
+  if (dataVencimento < dataPagamento) {
+    alert('A data de vencimento não pode ser menor do que a data de pagamento.');
+    return;
+  }
+
+  const formData = new FormData(this);
+
+  fetch('../src/despesas/cadastrar-despesa-fixa.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.text())
+  .then(text => {
+    const mensagemDiv = document.getElementById('mensagem-sucesso');
+
+    if (text.includes("sucesso")) {
+      mensagemDiv.style.color = 'green';
+      mensagemDiv.textContent = "Receita foi salva com sucesso!";
+      mensagemDiv.style.display = 'block';
+      this.reset(); // Limpa o formulário
+    } else {
+      mensagemDiv.style.color = 'red';
+      mensagemDiv.textContent = "Erro ao salvar a receita.";
+      mensagemDiv.style.display = 'block';
+    }
+  })
+  .catch(error => {
+    const mensagemDiv = document.getElementById('mensagem-sucesso');
+    mensagemDiv.style.color = 'red';
+    mensagemDiv.textContent = "Erro de conexão, tente novamente.";
+    mensagemDiv.style.display = 'block';
+  });
+});
+
 
 </script>
 
