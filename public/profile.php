@@ -1,6 +1,5 @@
 <?php 
 include '../src/login/verify-session.php'; 
-
 include __DIR__ . '/../config/config.php';
 
 $user_id = $_SESSION['id_usuario'] ?? null;
@@ -13,12 +12,24 @@ if (!$user_id) {
 $conn = Conexao::getConn();
 
 $sql = "SELECT 
-    u.nome_usuario, u.cpf_usuario, u.cnpj_usuario, u.email_usuario, u.tipo_usuario,
-    e.cep, e.rua, e.bairro, e.cidade, e.estado,
-    t.num_telefone, t.ddd
+    u.nome_usuario, 
+    u.cpf_usuario, 
+    u.cnpj_usuario, 
+    u.email_usuario, 
+    u.tipo_usuario,
+    e.cep, 
+    e.rua, 
+    e.bairro, 
+    e.cidade, 
+    e.estado,
+    t.num_telefone, 
+    t.ddd,
+    c.nome_cargo, 
+    c.nivel_permissao
 FROM USUARIO u
 LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
 LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
+LEFT JOIN CARGO c ON u.id_cargo = c.id_cargo
 WHERE u.id_usuario = :user_id
 ";
 
@@ -31,6 +42,24 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$usuario) {
     die("Usuário não encontrado.");
 }
+
+// Agora você pode usar:
+$nomeCargo = $usuario['nome_cargo'] ?? 'Sem cargo';
+$nivelPermissao = $usuario['nivel_permissao'] ?? 0;
+
+// Exemplo de uso:
+if ($nivelPermissao >= 2) {
+    // Permissão para recursos de nível 2 ou superior
+    // echo "Bem-vindo, você tem acesso!";
+} else {
+    // echo "Acesso restrito.";
+}
+
+$sqlCargos = "SELECT id_cargo AS id, nome_cargo AS nome FROM CARGO";
+$stmtCargos = $conn->prepare($sqlCargos);
+$stmtCargos->execute();
+$cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -107,7 +136,7 @@ if (!$usuario) {
             <form id="form-dados" class="form-grid" method="post" action="../src/profile/save-profile.php">
               <input id="nome" name="nome" type="text" placeholder="*Nome" required value="<?= htmlspecialchars($usuario['nome_usuario'] ?? '') ?>">
               <input id="cidade" name="cidade" type="text" placeholder="Cidade" value="<?= htmlspecialchars($usuario['cidade'] ?? '') ?>">
-              <input id="cpf" name="cpf" type="text" placeholder="CPF" value="<?= htmlspecialchars(($usuario['tipo_usuario'] === 'admin' ? $usuario['cnpj_usuario'] : $usuario['cpf_usuario']) ?? '') ?>">
+              <input id="cpf" name="cpf" type="text" placeholder="CPF" value="<?= htmlspecialchars((strtolower(trim($usuario['tipo_usuario'] ?? '')) === 'admin' && !empty($usuario['cnpj_usuario'])) ? $usuario['cnpj_usuario'] : ($usuario['cpf_usuario'] ?? '')) ?>">
               <input id="estado" name="estado" type="text" placeholder="Estado" value="<?= htmlspecialchars($usuario['estado'] ?? '') ?>">
               <input id="cep" name="cep" type="text" placeholder="CEP" value="<?= htmlspecialchars($usuario['cep'] ?? '') ?>">
               <input name="telefone" type="text" placeholder="Telefone" inputmode="numeric"  title="Por favor, insira apenas números." pattern="\d*" value="<?= htmlspecialchars($usuario['num_telefone'] ?? '') ?>">
@@ -233,21 +262,24 @@ if (!$usuario) {
                           <label for="cargo">Cargo</label>
                           <select id="cargo" name="cargo" required>
                               <option value="">Selecione o cargo</option>
-                              <option value="admin">Administrador</option>
-                              <option value="gerente">Gerente</option>
-                              <option value="analista">Analista</option>
+                                <?php foreach ($cargos as $cargo): ?>
+                                    <option value="<?= htmlspecialchars($cargo['id']) ?>">
+                                        <?= htmlspecialchars($cargo['nome']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                           </select>
                       </div>
 
                       <div class="input-box">
-                          <label for="nivel">Nível de permissão</label>
-                          <select id="nivel" name="nivel" required>
-                              <option value="">Selecione o nível de permissão</option>
-                              <option value="1">Nível 1</option>
-                              <option value="2">Nível 2</option>
-                              <option value="3">Nível 3</option>
-                          </select>
-                      </div>
+    <label for="nivel">Nível de permissão</label>
+    <select id="nivel" name="nivel" required>
+        <option value="">Selecione o nível de permissão</option>
+        <option value="1" <?= ($nivelPermissao == 1) ? 'selected' : '' ?>>Nível 222</option>
+        <option value="2" <?= ($nivelPermissao == 2) ? 'selected' : '' ?>>Nível 2</option>
+        <option value="3" <?= ($nivelPermissao == 3) ? 'selected' : '' ?>>Nível 3</option>
+    </select>
+</div>
+
 
                       <div class="input-box">
                           <label for="senha">Senha</label>
@@ -320,7 +352,7 @@ if (!$usuario) {
         });
     </script>
   
-    <script src="../assets/js/inatividade.js"></script>
+
     <script src="../assets/js/cep-enter-prevent.js"></script>
     <script src="../assets/js/cep.js"></script>
     <script src="../assets/js/user-update.js"></script>
