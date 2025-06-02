@@ -79,25 +79,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
 </head>
-<script>
-    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
-    fetch('desativar_conta.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
-            window.location.href = 'login.html'; // Redireciona após sucesso
-        }
-    })
-    .catch(error => {
-        alert('Erro ao tentar desativar a conta.');
-        console.error(error);
-    });
-});
-</script>
 <body>
 
     <header class="container-header">
@@ -368,6 +349,46 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                 e.target.classList.add("hidden");
             }
         });
+
+    // Variável global para armazenar o id do usuário a ser desativado
+    let usuarioParaDesativar = null;
+
+    // Ao clicar no botão "Desativar", abre o modal e armazena o id
+    document.querySelectorAll('.btn-desativar-conta').forEach(btn => {
+        btn.addEventListener('click', function() {
+            usuarioParaDesativar = this.getAttribute('data-id');
+            document.getElementById('modal-1').classList.remove('hidden');
+        });
+    });
+
+    // Ao clicar no botão "Sim" do modal, faz a requisição para desativar o usuário
+    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
+        if (!usuarioParaDesativar) return;
+        fetch('desativar_conta.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id_usuario=' + encodeURIComponent(usuarioParaDesativar)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            alert('Erro ao tentar desativar a conta.');
+            console.error(error);
+        });
+    });
+
+    // Botão "Não" fecha o modal
+    document.querySelectorAll('.nao-btn-desativar button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('modal-1').classList.add('hidden');
+            usuarioParaDesativar = null;
+        });
+    });
     </script>
   
 
