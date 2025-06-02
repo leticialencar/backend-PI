@@ -79,6 +79,25 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
 </head>
+<script>
+document.getElementById('confirmarDesativacao').addEventListener('click', function () {
+    fetch('desativar_conta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            window.location.href = 'login.html'; // Redireciona após sucesso
+        }
+    })
+    .catch(error => {
+        alert('Erro ao tentar desativar a conta.');
+        console.error(error);
+    });
+});
+</script>
 <body>
 
     <header class="container-header">
@@ -315,7 +334,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
           <div class="modal-form-desativar">
               <form action="#">
                   <div class="sim-btn-desativar">
-                      <button type="button">Sim</button>
+                     <button type="button" id="confirmarDesativacao">Sim</button>
                   </div>
                   <div class="nao-btn-desativar">
                       <button type="button">Não</button>
