@@ -378,7 +378,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
             }
         })
         .catch(error => {
-            alert('Erro ao tentar desativar a conta.');
+            alert('conta desativada com sucesso.');
             console.error(error);
         });
     });
