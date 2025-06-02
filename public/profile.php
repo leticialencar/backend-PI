@@ -118,7 +118,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                             </ul>
                         </details>
                     </li>
-                    <li class="logout">
+                    <li class="logout"> 
                         <img src="../assets/img/logouticon.svg" alt="Sair">
                         <button class="open-modal" data-modal="modal-sair">Sair</button>
                     </li>
