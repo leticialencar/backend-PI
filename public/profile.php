@@ -89,7 +89,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
     .then(data => {
         alert(data.message);
         if (data.success) {
-            window.location.href = 'login.html'; // Redireciona após sucesso
+            window.location.href = 'login.html'; 
         }
     })
     .catch(error => {
@@ -255,7 +255,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
           </div>
 
           <div class="modal-form-new-user">
-              <form action="../src/profile/register-user.php">
+              <form action="../src/profile/register-user.php" method="POST">
                   <div class="input-group">
                       <div class="input-box">
                           <label for="nome">Nome</label>
