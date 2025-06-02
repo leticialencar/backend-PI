@@ -80,26 +80,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
 </head>
 
-<script>
-    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
-    fetch('desativar_conta.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
-            window.location.href = 'login.html'; 
-        }
-    })
-    .catch(error => {
-        alert('Erro ao tentar desativar a conta.');
-        console.error(error);
-    });
-});
-</script>
-
 <body>
 
     <header class="container-header">
