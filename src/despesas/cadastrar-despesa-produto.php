@@ -11,27 +11,34 @@ try {
         $nome_produto = trim($_POST['nome-produto'] ?? '');
         $valor_unitario = $_POST['valor-unitario'] ?? 0;
         $quantidade = $_POST['quantidade'] ?? 0;
-        $fornecedor = $_POST['fornecedor'] ?? null;
+        $id_fornecedor = $_POST['id_fornecedor'] ?? null;
 
         $total_despesa = floatval($valor_unitario) * intval($quantidade);
 
-        if (!$data_compra || !$validade || !$nome_produto || !$valor_unitario || !$quantidade || !$fornecedor) {
-            throw new Exception("Todos os campos são obrigatórios.");
+        if (
+            empty($data_compra) ||
+            empty($validade) ||
+            empty($nome_produto) ||
+            !is_numeric($valor_unitario) || floatval($valor_unitario) <= 0 ||
+            !is_numeric($quantidade) || intval($quantidade) <= 0 ||
+            !is_numeric($id_fornecedor) || intval($id_fornecedor) <= 0
+        ) {
+            throw new Exception("Todos os campos são obrigatórios e devem ser válidos.");
         }
 
         $stmt = $conn->prepare("INSERT INTO DESPESA_PRODUTO 
-            (data_compra, nome_produto, qtd_produto, val_unitario, total_despesa, validade, fornecedor) 
+            (data_compra, nome_produto, qtd_produto, val_unitario, total_despesa, validade, id_fornecedor) 
             VALUES 
-            (:data_compra, :nome_produto, :qtd_produto, :val_unitario, :total_despesa, :validade, :fornecedor)");
+            (:data_compra, :nome_produto, :qtd_produto, :val_unitario, :total_despesa, :validade, :id_fornecedor)");
 
         $stmt->execute([
             ':data_compra' => $data_compra,
             ':nome_produto' => $nome_produto,
-            ':qtd_produto' => $quantidade,
-            ':val_unitario' => $valor_unitario,
+            ':qtd_produto' => intval($quantidade),
+            ':val_unitario' => floatval($valor_unitario),
             ':total_despesa' => $total_despesa,
             ':validade' => $validade,
-            ':fornecedor' => $fornecedor,
+            ':id_fornecedor' => intval($id_fornecedor),
         ]);
 
         echo "Despesa cadastrada com sucesso!";
