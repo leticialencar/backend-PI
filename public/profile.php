@@ -162,19 +162,25 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
 
           </main>
 
-    <?php if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
-      $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao FROM USUARIO";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      ?>
-    <div class="header-card">
-    <div class="left-content">
-        <img src="../assets/img/profileicon.svg" alt="Ícone usuário" />
-        <span>Adicionar usuário</span>
-    </div>
-    <button class="open-modal" data-modal="modal-cadastro">Adicionar novo usuário</button>
-</div>
+          <?php 
+            if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
+                // Consulta apenas usuários com status 'ativo'
+                $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao 
+                        FROM USUARIO 
+                        WHERE status = 'ativo'";
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+                <div class="header-card">
+                    <div class="left-content">
+                        <img src="../assets/img/profileicon.svg" alt="Ícone usuário" />
+                        <span>Adicionar usuário</span>
+                    </div>
+                    <button class="open-modal" data-modal="modal-cadastro">Adicionar novo usuário</button>
+                </div>
+            <?php endif; ?>
 
 <div class="card">
     <?php if (count($usuarios) > 0): ?>
@@ -206,7 +212,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
 </div>
 
-<?php endif; ?>
 
   <!-- Modal de Sair -->
   <div class="modal-overlay hidden" id="modal-sair">
@@ -284,8 +289,23 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       </div>
 
                       <div class="input-box">
+<<<<<<< HEAD
+                        <label for="nivel">Nível de permissão</label>
+                        <select id="nivel" name="nivel" required>
+                            <option value="">Selecione o nível de permissão</option>
+                            <option value="1" <?= ($nivelPermissao == 1) ? 'selected' : '' ?>>Nível 1</option>
+                            <option value="2" <?= ($nivelPermissao == 2) ? 'selected' : '' ?>>Nível 2</option>
+                            <option value="3" <?= ($nivelPermissao == 3) ? 'selected' : '' ?>>Nível 3</option>
+                        </select>
+                    </div>
+
+                      <div class="input-box">
+                          <label for="senha">Senha</label>
+                          <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
+=======
                           <label for="cadastro-nivel">Nível de permissão</label>
                           <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
+>>>>>>> 594c67b6e670597bd9de23384c44fa50038033ff
                       </div>
 
                       <div class="input-box">

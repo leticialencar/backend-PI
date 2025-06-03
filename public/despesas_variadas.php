@@ -103,7 +103,7 @@
             <thead>
                 <tr>
                     <th>Data</th>
-                    <th>Variado</th>
+                    <th>Categoria</th>
                     <th>Descrição</th>
                     <th>Valor</th>
                 </tr>
