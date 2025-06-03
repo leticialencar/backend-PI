@@ -109,15 +109,29 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- As linhas da tabela serão preenchidas dinamicamente pelo backend -->
-                <tr>
-                    <td>03/02/2025</td>
-                    <td>Copo descartável</td>
-                    <td>Acabou no estoque</td>
-                    <td>R$ 250,00</td>
-                </tr>
-                <!-- As outras linhas virão do banco de dados -->
-            </tbody>
+            <?php
+            require __DIR__ . '/../config/config.php';
+            $conn = Conexao::getConn();
+
+            $sql = "SELECT * FROM DESPESA_VARIADOS ORDER BY data_conta DESC";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if($result) {
+                foreach($result as $row) {
+                    echo "<tr>";
+                    echo "<td>" . date('d/m/Y', strtotime($row['data_conta'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['variado']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
+                    echo "<td>R$ " . number_format($row['valor'], 2, ',', '.') . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='4'>Nenhuma despesa encontrada.</td></tr>";
+            }
+            ?>
+        </tbody>
         </table>
     </main>
 
