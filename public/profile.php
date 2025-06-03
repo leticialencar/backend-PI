@@ -167,7 +167,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                 // Consulta apenas usuários com status 'ativo'
                 $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao 
                         FROM USUARIO 
-                        WHERE status = 'ativo'";
+                        WHERE ativo = 1";
                 
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
