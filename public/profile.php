@@ -43,23 +43,13 @@ if (!$usuario) {
     die("Usuário não encontrado.");
 }
 
-// Agora você pode usar:
 $nomeCargo = $usuario['nome_cargo'] ?? 'Sem cargo';
 $nivelPermissao = $usuario['nivel_permissao'] ?? 0;
 
-// Exemplo de uso:
-if ($nivelPermissao >= 2) {
-    // Permissão para recursos de nível 2 ou superior
-    // echo "Bem-vindo, você tem acesso!";
-} else {
-    // echo "Acesso restrito.";
-}
-
-$sqlCargos = "SELECT id_cargo AS id, nome_cargo AS nome FROM CARGO";
+$sqlCargos = "SELECT id_cargo AS id, nome_cargo AS nome, nivel_permissao FROM CARGO";
 $stmtCargos = $conn->prepare($sqlCargos);
 $stmtCargos->execute();
 $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>
@@ -79,6 +69,26 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
 </head>
+
+<script>
+    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
+    fetch('desativar_conta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.success) {
+            window.location.href = 'login.html'; 
+        }
+    })
+    .catch(error => {
+        alert('Erro ao tentar desativar a conta.');
+        console.error(error);
+    });
+});
+</script>
 
 <body>
 
@@ -119,7 +129,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                             </ul>
                         </details>
                     </li>
-                    <li class="logout"> 
+                    <li class="logout">
                         <img src="../assets/img/logouticon.svg" alt="Sair">
                         <button class="open-modal" data-modal="modal-sair">Sair</button>
                     </li>
@@ -245,38 +255,41 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
               <form action="../src/profile/register-user.php" method="POST">
                   <div class="input-group">
                       <div class="input-box">
-                          <label for="nome">Nome</label>
-                          <input type="text" id="nome" name="nome" placeholder="Digite o nome do novo usuário" required>
+                          <label for="cadastro-nome">Nome</label>
+                          <input type="text" id="cadastro-nome" name="nome" placeholder="Digite o nome do novo usuário" required>
                       </div>
 
                       <div class="input-box">
-                          <label for="sobrenome">Sobrenome</label>
-                          <input type="text" id="sobrenome" name="sobrenome" placeholder="Digite o sobrenome do novo usuário" required>
+                          <label for="cadastro-sobrenome">Sobrenome</label>
+                          <input type="text" id="cadastro-sobrenome" name="sobrenome" placeholder="Digite o sobrenome do novo usuário" required>
                       </div>
 
                       <div class="input-box">
-                          <label for="cpf">CPF</label>
-                          <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                          <label for="cadastro-cpf">CPF</label>
+                          <input type="text" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
                       </div>
 
                       <div class="input-box">
-                          <label for="email">E-mail</label>
-                          <input type="email" id="email" name="email" placeholder="Digite o e-mail do novo usuário" required>
+                          <label for="cadastro-email">E-mail</label>
+                          <input type="email" id="cadastro-email" name="email" placeholder="Digite o e-mail do novo usuário" required>
                       </div>
 
                       <div class="input-box">
-                          <label for="cargo">Cargo</label>
-                          <select id="cargo" name="cargo" required>
+                          <label for="cadastro-cargo">Cargo</label>
+                          <select id="cadastro-cargo" name="cargo" required>
                               <option value="">Selecione o cargo</option>
-                                <?php foreach ($cargos as $cargo): ?>
-                                    <option value="<?= htmlspecialchars($cargo['id']) ?>">
-                                        <?= htmlspecialchars($cargo['nome']) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                              <?php foreach ($cargos as $cargo): ?>
+                                  <option 
+                                    value="<?= htmlspecialchars($cargo['id']) ?>" 
+                                    data-nivel="<?= htmlspecialchars($cargo['nivel_permissao']) ?>">
+                                      <?= htmlspecialchars($cargo['nome']) ?>
+                                  </option>
+                              <?php endforeach; ?>
                           </select>
                       </div>
 
                       <div class="input-box">
+<<<<<<< HEAD
                         <label for="nivel">Nível de permissão</label>
                         <select id="nivel" name="nivel" required>
                             <option value="">Selecione o nível de permissão</option>
@@ -289,11 +302,20 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       <div class="input-box">
                           <label for="senha">Senha</label>
                           <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
+=======
+                          <label for="cadastro-nivel">Nível de permissão</label>
+                          <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
+>>>>>>> 594c67b6e670597bd9de23384c44fa50038033ff
                       </div>
 
                       <div class="input-box">
-                          <label for="repetir_senha">Repetir senha</label>
-                          <input type="password" id="repetir_senha" name="repetir_senha" placeholder="Repita a senha criada" required>
+                          <label for="cadastro-senha">Senha</label>
+                          <input type="password" id="cadastro-senha" name="senha" placeholder="Crie uma senha" required>
+                      </div>
+
+                      <div class="input-box">
+                          <label for="cadastro-repetir-senha">Repetir senha</label>
+                          <input type="password" id="cadastro-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada" required>
                       </div>
                   </div>
 
@@ -396,7 +418,14 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         });
     });
     </script>
-  
+
+    <script>
+        document.getElementById("cadastro-cargo").addEventListener("change", function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const nivel = selectedOption.getAttribute("data-nivel") || "";
+        document.getElementById("cadastro-nivel").value = nivel;
+        });
+</script>
 
     <script src="../assets/js/cep-enter-prevent.js"></script>
     <script src="../assets/js/cep.js"></script>

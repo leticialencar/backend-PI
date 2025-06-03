@@ -266,6 +266,11 @@ try {
                 <input type="bairro" id="bairro" name="bairro" placeholder="Digite o bairro" required>
             </div>
 
+             <div class="input-box">
+                <label for="bairro">Data de admissão</label>
+                <input type="date" id="data" name="data" required>
+            </div>
+
             <div class="input-box">
                 <label for="cargo">Cargo</label>
                 <select id="cargo" name="cargo" required>
@@ -274,11 +279,6 @@ try {
                     <option value="gerente">Gerente</option>
                     <option value="analista">Analista</option>
                 </select>
-            </div>
-
-             <div class="input-box">
-                <label for="bairro">Data de admissão</label>
-                <input type="date" id="data" name="data" required>
             </div>
 
             <div class="input-box">

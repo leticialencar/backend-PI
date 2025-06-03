@@ -132,6 +132,17 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                     <div class="input-box">
+                        <label for="sabor-produto">Sabor</label>
+                        <select id="sabor-produto" name="sabor-produto" required>
+                            <option value="">Selecione</option>
+                            <option value="morango">Morango</option>
+                            <option value="chocolate">Chocolate</option>
+                            <option value="napolitano">Napolitano</option>
+                            <option value="aracuja">Maracujá</option>
+                        </select>
+                    </div>
+
+                    <div class="input-box">
                         <label for="valor-unitario">Valor Unitário</label>
                         <input type="number" id="valor-unitario" name="valor-unitario" step="0.01" required>
                     </div>

@@ -1,3 +1,21 @@
+<?php
+require __DIR__ . '/../config/config.php'; // Ajuste o caminho conforme sua estrutura
+
+$conn = Conexao::getConn();
+
+try {
+    $sql = "SELECT dp.data_compra, f.nome AS fornecedor, dp.nome_produto, dp.qtd_produto, dp.val_unitario, dp.total_despesa, dp.validade
+            FROM DESPESA_PRODUTO dp
+            LEFT JOIN FORNECEDOR f ON dp.id_fornecedor = f.id
+            ORDER BY dp.data_compra DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar dados: " . $e->getMessage();
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -68,8 +86,8 @@
             <nav class="nav-options">
                 <ul>
                     <li><a href="../public/despesas_fixas.php">Fixos</a></li>
-                    <li class="active"><a href="despesa_produto.html">Produto</a></li>
-                    <li><a href="despesas_variadas.html">Variados</a></li>
+                    <li class="active"><a href="despesa_produto.php">Produto</a></li>
+                    <li><a href="despesas_variadas.php">Variados</a></li>
                 </ul>
             </nav>
         </div>
@@ -78,7 +96,6 @@
         <div class="nav-filter-category">
             <div class="filters">
                 <input type="date" id="data-filter" name="data">
-
 
                 <select id="pagamento-filter" name="pagamento">
                     <option value="pagamento">Janeiro</option>
@@ -132,18 +149,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- As linhas da tabela serão preenchidas dinamicamente pelo backend -->
-                    <tr>
-                        <td>01/01/2025</td>
-                        <td>KIBON</td>
-                        <td>Chocolate ao leite</td>
-                        <td>200 unid</td>
-                        <td>2,50</td>
-                        <td>R$ 200,00</td>
-                        <td>23/06/2025</td>
-
-                    </tr>
-                    <!-- As outras linhas virão do banco de dados -->
+                    <?php if (!empty($despesas)): ?>
+                        <?php foreach ($despesas as $dp): ?>
+                            <tr>
+                                <td><?= date('d/m/Y', strtotime($dp['data_compra'])) ?></td>
+                                <td><?= htmlspecialchars($dp['fornecedor'] ?? '-') ?></td>
+                                <td><?= htmlspecialchars($dp['nome_produto']) ?></td>
+                                <td><?= (int)$dp['qtd_produto'] ?> unid</td>
+                                <td>R$ <?= number_format($dp['val_unitario'], 2, ',', '.') ?></td>
+                                <td>R$ <?= number_format($dp['total_despesa'], 2, ',', '.') ?></td>
+                                <td><?= $dp['validade'] ? date('d/m/Y', strtotime($dp['validade'])) : '-' ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="7" style="text-align:center;">Nenhum registro encontrado.</td></tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </main>
@@ -160,8 +180,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- Modal de Sair -->
     <div class="modal-overlay hidden" id="modal-sair">

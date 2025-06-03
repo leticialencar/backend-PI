@@ -1,3 +1,18 @@
+<?php
+require __DIR__ . '/../config/config.php';
+
+$conn = Conexao::getConn();
+
+try {
+    $stmt = $conn->prepare("SELECT id, nome FROM FORNECEDOR ORDER BY nome ASC");
+    $stmt->execute();
+    $fornecedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar fornecedores: " . $e->getMessage();
+    $fornecedores = [];
+}
+?>
+
 <!DOCTYPE html> 
 <html lang="pt-br">
 <head>
@@ -62,9 +77,9 @@
     <div class="nav-category">
         <nav class="nav-options">
             <ul>
-                <li><a href="cadastrar_despesas_fixas.html">Fixos</a></li>
-                <li class="active"><a href="cadastrar_despesas_produtos.html">Produtos</a></li>
-                <li><a href="cadastrar_despesas_variados.html">Variados</a></li>
+                <li><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
+                <li class="active"><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
+                <li><a href="../public/cadastrar_despesas_variados.html">Variados</a></li>
             </ul>
         </nav>
     </div>
@@ -143,22 +158,28 @@
 
                     <div class="input-box">
                         <label for="valor-unitario">Valor Unitário</label>
-                        <input type="number" id="valor-unitario" name="valor-unitario" step="0.01" required>
+                        <input type="number" id="valor-unitario" name="valor-unitario" min="1" step="1" required>
                     </div>
 
                     <div class="input-box">
                         <label for="quantidade">Quantidade</label>
-                        <input type="number" id="quantidade" name="quantidade" required>
+                        <input type="number" id="quantidade" name="quantidade" min="1" step="1" required>
                     </div>
 
                     <div class="input-box">
                         <label for="fornecedor">Fornecedor</label>
-                        <select id="fornecedor" name="fornecedor" required>
-                            <option value="">Selecione</option>
-                            <option value="Kibon">Kibon</option>
-                            <option value="Nestlé">Nestlé</option>
-                            <option value="Mareni">Mareni</option>
-                        </select>
+                        <select id="fornecedor" name="id_fornecedor" required>
+                        <option value="">Selecione um fornecedor</option>
+                        <?php if (!empty($fornecedores)): ?>
+                            <?php foreach ($fornecedores as $fornecedor): ?>
+                                <option value="<?= htmlspecialchars($fornecedor['id']) ?>">
+                                    <?= htmlspecialchars($fornecedor['nome']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="">Nenhum fornecedor cadastrado</option>
+                        <?php endif; ?>
+                    </select>
                     </div>
 
                     <div class="input-box">
