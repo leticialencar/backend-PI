@@ -287,3 +287,7 @@ body {
     background-color: #FFD36E;
     font-weight: 700;
 }
+.input-box label::after {
+    content: " *";
+    color: red;
+}
