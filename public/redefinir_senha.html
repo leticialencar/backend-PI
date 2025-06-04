@@ -142,15 +142,14 @@
             <button class="modal2-close close-modal2">&times;</button>
             <p class="modal-title">Deseja mesmo <span>redefinir</span> sua senha?</p>
             <div class="modal2-form">
-                <form>
-                    <div class="modal2-btn-sim">
-                        <button type="submit">Sim</button>
-                    </div>
-                    <div class="modal2-btn-nao">
-                        <button type="button">Não</button>
-                    </div>
-                </form>
+                <div class="modal2-btn-sim">
+                    <button type="button" id="confirmar-redefinicao">Sim</button>
+                </div>
+                <div class="modal2-btn-nao">
+                    <button type="button">Não</button>
+                </div>
             </div>
+            
         </div>
     </div>
     
@@ -232,6 +231,11 @@
             });
         });
       </script>
-     
+      <script>
+        document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
+        document.querySelector("form[action='../src/profile/reset-password.php']").submit();
+        });
+
+      </script>
 </body>
 </html>
