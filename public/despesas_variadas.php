@@ -1,3 +1,12 @@
+<?php
+require __DIR__ . '/../config/config.php';
+$conn = Conexao::getConn();
+
+$produtos = $conn->query("SELECT DISTINCT MONTH(data_conta) AS mes FROM DESPESA_VARIADOS ORDER BY mes")->fetchAll(PDO::FETCH_COLUMN);
+$categorias = $conn->query("SELECT DISTINCT valor FROM DESPESA_VARIADOS ORDER BY valor")->fetchAll(PDO::FETCH_COLUMN);
+$quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER BY variado")->fetchAll(PDO::FETCH_COLUMN);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -75,24 +84,24 @@
             <input type="date" id="data-filter" name="data">
 
             <select id="produto-filter" name="produto">
-                <option value="produto">Janeiro</option>
-                <option value="produto1"></option>
-                <option value="produto2"></option>
-                <option value="produto3"></option>
+            <option value="">Selecione o Mês</option>
+                <?php foreach($produtos as $produto): ?>
+                    <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
+                <?php endforeach; ?>
             </select>
 
             <select id="categoria-filter" name="categoria">
-                <option value="categoria">Valor</option>
-                <option value="categoria1"></option>
-                <option value="categoria2"></option>
-                <option value="categoria3"></option>
+                <option value="">Selecione o Valor</option>
+                <?php foreach($categorias as $categoria): ?>
+                    <option value="<?= htmlspecialchars($categoria) ?>">R$ <?= number_format($categoria, 2, ',', '.') ?></option>
+                <?php endforeach; ?>
             </select>
 
-            <select id="quandtidade-filter" name="quantidade">
-                <option value="quantidade">Variados</option>
-                <option value="quantidade1"></option>
-                <option value="quantidade2"></option>
-                <option value="quantidade3"></option>
+            <select id="quantidade-filter" name="quantidade">
+                <option value="">Selecione o Variado</option>
+                <?php foreach($quantidades as $quantidade): ?>
+                    <option value="<?= htmlspecialchars($quantidade) ?>"><?= htmlspecialchars($quantidade) ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
     </div>
@@ -110,9 +119,6 @@
             </thead>
             <tbody>
             <?php
-            require __DIR__ . '/../config/config.php';
-            $conn = Conexao::getConn();
-
             $sql = "SELECT * FROM DESPESA_VARIADOS ORDER BY data_conta DESC";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
