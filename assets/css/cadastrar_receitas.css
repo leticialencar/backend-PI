@@ -242,3 +242,7 @@ body {
 .btn-excluir:hover {
   background-color: #c9302c;
 }
+.input-box label::after {
+    content: " *";
+    color: red;
+}
