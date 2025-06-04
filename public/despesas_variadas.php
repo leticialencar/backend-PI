@@ -73,7 +73,7 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
             <ul>
                 <li><a href="../public/despesas_fixas.php">Fixos</a></li>
                 <li><a href="despesa_produto.html">Produto</a></li>
-                <li  class="active"><a href="despesas_variadas.html">Variado</a></li>
+                <li class="active"><a href="despesas_variadas.html">Variado</a></li>
             </ul>
         </nav>
     </div>
@@ -84,7 +84,7 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
             <input type="date" id="data-filter" name="data">
 
             <select id="produto-filter" name="produto">
-            <option value="">Selecione o Mês</option>
+                <option value="">Selecione o Mês</option>
                 <?php foreach($produtos as $produto): ?>
                     <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
                 <?php endforeach; ?>
@@ -127,25 +127,25 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
             if($result) {
                 foreach($result as $row) {
                     echo "<tr>";
-                    echo "<td>" . date('d/m/Y', strtotime($row['data_conta'])) . "</td>";
+                    echo "<td>" . date('Y-m-d', strtotime($row['data_conta'])) . "</td>";
                     echo "<td>" . htmlspecialchars($row['variado']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
-                    echo "<td>R$ " . number_format($row['valor'], 2, ',', '.') . "</td>";
+                    echo "<td>" . htmlspecialchars($row['valor']) . "</td>";
                     echo "</tr>";
                 }
             } else {
                 echo "<tr><td colspan='4'>Nenhuma despesa encontrada.</td></tr>";
             }
             ?>
-        </tbody>
+            </tbody>
         </table>
     </main>
 
     <div class="final-tabela">
         <div class="acoes">
             <div class="botoes">
-            <p>* Selecionar pra excluir</p>
-            <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
+                <p>* Selecionar pra excluir</p>
+                <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
             </div>
         </div>
         <div class="total-gasto-box">
@@ -153,20 +153,16 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         </div>
     </div>
 
-
-
     <!-- Modal de Sair -->
     <div class="modal-overlay hidden" id="modal-sair">
         <div class="modal-box">
             <button class="modal-close close-modal close-modal-sair" type="button">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-
             <div class="modal-subject">
                 <div class="modal-header">
                     <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
                 </div>
-
                 <div class="modal-form">
                     <form>
                         <div class="sim-btn">
@@ -181,29 +177,71 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         </div>
     </div>
 </div>
+
 <script>
-      // Abre o modal ao clicar no botão com data-modal
-        document.querySelectorAll(".open-modal").forEach(button => {
-            button.addEventListener("click", () => {
-                const modalId = button.getAttribute("data-modal");
-                document.getElementById(modalId).classList.remove("hidden");
-            });
+    // Abrir e fechar modal
+    document.querySelectorAll(".open-modal").forEach(button => {
+        button.addEventListener("click", () => {
+            const modalId = button.getAttribute("data-modal");
+            document.getElementById(modalId).classList.remove("hidden");
         });
-    
-        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
-        document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
-            button.addEventListener("click", () => {
-                button.closest(".modal-overlay").classList.add("hidden");
-            });
+    });
+
+    document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
+        button.addEventListener("click", () => {
+            button.closest(".modal-overlay").classList.add("hidden");
         });
-    
-        // Fecha ao clicar fora da caixa
-        window.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal-overlay")) {
-                e.target.classList.add("hidden");
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal-overlay")) {
+            e.target.classList.add("hidden");
+        }
+    });
+
+    // Filtros
+    const dataFilter = document.getElementById('data-filter');
+    const produtoFilter = document.getElementById('produto-filter');
+    const categoriaFilter = document.getElementById('categoria-filter');
+    const quantidadeFilter = document.getElementById('quantidade-filter');
+    const tabela = document.querySelector('.tabela-receitas tbody');
+
+    function aplicarFiltros() {
+        const data = dataFilter.value;
+        const produto = produtoFilter.value;
+        const categoria = categoriaFilter.value;
+        const quantidade = quantidadeFilter.value;
+
+        tabela.querySelectorAll('tr').forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+
+            if(tds.length === 0) return;
+
+            const dataTd = tds[0].textContent.trim();
+            const mesTd = new Date(dataTd).getMonth() + 1; 
+            const categoriaTd = tds[1].textContent.trim();
+            const descricaoTd = tds[2].textContent.trim();
+            const valorTd = tds[3].textContent.trim().replace('R$', '').replace(',', '.').trim();
+
+            let mostrar = true;
+
+            if (data && data !== dataTd) mostrar = false;
+            if (produto && produto != mesTd) mostrar = false;
+            if (categoria && parseFloat(categoria).toFixed(2) != parseFloat(valorTd).toFixed(2)) mostrar = false;
+            if (quantidade && quantidade !== categoriaTd) mostrar = false;
+
+            if (mostrar) {
+                tr.style.display = '';
+            } else {
+                tr.style.display = 'none';
             }
         });
+    }
+
+    [dataFilter, produtoFilter, categoriaFilter, quantidadeFilter].forEach(f => {
+        f.addEventListener('change', aplicarFiltros);
+    });
 </script>
-    
+
 </body>
 </html>
