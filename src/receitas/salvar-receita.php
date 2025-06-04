@@ -13,11 +13,12 @@ try {
 $data_venda = $_POST['data-venda'] ?? null;
 $nome_cliente = $_POST['nome-cliente'] ?? null;
 $nome_produto = $_POST['nome-produto'] ?? null;
+$id_sabor = isset($_POST['sabor-produto']) ? (int)$_POST['sabor-produto'] : null;
 $qtd_produto = isset($_POST['quantidade']) ? (int)$_POST['quantidade'] : null;
 $val_unitario = isset($_POST['valor-unitario']) ? (float)$_POST['valor-unitario'] : null;
 $id_categoria = isset($_POST['categoria']) ? (int)$_POST['categoria'] : null;
 
-if (empty($data_venda) || empty($nome_cliente) || empty($nome_produto) || $qtd_produto === null || $val_unitario === null || $id_categoria === null) {
+if (empty($data_venda) || empty($nome_cliente) || empty($nome_produto) || $id_sabor === null || $qtd_produto === null || $val_unitario === null || $id_categoria === null) {
     http_response_code(400);
     exit;
 }
@@ -39,8 +40,8 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_venda)) {
 
 $total_receita = number_format($qtd_produto * $val_unitario, 2, '.', '');
 
-$sql = "INSERT INTO RECEITA (data_venda, nome_cliente, nome_produto, qtd_produto, val_unitario, id_categoria, total_receita)
-        VALUES (:data_venda, :nome_cliente, :nome_produto, :qtd_produto, :val_unitario, :id_categoria, :total_receita)";
+$sql = "INSERT INTO RECEITA (data_venda, nome_cliente, nome_produto, id_sabor, qtd_produto, val_unitario, id_categoria, total_receita)
+        VALUES (:data_venda, :nome_cliente, :nome_produto, :id_sabor, :qtd_produto, :val_unitario, :id_categoria, :total_receita)";
 
 $stmt = $conn->prepare($sql);
 
@@ -52,6 +53,7 @@ if ($stmt === false) {
 $stmt->bindValue(':data_venda', $data_venda, PDO::PARAM_STR);
 $stmt->bindValue(':nome_cliente', $nome_cliente, PDO::PARAM_STR);
 $stmt->bindValue(':nome_produto', $nome_produto, PDO::PARAM_STR);
+$stmt->bindValue(':id_sabor', $id_sabor, PDO::PARAM_INT);
 $stmt->bindValue(':qtd_produto', $qtd_produto, PDO::PARAM_INT);
 $stmt->bindValue(':val_unitario', $val_unitario);
 $stmt->bindValue(':id_categoria', $id_categoria, PDO::PARAM_INT);
