@@ -138,7 +138,7 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <ul>
         <li class="active"><a href="../public/despesas_fixas.php">Fixos</a></li>
         <li><a href="despesa_produto.html">Produto</a></li>
-        <li><a href="despesas_variadas.html">Variados</a></li>
+        <li><a href="../public/despesas_variadas.php">Variados</a></li>
       </ul>
     </nav>
   </div>
