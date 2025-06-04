@@ -167,7 +167,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                 // Consulta apenas usuários com status 'ativo'
                 $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao 
                         FROM USUARIO 
-                        WHERE status = 'ativo'";
+                        WHERE ativo = 1";
                 
                 $stmt = $conn->prepare($sql);
                 $stmt->execute();
@@ -289,7 +289,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       </div>
 
                       <div class="input-box">
-<<<<<<< HEAD
+
                         <label for="nivel">Nível de permissão</label>
                         <select id="nivel" name="nivel" required>
                             <option value="">Selecione o nível de permissão</option>
@@ -302,10 +302,8 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       <div class="input-box">
                           <label for="senha">Senha</label>
                           <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
-=======
                           <label for="cadastro-nivel">Nível de permissão</label>
                           <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
->>>>>>> 594c67b6e670597bd9de23384c44fa50038033ff
                       </div>
 
                       <div class="input-box">
