@@ -43,14 +43,12 @@ if (!password_verify($senha_antiga, $senha_hash)) {
 
 $nova_senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
-// Atualiza a nova senha
 $sql_update = "UPDATE USUARIO SET senha_usuario = ? WHERE id_usuario = ?";
 $stmt_update = $conn->prepare($sql_update);
 $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 
 if ($executou) {
-    // Redireciona para perfil com sucesso
-    header("Location: ../public/profile.php?sucesso=senha_alterada");
+    header("Location: ../public/profile.php");
     exit;
 } else {
     die("Erro ao atualizar a senha.");
