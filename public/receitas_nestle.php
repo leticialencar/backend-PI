@@ -100,6 +100,14 @@
         <option value="categoria3">Categoria 3</option>
       </select>
 
+      <select id="sabor-filter" name="sabor">
+          <option value="quantidade">Sabor</option>
+          <option value="quantidade1">Morango</option>
+          <option value="quantidade2">Chocolate</option>
+          <option value="quantidade3">Maracujá</option>
+          <option value="quantidade3">Creme com passas</option>
+          </select>
+
       <select id="quandtidade-filter" name="quantidade">
         <option value="quantidade">Quantidade</option>
         <option value="quantidade1">Quantidade 1</option>
