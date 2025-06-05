@@ -9,6 +9,8 @@ $categorias = $queryCat->fetchAll(PDO::FETCH_ASSOC);
 $queryProd = $conn->query("SELECT id_produto, nome_produto FROM produtos");
 $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
 
+$sabores = $conn->query("SELECT id_sabor, nome_sabor FROM SABOR_PRODUTO")->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -58,11 +60,11 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
                             Financeiro
                         </summary>
                         <ul>
-                            <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
+                            <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
                             <li><a href="../public/receitas_kibon.php">Receitas</a></li>
-                            <li><a href="cadastrar_receitas.html">Cadastro de Receitas</a></li>
-                            <li><a href="despesas_fixas.html">Despesas</a></li>
-                            <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
+                            <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
+                            <li><a href="../public/despesas_fixas.php">Despesas</a></li>
+                            <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
                         </ul>
                     </details>
                 </li>
@@ -135,10 +137,9 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
                         <label for="sabor-produto">Sabor</label>
                         <select id="sabor-produto" name="sabor-produto" required>
                             <option value="">Selecione</option>
-                            <option value="morango">Morango</option>
-                            <option value="chocolate">Chocolate</option>
-                            <option value="napolitano">Napolitano</option>
-                            <option value="aracuja">Maracujá</option>
+                            <?php foreach ($sabores as $sabor): ?>
+                                <option value="<?= $sabor['id_sabor'] ?>"><?= htmlspecialchars($sabor['nome_sabor']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -249,32 +250,28 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
     <script>
-        // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
                 document.getElementById(modalId).classList.remove("hidden");
             });
         });
-    
-        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
+
         document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
     
-        // Fecha ao clicar fora da caixa
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
             }
         });
 
-        // Verifica se o formulário está preenchido antes de abrir o modal de exclusão
         const botaoAbrirModalExcluir = document.querySelector(".abrir-modal-excluir");
         botaoAbrirModalExcluir.addEventListener("click", (e) => {
-            e.preventDefault(); // Evita o comportamento padrão do botão
+            e.preventDefault();
             const inputs = document.querySelectorAll(".input-receitas input, .input-receitas select");
             let isFormValid = true;
 
@@ -292,34 +289,30 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
             }
         });
 
-        // Verifica se o formulário está preenchido antes de permitir o cadastro
         const form = document.querySelector("form");
         form.addEventListener("submit", (e) => {
-            e.preventDefault(); // Evita o envio do formulário se não estiver válido
+            e.preventDefault(); 
             const inputs = document.querySelectorAll(".input-group input, .input-group select");
             let isFormValid = true;
 
             inputs.forEach(input => {
                 if (!input.value.trim()) {
                     isFormValid = false;
-                    input.style.borderColor = "red"; // Destaca o campo vazio
-                    input.setAttribute("title", "Este campo é obrigatório"); // Adiciona um tooltip para o usuário
+                    input.style.borderColor = "red"; 
+                    input.setAttribute("title", "Este campo é obrigatório"); 
                 } else {
-                    input.style.borderColor = ""; // Remove o destaque se preenchido
-                    input.removeAttribute("title"); // Remove o tooltip
+                    input.style.borderColor = ""; 
+                    input.removeAttribute("title");
                 }
             });
 
             if (isFormValid) {
                 alert("Cadastro realizado com sucesso!");
-                // Remova o comentário abaixo para enviar o formulário apenas se estiver válido
-                // form.submit();
             } else {
                 alert("Por favor, preencha todos os campos antes de cadastrar.");
             }
         });
 
-        // Calcula o total automaticamente
         document.getElementById("quantidade").addEventListener("input", calculateTotal);
         document.getElementById("valor-unitario").addEventListener("input", calculateTotal);
 
@@ -362,7 +355,7 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
     function showSuccessPopup() {
         const popup = document.getElementById('success-popup');
         popup.style.display = 'block';
-        void popup.offsetWidth; // força reflow
+        void popup.offsetWidth;
         popup.style.opacity = '1';
         popup.style.transform = 'translateY(0)';
 
@@ -407,23 +400,20 @@ function showToast(message) {
 
     document.body.appendChild(toast);
 
-    // animação de entrada
     setTimeout(() => {
         toast.style.opacity = '1';
         toast.style.transform = 'translateY(0)';
     }, 100);
 
-    // animação de saída e remoção
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(20px)';
         setTimeout(() => {
             document.body.removeChild(toast);
         }, 500);
-    }, 5000); // fica visível por 3 segundos
+    }, 5000); 
 }
 </script>
-
 
 </body>
 </html>

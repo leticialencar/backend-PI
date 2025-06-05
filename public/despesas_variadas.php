@@ -1,3 +1,12 @@
+<?php
+require __DIR__ . '/../config/config.php';
+$conn = Conexao::getConn();
+
+$produtos = $conn->query("SELECT DISTINCT MONTH(data_conta) AS mes FROM DESPESA_VARIADOS ORDER BY mes")->fetchAll(PDO::FETCH_COLUMN);
+$categorias = $conn->query("SELECT DISTINCT valor FROM DESPESA_VARIADOS ORDER BY valor")->fetchAll(PDO::FETCH_COLUMN);
+$quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER BY variado")->fetchAll(PDO::FETCH_COLUMN);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -64,7 +73,7 @@
             <ul>
                 <li><a href="../public/despesas_fixas.php">Fixos</a></li>
                 <li><a href="despesa_produto.html">Produto</a></li>
-                <li  class="active"><a href="despesas_variadas.html">Variado</a></li>
+                <li class="active"><a href="despesas_variadas.html">Variado</a></li>
             </ul>
         </nav>
     </div>
@@ -75,24 +84,24 @@
             <input type="date" id="data-filter" name="data">
 
             <select id="produto-filter" name="produto">
-                <option value="produto">Janeiro</option>
-                <option value="produto1"></option>
-                <option value="produto2"></option>
-                <option value="produto3"></option>
+                <option value="">Selecione o Mês</option>
+                <?php foreach($produtos as $produto): ?>
+                    <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
+                <?php endforeach; ?>
             </select>
 
             <select id="categoria-filter" name="categoria">
-                <option value="categoria">Valor</option>
-                <option value="categoria1"></option>
-                <option value="categoria2"></option>
-                <option value="categoria3"></option>
+                <option value="">Selecione o Valor</option>
+                <?php foreach($categorias as $categoria): ?>
+                    <option value="<?= htmlspecialchars($categoria) ?>">R$ <?= number_format($categoria, 2, ',', '.') ?></option>
+                <?php endforeach; ?>
             </select>
 
-            <select id="quandtidade-filter" name="quantidade">
-                <option value="quantidade">Variados</option>
-                <option value="quantidade1"></option>
-                <option value="quantidade2"></option>
-                <option value="quantidade3"></option>
+            <select id="quantidade-filter" name="quantidade">
+                <option value="">Selecione o Variado</option>
+                <?php foreach($quantidades as $quantidade): ?>
+                    <option value="<?= htmlspecialchars($quantidade) ?>"><?= htmlspecialchars($quantidade) ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
     </div>
@@ -109,14 +118,25 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- As linhas da tabela serão preenchidas dinamicamente pelo backend -->
-                <tr>
-                    <td>03/02/2025</td>
-                    <td>Copo descartável</td>
-                    <td>Acabou no estoque</td>
-                    <td>R$ 250,00</td>
-                </tr>
-                <!-- As outras linhas virão do banco de dados -->
+            <?php
+            $sql = "SELECT * FROM DESPESA_VARIADOS ORDER BY data_conta DESC";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if($result) {
+                foreach($result as $row) {
+                    echo "<tr>";
+                    echo "<td>" . date('Y-m-d', strtotime($row['data_conta'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['variado']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['valor']) . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='4'>Nenhuma despesa encontrada.</td></tr>";
+            }
+            ?>
             </tbody>
         </table>
     </main>
@@ -124,8 +144,8 @@
     <div class="final-tabela">
         <div class="acoes">
             <div class="botoes">
-            <p>* Selecionar pra excluir</p>
-            <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
+                <p>* Selecionar pra excluir</p>
+                <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
             </div>
         </div>
         <div class="total-gasto-box">
@@ -133,20 +153,16 @@
         </div>
     </div>
 
-
-
     <!-- Modal de Sair -->
     <div class="modal-overlay hidden" id="modal-sair">
         <div class="modal-box">
             <button class="modal-close close-modal close-modal-sair" type="button">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-
             <div class="modal-subject">
                 <div class="modal-header">
                     <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
                 </div>
-
                 <div class="modal-form">
                     <form>
                         <div class="sim-btn">
@@ -161,29 +177,71 @@
         </div>
     </div>
 </div>
+
 <script>
-      // Abre o modal ao clicar no botão com data-modal
-        document.querySelectorAll(".open-modal").forEach(button => {
-            button.addEventListener("click", () => {
-                const modalId = button.getAttribute("data-modal");
-                document.getElementById(modalId).classList.remove("hidden");
-            });
+    // Abrir e fechar modal
+    document.querySelectorAll(".open-modal").forEach(button => {
+        button.addEventListener("click", () => {
+            const modalId = button.getAttribute("data-modal");
+            document.getElementById(modalId).classList.remove("hidden");
         });
-    
-        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
-        document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
-            button.addEventListener("click", () => {
-                button.closest(".modal-overlay").classList.add("hidden");
-            });
+    });
+
+    document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
+        button.addEventListener("click", () => {
+            button.closest(".modal-overlay").classList.add("hidden");
         });
-    
-        // Fecha ao clicar fora da caixa
-        window.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal-overlay")) {
-                e.target.classList.add("hidden");
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("modal-overlay")) {
+            e.target.classList.add("hidden");
+        }
+    });
+
+    // Filtros
+    const dataFilter = document.getElementById('data-filter');
+    const produtoFilter = document.getElementById('produto-filter');
+    const categoriaFilter = document.getElementById('categoria-filter');
+    const quantidadeFilter = document.getElementById('quantidade-filter');
+    const tabela = document.querySelector('.tabela-receitas tbody');
+
+    function aplicarFiltros() {
+        const data = dataFilter.value;
+        const produto = produtoFilter.value;
+        const categoria = categoriaFilter.value;
+        const quantidade = quantidadeFilter.value;
+
+        tabela.querySelectorAll('tr').forEach(tr => {
+            const tds = tr.querySelectorAll('td');
+
+            if(tds.length === 0) return;
+
+            const dataTd = tds[0].textContent.trim();
+            const mesTd = new Date(dataTd).getMonth() + 1; 
+            const categoriaTd = tds[1].textContent.trim();
+            const descricaoTd = tds[2].textContent.trim();
+            const valorTd = tds[3].textContent.trim().replace('R$', '').replace(',', '.').trim();
+
+            let mostrar = true;
+
+            if (data && data !== dataTd) mostrar = false;
+            if (produto && produto != mesTd) mostrar = false;
+            if (categoria && parseFloat(categoria).toFixed(2) != parseFloat(valorTd).toFixed(2)) mostrar = false;
+            if (quantidade && quantidade !== categoriaTd) mostrar = false;
+
+            if (mostrar) {
+                tr.style.display = '';
+            } else {
+                tr.style.display = 'none';
             }
         });
+    }
+
+    [dataFilter, produtoFilter, categoriaFilter, quantidadeFilter].forEach(f => {
+        f.addEventListener('change', aplicarFiltros);
+    });
 </script>
-    
+
 </body>
 </html>

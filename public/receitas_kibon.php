@@ -52,11 +52,11 @@
                 Financeiro
               </summary>
               <ul>
-                <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
-                <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+                <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
+                <li><a href="../public/receitas_kibon.php">Receitas</a></li>
                 <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
-                <li><a href="despesas_fixas.html">Despesas</a></li>
-                <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
+                <li><a href="../public/despesas_fixas.html">Despesas</a></li>
+                <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
               </ul>
             </details>
           </li>

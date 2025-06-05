@@ -70,7 +70,7 @@
 
               <h2>Redefinição de senha</h2>
 
-              <form action="../src/profile/reset-password.php" method="POST">
+              <form id="form-redefinir-senha" action="../src/profile/reset-password.php" method="POST">
                 <div class="form-box">
                     <div class="form-group">
                         <label for="senha-antiga">Senha anterior</label>
@@ -89,7 +89,7 @@
                 </div>
 
                 <div class="form-buttons">
-                    <button class="open-modal2" data-modal-2="meuModal2">Salvar</button>
+                    <button type="button" class="open-modal2" data-modal-2="meuModal2">Salvar</button>
                   <a href="../public/profile.php"><button type="button" class="btn-voltar">Voltar</button></a>
                 </div>
 
@@ -142,15 +142,14 @@
             <button class="modal2-close close-modal2">&times;</button>
             <p class="modal-title">Deseja mesmo <span>redefinir</span> sua senha?</p>
             <div class="modal2-form">
-                <form>
-                    <div class="modal2-btn-sim">
-                        <button type="submit">Sim</button>
-                    </div>
-                    <div class="modal2-btn-nao">
-                        <button type="button">Não</button>
-                    </div>
-                </form>
+                <div class="modal2-btn-sim">
+                    <button type="button" id="confirmar-redefinicao">Sim</button>
+                </div>
+                <div class="modal2-btn-nao">
+                    <button type="button">Não</button>
+                </div>
             </div>
+            
         </div>
     </div>
     
@@ -232,6 +231,16 @@
             });
         });
       </script>
-     
+      <script>
+        document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
+            const form = document.querySelector("main .form-container form");
+            if (form) {
+                form.submit();
+            } else {
+                alert("Formulário não encontrado.");
+            }
+        });
+
+      </script>
 </body>
 </html>

@@ -62,9 +62,9 @@
     <div class="nav-category">
         <nav class="nav-options">
             <ul>
-                <li><a href="../public/receitas_kibon.html">Kibon</a></li>
-                <li><a href="../public/receitas_nestle.html">Nestlé</a></li>
-                <li class="active"><a href="../public/receitas_mareni.html">Mareni</a></li>
+                <li><a href="../public/receitas_kibon.php">Kibon</a></li>
+                <li><a href="../public/receitas_nestle.php">Nestlé</a></li>
+                <li class="active"><a href="../public/receitas_mareni.php">Mareni</a></li>
             </ul>
         </nav>
     </div>

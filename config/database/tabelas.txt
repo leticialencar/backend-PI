@@ -73,6 +73,20 @@ ALTER TABLE RECEITA
 ADD COLUMN id_pgto_receita INT,
 ADD FOREIGN KEY (id_pgto_receita) REFERENCES PGTO_RECEITA(id_pgto_receita);
 
+CREATE TABLE SABOR_PRODUTO (
+    id_sabor INT AUTO_INCREMENT PRIMARY KEY,
+    nome_sabor VARCHAR(100) NOT NULL
+);
+
+ALTER TABLE RECEITA
+ADD COLUMN id_sabor INT,
+ADD FOREIGN KEY (id_sabor) REFERENCES SABOR_PRODUTO(id_sabor);
+
+INSERT INTO SABOR_PRODUTO (nome_sabor) VALUES
+('Morango'),
+('Chocolate'),
+('Napolitano'),
+('Maracujá');
 
 CREATE TABLE DESPESA_FUNCIONARIO (
     id_despesa_func INT AUTO_INCREMENT PRIMARY KEY,

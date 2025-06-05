@@ -1,5 +1,5 @@
 <?php
-$senha = 'admin'; // substitua pela senha que você quer salvar
+$senha = 'admin'; 
 $hash = password_hash($senha, PASSWORD_DEFAULT);
 echo $hash;
 ?>
