@@ -147,12 +147,9 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form id="filtro-form" method="GET">
         <div class="filters">
             
-            <select id="pagamento-filter" name="pagamento">
-            <option value="">Data de Pagamento</option>
-            <?php foreach ($dataPagamentos as $data): ?>
-                <option value="<?= htmlspecialchars($data) ?>"><?= date('d/m/Y', strtotime($data)) ?></option>
-            <?php endforeach; ?>
-            </select>
+          
+          <input type="date" id="search-input" placeholder="Data de pagamento" name="data">
+
 
             <select id="categoria-filter" name="categoria">
                 <option value="">Categoria</option>
