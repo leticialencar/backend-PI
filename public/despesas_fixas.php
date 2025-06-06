@@ -161,7 +161,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
     <nav class="nav-options">
       <ul>
         <li class="active"><a href="../public/despesas_fixas.php">Fixos</a></li>
-        <li><a href="despesa_produto.html">Produto</a></li>
+        <li><a href="../public/despesa_produto.php">Produto</a></li>
         <li><a href="../public/despesas_variadas.php">Variados</a></li>
       </ul>
     </nav>

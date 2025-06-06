@@ -1,21 +1,78 @@
 <?php
-require __DIR__ . '/../config/config.php'; // Ajuste o caminho conforme sua estrutura
+require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
 
 try {
+    $where = [];
+    $params = [];
+
+    if (!empty($_GET['fornecedor'])) {
+        $where[] = 'f.nome = :fornecedor';
+        $params[':fornecedor'] = $_GET['fornecedor'];
+    }
+
+    if (!empty($_GET['produto'])) {
+        $where[] = 'dp.nome_produto = :produto';
+        $params[':produto'] = $_GET['produto'];
+    }
+
+    if (!empty($_GET['quantidade'])) {
+        $where[] = 'dp.qtd_produto = :quantidade';
+        $params[':quantidade'] = $_GET['quantidade'];
+    }
+
+    if (!empty($_GET['validade'])) {
+        $where[] = 'dp.validade = :validade';
+        $params[':validade'] = $_GET['validade'];
+    }
+
+    if (!empty($_GET['mes'])) {
+        $where[] = 'MONTH(dp.data_compra) = :mes';
+        $params[':mes'] = $_GET['mes'];
+    }
+
     $sql = "SELECT dp.data_compra, f.nome AS fornecedor, dp.nome_produto, dp.qtd_produto, dp.val_unitario, dp.total_despesa, dp.validade
             FROM DESPESA_PRODUTO dp
-            LEFT JOIN FORNECEDOR f ON dp.id_fornecedor = f.id
-            ORDER BY dp.data_compra DESC";
+            LEFT JOIN FORNECEDOR f ON dp.id_fornecedor = f.id";
+
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    $sql .= " ORDER BY dp.data_compra DESC";
+
     $stmt = $conn->prepare($sql);
-    $stmt->execute();
+    $stmt->execute($params);
     $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $totalFiltrado = 0;
+    foreach ($despesas as $dp) {
+        $totalFiltrado += (float)$dp['total_despesa'];
+    }
+
+    $fornecedores = $conn->query("SELECT DISTINCT f.nome FROM FORNECEDOR f 
+                                  INNER JOIN DESPESA_PRODUTO dp ON dp.id_fornecedor = f.id")
+                         ->fetchAll(PDO::FETCH_COLUMN);
+
+    $produtos = $conn->query("SELECT DISTINCT nome_produto FROM DESPESA_PRODUTO")
+                     ->fetchAll(PDO::FETCH_COLUMN);
+
+    $quantidades = $conn->query("SELECT DISTINCT qtd_produto FROM DESPESA_PRODUTO ORDER BY qtd_produto")
+                        ->fetchAll(PDO::FETCH_COLUMN);
+
+    $validades = $conn->query("SELECT DISTINCT validade FROM DESPESA_PRODUTO ORDER BY validade DESC")
+                      ->fetchAll(PDO::FETCH_COLUMN);
+
+    $meses = $conn->query("SELECT DISTINCT MONTH(data_compra) as mes FROM DESPESA_PRODUTO ORDER BY mes")
+                  ->fetchAll(PDO::FETCH_COLUMN);
+
 } catch (PDOException $e) {
     echo "Erro ao buscar dados: " . $e->getMessage();
     exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -94,44 +151,49 @@ try {
 
         <!-- Div de Filtros -->
         <div class="nav-filter-category">
-            <div class="filters">
-                <input type="date" id="data-filter" name="data">
+            <form id="filtro-form" method="GET">
+                <div class="filters">
 
-                <select id="pagamento-filter" name="pagamento">
-                    <option value="pagamento">Janeiro</option>
-                    <option value="pagamento1"></option>
-                    <option value="pagamento2"></option>
-                    <option value="pagamento"></option>
+                    <input type="date" id="data-filter" name="data">
+
+                    <select id="pagamento-filter" name="mes">
+                        <option value="">Mês</option>
+                            <?php 
+                            $nomesMeses = [1=>'Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                            foreach ($meses as $m): ?>
+                                <option value="<?= $m ?>"><?= $nomesMeses[(int)$m] ?></option>
+                            <?php endforeach; ?>
+                    </select>
+
+                    <select id="produto-filter" name="produto">
+                        <option value="">Produto</option>
+                        <?php foreach ($produtos as $p): ?>
+                            <option value="<?= htmlspecialchars($p) ?>"><?= htmlspecialchars($p) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <select id="categoria-filter" name="quantidade">
+                        <option value="">Quantidade</option>
+                        <?php foreach ($quantidades as $q): ?>
+                            <option value="<?= $q ?>"><?= $q ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                <select id="quandtidade-filter" name="validade">
+                    <option value="">Validade</option>
+                    <?php foreach ($validades as $v): ?>
+                        <option value="<?= $v ?>"><?= date("d/m/Y", strtotime($v)) ?></option>
+                    <?php endforeach; ?>
                 </select>
 
-                <select id="produto-filter" name="produto">
-                    <option value="produto">Nome cliente</option>
-                    <option value="produto1"></option>
-                    <option value="produto2"></option>
-                    <option value="produto3"></option>
-                </select>
-
-                <select id="categoria-filter" name="categoria">
-                    <option value="categoria">Quantidade</option>
-                    <option value="categoria1"></option>
-                    <option value="categoria2"></option>
-                    <option value="categoria3"></option>
-                </select>
-
-                <select id="quandtidade-filter" name="quantidade">
-                    <option value="quantidade">Validade</option>
-                    <option value="quantidade1"></option>
-                    <option value="quantidade2"></option>
-                    <option value="quantidade3"></option>
-                </select>
-
-                <select id="valor-unit-filter" name="valor-unit">
-                    <option value="valor-unit">Fornecedor</option>
-                    <option value="valor-unit1"></option>
-                    <option value="valor-unit2"></option>
-                    <option value="valor-unit3"></option>
+                <select id="valor-unit-filter" name="fornecedor">
+                    <option value="">Fornecedor</option>
+                    <?php foreach ($fornecedores as $f): ?>
+                        <option value="<?= htmlspecialchars($f) ?>"><?= htmlspecialchars($f) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
+        </form>
         </div>
 
         <!-- Tabela de Receitas -->
@@ -176,7 +238,9 @@ try {
                 </div>
             </div>
             <div class="total-gasto-box">
-                <p class="total-gasto">TOTAL GASTO: R$ 3000,00</p>
+                <p class="total-gasto">
+                    TOTAL GASTO: R$ <?= number_format($totalFiltrado, 2, ',', '.') ?>
+                </p>
             </div>
         </div>
     </div>
@@ -208,7 +272,6 @@ try {
     </div>
     </div>
     <script>
-        // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
@@ -216,20 +279,32 @@ try {
             });
         });
 
-        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
         document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
 
-        // Fecha ao clicar fora da caixa
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
             }
         });
     </script>
+
+    <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('filtro-form');
+    if (!form) return;
+
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        form.submit();
+      });
+    });
+  });
+</script>
+
 
 </body>
 
