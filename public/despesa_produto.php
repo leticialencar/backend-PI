@@ -3,7 +3,19 @@ require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
 
+function normalizaData(string $date): ?string
+{
+
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return $date;
+    }
+
+    $d = DateTime::createFromFormat('d/m/Y', $date);
+    return $d ? $d->format('Y-m-d') : null;
+}
+
 try {
+
     $where = [];
     $params = [];
 
@@ -32,6 +44,14 @@ try {
         $params[':mes'] = $_GET['mes'];
     }
 
+    if (!empty($_GET['data'])) {
+        $dataSql = normalizaData($_GET['data']);
+        if ($dataSql) {
+            $where[] = 'dp.data_compra = :data_compra';
+            $params[':data_compra'] = $dataSql;
+        }
+    }
+
     $sql = "SELECT dp.data_compra, f.nome AS fornecedor, dp.nome_produto, dp.qtd_produto, dp.val_unitario, dp.total_despesa, dp.validade
             FROM DESPESA_PRODUTO dp
             LEFT JOIN FORNECEDOR f ON dp.id_fornecedor = f.id";
@@ -51,8 +71,7 @@ try {
         $totalFiltrado += (float)$dp['total_despesa'];
     }
 
-    $fornecedores = $conn->query("SELECT DISTINCT f.nome FROM FORNECEDOR f 
-                                  INNER JOIN DESPESA_PRODUTO dp ON dp.id_fornecedor = f.id")
+    $fornecedores = $conn->query("SELECT DISTINCT f.nome FROM FORNECEDOR f INNER JOIN DESPESA_PRODUTO dp ON dp.id_fornecedor = f.id")
                          ->fetchAll(PDO::FETCH_COLUMN);
 
     $produtos = $conn->query("SELECT DISTINCT nome_produto FROM DESPESA_PRODUTO")
@@ -71,6 +90,7 @@ try {
     echo "Erro ao buscar dados: " . $e->getMessage();
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -154,7 +174,7 @@ try {
             <form id="filtro-form" method="GET">
                 <div class="filters">
 
-                    <input type="date" id="data-filter" name="data">
+                    <input type="date" name="data" value="<?= htmlspecialchars($filtroDataPagamento) ?>" />
 
                     <select id="pagamento-filter" name="mes">
                         <option value="">Mês</option>
@@ -224,7 +244,7 @@ try {
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="7" style="text-align:center;">Nenhum registro encontrado.</td></tr>
+                        <tr><td colspan="7" style="text-align:center;">Nenhuma despesa encontrada para os filtros selecionados.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
