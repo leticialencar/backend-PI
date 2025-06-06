@@ -325,6 +325,73 @@ try {
   });
 </script>
 
+<script>
+document.querySelector('.btn-imprimir').addEventListener('click', function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const titulo = 'Relatório de Despesas de Produtos';
+    const dataHora = new Date();
+    const dataFormatada = dataHora.toLocaleDateString();
+    const horaFormatada = dataHora.toLocaleTimeString();
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(0);
+    doc.text(titulo, 105, 20, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${dataFormatada} às ${horaFormatada}`, 190, 27, { align: 'right' });
+
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.2);
+    doc.line(20, 30, 190, 30);
+
+    const tabela = document.querySelector('.tabela-receitas');
+
+    doc.autoTable({
+        html: tabela,
+        startY: 35,
+        styles: {
+            font: 'helvetica',
+            fontSize: 9,
+            cellPadding: 3,
+            textColor: 0,
+            valign: 'middle',
+        },
+        headStyles: {
+            fillColor: [230, 230, 230],
+            textColor: 0,
+            fontStyle: 'bold',
+            halign: 'center',
+        },
+        bodyStyles: {
+            halign: 'left'
+        },
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
+        },
+        tableLineColor: [200, 200, 200],
+        tableLineWidth: 0.1,
+        margin: { top: 35 },
+        didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100);
+            doc.text('CashHive System - 2025', doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+        }
+    });
+
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+});
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 

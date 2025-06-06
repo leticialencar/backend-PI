@@ -2,9 +2,41 @@
 require __DIR__ . '/../config/config.php';
 $conn = Conexao::getConn();
 
+$mesFiltro = $_GET['produto'] ?? '';
+$valorFiltro = $_GET['categoria'] ?? '';
+$variadoFiltro = $_GET['quantidade'] ?? '';
+$dataFiltro = $_GET['data'] ?? '';
+
 $produtos = $conn->query("SELECT DISTINCT MONTH(data_conta) AS mes FROM DESPESA_VARIADOS ORDER BY mes")->fetchAll(PDO::FETCH_COLUMN);
 $categorias = $conn->query("SELECT DISTINCT valor FROM DESPESA_VARIADOS ORDER BY valor")->fetchAll(PDO::FETCH_COLUMN);
 $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER BY variado")->fetchAll(PDO::FETCH_COLUMN);
+
+$sql = "SELECT * FROM DESPESA_VARIADOS WHERE 1=1 ";
+$params = [];
+
+if ($mesFiltro !== '') {
+    $sql .= " AND MONTH(data_conta) = :mes ";
+    $params[':mes'] = $mesFiltro;
+}
+if ($valorFiltro !== '') {
+    $sql .= " AND valor = :valor ";
+    $params[':valor'] = $valorFiltro;
+}
+if ($variadoFiltro !== '') {
+    $sql .= " AND variado = :variado ";
+    $params[':variado'] = $variadoFiltro;
+}
+if ($dataFiltro !== '') {
+    $sql .= " AND data_conta = :data ";
+    $params[':data'] = $dataFiltro;
+}
+
+$sql .= " ORDER BY data_conta DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute($params);
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -78,37 +110,41 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         </nav>
     </div>
 
-    <!-- Div de Filtros -->
     <div class="nav-filter-category">
         <form id="filtro-form" method="GET">
             <div class="filters">
-                <input type="date" id="data-filter" name="data">
+                <input type="date" id="data-filter" name="data" value="<?= htmlspecialchars($dataFiltro) ?>">
 
                 <select id="produto-filter" name="produto">
-                    <option value="">Selecione o Mês</option>
+                    <option value="">Mês</option>
                     <?php foreach($produtos as $produto): ?>
-                        <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
+                        <option value="<?= (int)$produto ?>" <?= ($produto == $mesFiltro) ? 'selected' : '' ?>>
+                          <?= DateTime::createFromFormat('!m', $produto)->format('F') ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
 
                 <select id="categoria-filter" name="categoria">
-                    <option value="">Selecione o Valor</option>
+                    <option value="">Valor</option>
                     <?php foreach($categorias as $categoria): ?>
-                        <option value="<?= htmlspecialchars($categoria) ?>">R$ <?= number_format($categoria, 2, ',', '.') ?></option>
+                        <option value="<?= number_format($categoria, 2, '.', '') ?>" <?= (number_format($categoria, 2, '.', '') == $valorFiltro) ? 'selected' : '' ?>>
+                            R$ <?= number_format($categoria, 2, ',', '.') ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
 
                 <select id="quantidade-filter" name="quantidade">
                     <option value="">Variado</option>
                     <?php foreach($quantidades as $quantidade): ?>
-                        <option value="<?= htmlspecialchars($quantidade) ?>"><?= htmlspecialchars($quantidade) ?></option>
+                        <option value="<?= htmlspecialchars($quantidade) ?>" <?= ($quantidade == $variadoFiltro) ? 'selected' : '' ?>>
+                          <?= htmlspecialchars($quantidade) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
         </form>
     </div>
 
-    <!-- Tabela de Receitas -->
     <main class="main-tabela">
         <table class="tabela-receitas">
             <thead>
@@ -121,18 +157,13 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
             </thead>
             <tbody>
             <?php
-            $sql = "SELECT * FROM DESPESA_VARIADOS ORDER BY data_conta DESC";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             if($result) {
                 foreach($result as $row) {
                     echo "<tr>";
-                    echo "<td>" . date('Y-m-d', strtotime($row['data_conta'])) . "</td>";
+                    echo "<td>" . htmlspecialchars(date('Y-m-d', strtotime($row['data_conta']))) . "</td>";
                     echo "<td>" . htmlspecialchars($row['variado']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['descricao']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['valor']) . "</td>";
+                    echo "<td>R$ " . number_format($row['valor'], 2, ',', '.') . "</td>";
                     echo "</tr>";
                 }
             } else {
@@ -155,7 +186,6 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         </div>
     </div>
 
-    <!-- Modal de Sair -->
     <div class="modal-overlay hidden" id="modal-sair">
         <div class="modal-box">
             <button class="modal-close close-modal close-modal-sair" type="button">
@@ -181,7 +211,6 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
 </div>
 
 <script>
-    // Abrir e fechar modal
     document.querySelectorAll(".open-modal").forEach(button => {
         button.addEventListener("click", () => {
             const modalId = button.getAttribute("data-modal");
@@ -201,51 +230,17 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         }
     });
 
-    // Filtros
-    const dataFilter = document.getElementById('data-filter');
-    const produtoFilter = document.getElementById('produto-filter');
-    const categoriaFilter = document.getElementById('categoria-filter');
-    const quantidadeFilter = document.getElementById('quantidade-filter');
-    const tabela = document.querySelector('.tabela-receitas tbody');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('filtro-form');
+        if (!form) return;
 
-    function aplicarFiltros() {
-        const data = dataFilter.value;
-        const produto = produtoFilter.value;
-        const categoria = categoriaFilter.value;
-        const quantidade = quantidadeFilter.value;
-
-        tabela.querySelectorAll('tr').forEach(tr => {
-            const tds = tr.querySelectorAll('td');
-
-            if(tds.length === 0) return;
-
-            const dataTd = tds[0].textContent.trim();
-            const mesTd = new Date(dataTd).getMonth() + 1; 
-            const categoriaTd = tds[1].textContent.trim();
-            const descricaoTd = tds[2].textContent.trim();
-            const valorTd = tds[3].textContent.trim().replace('R$', '').replace(',', '.').trim();
-
-            let mostrar = true;
-
-            if (data && data !== dataTd) mostrar = false;
-            if (produto && produto != mesTd) mostrar = false;
-            if (categoria && parseFloat(categoria).toFixed(2) != parseFloat(valorTd).toFixed(2)) mostrar = false;
-            if (quantidade && quantidade !== categoriaTd) mostrar = false;
-
-            if (mostrar) {
-                tr.style.display = '';
-            } else {
-                tr.style.display = 'none';
-            }
+        form.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', () => {
+                form.submit();
+            });
         });
-    }
-
-    [dataFilter, produtoFilter, categoriaFilter, quantidadeFilter].forEach(f => {
-        f.addEventListener('change', aplicarFiltros);
     });
 </script>
-
-<script src="../assets/js/filtro-despesas-variadas.js"></script>
 
 </body>
 </html>
