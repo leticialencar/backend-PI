@@ -9,11 +9,11 @@ $formasPagamento = $conn->query("SELECT DISTINCT descricao FROM formas_pagamento
 $datasVencimento = $conn->query("SELECT DISTINCT data_conta FROM despesas_fixas ORDER BY data_conta")->fetchAll(PDO::FETCH_COLUMN);
 $valores = $conn->query("SELECT DISTINCT valor FROM despesas_fixas ORDER BY valor")->fetchAll(PDO::FETCH_COLUMN);
 
-$filtroDataPagamento  = $_GET['pagamento']        ?? '';  
-$filtroCategoria      = $_GET['categoria']        ?? '';
+$filtroDataPagamento  = $_GET['data'] ?? '';
+$filtroCategoria      = $_GET['categoria'] ?? '';
 $filtroFormaPagamento = $_GET['formadepagamento'] ?? '';
-$filtroDataVencimento = $_GET['vencimento']       ?? '';
-$filtroValor          = $_GET['valor-unit']       ?? '';
+$filtroDataVencimento = $_GET['vencimento'] ?? '';
+$filtroValor          = $_GET['valor-unit'] ?? '';
 
 function normalizaData(string $date): ?string
 {
@@ -24,12 +24,7 @@ function normalizaData(string $date): ?string
     return $d ? $d->format('Y-m-d') : null;
 }
 
-$sql = "SELECT df.data_pagamento,
-               df.categoria,
-               fp.descricao AS forma_pagamento,
-               df.data_conta,
-               df.valor,
-               df.descricao
+$sql = "SELECT df.data_pagamento, df.categoria, fp.descricao AS forma_pagamento, df.data_conta, df.valor, df.descricao
         FROM despesas_fixas df
         LEFT JOIN formas_pagamento fp
                ON fp.id_forma_pagamento = df.id_forma_pagamento
@@ -70,6 +65,35 @@ if ($filtroValor !== '') {
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sqlTotal = "SELECT SUM(df.valor) AS total FROM despesas_fixas df LEFT JOIN formas_pagamento fp ON fp.id_forma_pagamento = df.id_forma_pagamento WHERE 1=1";
+
+if ($filtroDataPagamento !== '') {
+    $dataSql = normalizaData($filtroDataPagamento);
+    if ($dataSql) {
+        $sqlTotal .= " AND df.data_pagamento = :data_pagamento";
+    }
+}
+if ($filtroCategoria !== '') {
+    $sqlTotal .= " AND df.categoria = :categoria";
+}
+if ($filtroFormaPagamento !== '') {
+    $sqlTotal .= " AND fp.descricao = :forma_pagamento";
+}
+if ($filtroDataVencimento !== '') {
+    $dataVencSql = normalizaData($filtroDataVencimento);
+    if ($dataVencSql) {
+        $sqlTotal .= " AND df.data_conta = :data_conta";
+    }
+}
+if ($filtroValor !== '') {
+    $sqlTotal .= " AND df.valor = :valor";
+}
+
+$stmtTotal = $conn->prepare($sqlTotal);
+$stmtTotal->execute($params);
+$resultTotal = $stmtTotal->fetch(PDO::FETCH_ASSOC);
+$totalFiltrado = $resultTotal['total'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -147,9 +171,7 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form id="filtro-form" method="GET">
         <div class="filters">
             
-          
           <input type="date" id="search-input" placeholder="Data de pagamento" name="data">
-
 
             <select id="categoria-filter" name="categoria">
                 <option value="">Categoria</option>
@@ -195,16 +217,22 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($despesas as $despesa): ?>
-                <tr>
-                    <td><?= date('d/m/Y', strtotime($despesa['data_pagamento'])) ?></td>
-                    <td><?= htmlspecialchars($despesa['categoria']) ?></td>
-                    <td><?= htmlspecialchars($despesa['forma_pagamento']) ?></td>
-                    <td><?= date('d/m/Y', strtotime($despesa['data_conta'])) ?></td>
-                    <td>R$ <?= number_format($despesa['valor'], 2, ',', '.') ?></td>
-                    <td><?= htmlspecialchars($despesa['descricao']) ?></td>
-                </tr>
-            <?php endforeach; ?>
+            <?php if (empty($despesas)): ?>
+            <tr>
+                <td colspan="6" style="text-align: center;">Nenhuma despesa encontrada para os filtros selecionados.</td>
+            </tr>
+              <?php else: ?>
+                  <?php foreach ($despesas as $despesa): ?>
+                      <tr>
+                          <td><?= date('d/m/Y', strtotime($despesa['data_pagamento'])) ?></td>
+                          <td><?= htmlspecialchars($despesa['categoria']) ?></td>
+                          <td><?= htmlspecialchars($despesa['forma_pagamento']) ?></td>
+                          <td><?= date('d/m/Y', strtotime($despesa['data_conta'])) ?></td>
+                          <td>R$ <?= number_format($despesa['valor'], 2, ',', '.') ?></td>
+                          <td><?= htmlspecialchars($despesa['descricao']) ?></td>
+                      </tr>
+                  <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
         </table>
     </main>
@@ -218,19 +246,9 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
       </div>
       <div class="total-gasto-box">
-    <p class="total-gasto">
-        TOTAL GASTO: R$
-        <?php
-            $sql = "SELECT SUM(valor) AS total FROM DESPESAS_FIXAS";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            $total = $result['total'] ?? 0;
-
-            echo number_format($total, 2, ',', '.');
-        ?>
-    </p>
+        <p class="total-gasto">
+          TOTAL GASTO: R$ <?= number_format($totalFiltrado, 2, ',', '.') ?>
+      </p>
 </div>
     </div>
 
@@ -306,12 +324,13 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 
     <script>
-      document.querySelectorAll('#filtro-form select').forEach(select => {
-        select.addEventListener('change', () => {
-          document.getElementById('filtro-form').submit();
-        });
+    const form = document.getElementById('filtro-form');
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        form.submit();
       });
-    </script>
+    });
+  </script>
     
     <script src="../assets/js/filtro-despesas-fixas.js"></script>
 
