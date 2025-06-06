@@ -263,22 +263,19 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </main>
 </div>
 <script>
-    // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
                 document.getElementById(modalId).classList.remove("hidden");
             });
         });
-    
-        // Fecha o modal ao clicar no botão de fechar ou no botão "Não"
+
         document.querySelectorAll(".close-modal, #btn-nao").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
     
-        // Fecha ao clicar fora da caixa
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
@@ -319,7 +316,7 @@ $despesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
       });
     </script>
     
-    <script src="../assets/js/filtro-despesas.js"></script>
+    <script src="../assets/js/filtro-despesas-fixas.js"></script>
 
 </body>
 </html>

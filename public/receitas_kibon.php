@@ -185,6 +185,7 @@
                       echo "<td>" . htmlspecialchars($row['nome_categoria']) . "</td>";
                       echo "<td>" . intval($row['qtd_produto']) . "</td>";
                       echo "<td>R$ " . number_format($row['val_unitario'], 2, ',', '.') . "</td>";
+                      echo "<td>R$ " . number_format($row['total_receita'], 2, ',', '.') . "</td>";
                       echo "</tr>";
                   }
               } else {

@@ -80,30 +80,32 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
 
     <!-- Div de Filtros -->
     <div class="nav-filter-category">
-        <div class="filters">
-            <input type="date" id="data-filter" name="data">
+        <form id="filtro-form" method="GET">
+            <div class="filters">
+                <input type="date" id="data-filter" name="data">
 
-            <select id="produto-filter" name="produto">
-                <option value="">Selecione o Mês</option>
-                <?php foreach($produtos as $produto): ?>
-                    <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
-                <?php endforeach; ?>
-            </select>
+                <select id="produto-filter" name="produto">
+                    <option value="">Selecione o Mês</option>
+                    <?php foreach($produtos as $produto): ?>
+                        <option value="<?= htmlspecialchars($produto) ?>"><?= htmlspecialchars($produto) ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <select id="categoria-filter" name="categoria">
-                <option value="">Selecione o Valor</option>
-                <?php foreach($categorias as $categoria): ?>
-                    <option value="<?= htmlspecialchars($categoria) ?>">R$ <?= number_format($categoria, 2, ',', '.') ?></option>
-                <?php endforeach; ?>
-            </select>
+                <select id="categoria-filter" name="categoria">
+                    <option value="">Selecione o Valor</option>
+                    <?php foreach($categorias as $categoria): ?>
+                        <option value="<?= htmlspecialchars($categoria) ?>">R$ <?= number_format($categoria, 2, ',', '.') ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-            <select id="quantidade-filter" name="quantidade">
-                <option value="">Selecione o Variado</option>
-                <?php foreach($quantidades as $quantidade): ?>
-                    <option value="<?= htmlspecialchars($quantidade) ?>"><?= htmlspecialchars($quantidade) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
+                <select id="quantidade-filter" name="quantidade">
+                    <option value="">Variado</option>
+                    <?php foreach($quantidades as $quantidade): ?>
+                        <option value="<?= htmlspecialchars($quantidade) ?>"><?= htmlspecialchars($quantidade) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </form>
     </div>
 
     <!-- Tabela de Receitas -->
@@ -242,6 +244,8 @@ $quantidades = $conn->query("SELECT DISTINCT variado FROM DESPESA_VARIADOS ORDER
         f.addEventListener('change', aplicarFiltros);
     });
 </script>
+
+<script src="../assets/js/filtro-despesas-variadas.js"></script>
 
 </body>
 </html>
