@@ -240,5 +240,46 @@
         });
 
       </script>
+      <script>
+           const senhaInput = document.getElementById("nova-senha");
+            const indicador = document.createElement("p");
+            indicador.className = "forca-senha";
+            senhaInput.parentNode.appendChild(indicador);
+
+            senhaInput.addEventListener("input", () => {
+                const senha = senhaInput.value;
+                let forca = 0;
+
+                if (senha.length >= 8) forca++;
+                if (/[A-Z]/.test(senha)) forca++;
+                if (/[a-z]/.test(senha)) forca++;
+                if (/\d/.test(senha)) forca++;
+                if (/[^A-Za-z0-9]/.test(senha)) forca++;
+
+                let texto = '';
+                let cor = '';
+
+                switch (forca) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        texto = "Senha fraca";
+                        cor = "red";
+                        break;
+                    case 3:
+                    case 4:
+                        texto = "Senha média";
+                        cor = "orange";
+                        break;
+                    case 5:
+                        texto = "Senha forte";
+                        cor = "green";
+                        break;
+                }
+
+                indicador.textContent = texto;
+                indicador.style.color = cor;
+            });
+      </script>
 </body>
 </html>

@@ -21,10 +21,9 @@ if ($nova_senha !== $repetir_senha) {
     die("As novas senhas não coincidem.");
 }
 
-if (strlen($nova_senha) < 8) {
-    die("A nova senha deve ter pelo menos 8 caracteres.");
+if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/", $nova_senha)) {
+    die("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
 }
-
 // Consulta a senha atual
 $sql = "SELECT senha_usuario FROM USUARIO WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
