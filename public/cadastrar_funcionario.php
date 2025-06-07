@@ -267,7 +267,6 @@ try {
             </div>
 
              <div class="input-box">
-                <label for="bairro">Data de admissão</label>
                 <input type="date" id="data" name="data" required>
             </div>
 
