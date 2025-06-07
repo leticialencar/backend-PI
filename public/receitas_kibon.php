@@ -4,7 +4,7 @@ require __DIR__ . '/../config/config.php';
 
 try {
     $conn = Conexao::getConn();
-
+    
     $nomeProduto = 'Kibon';
 
     $sqlClientes = "SELECT DISTINCT nome_cliente 
