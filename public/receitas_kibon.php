@@ -2,45 +2,81 @@
 include '../src/login/verify-session.php'; 
 require __DIR__ . '/../config/config.php';
 
-$conn = Conexao::getConn();
+try {
+    $conn = Conexao::getConn();
 
-$filtroProduto = "WHERE nome_produto = 'Kibon'";
+    $nomeProduto = 'Kibon';
 
-$sqlClientes = "SELECT DISTINCT nome_cliente FROM RECEITA $filtroProduto AND nome_cliente IS NOT NULL ORDER BY nome_cliente";
-$clientes = $conn->query($sqlClientes)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlClientes = "SELECT DISTINCT nome_cliente 
+                    FROM RECEITA 
+                    WHERE nome_produto = :produto AND nome_cliente IS NOT NULL 
+                    ORDER BY nome_cliente";
+    $stmt = $conn->prepare($sqlClientes);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $clientes = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlPagamentos = "SELECT DISTINCT f.descricao 
-                  FROM RECEITA r
-                  JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
-                  WHERE r.nome_produto = 'Kibon'
-                  ORDER BY f.descricao";
-$pagamentos = $conn->query($sqlPagamentos)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlPagamentos = "SELECT DISTINCT f.descricao 
+                      FROM RECEITA r
+                      JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+                      WHERE r.nome_produto = :produto
+                      ORDER BY f.descricao";
+    $stmt = $conn->prepare($sqlPagamentos);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $pagamentos = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlCategorias = "SELECT DISTINCT c.nome_categoria 
-                  FROM RECEITA r
-                  JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
-                  WHERE r.nome_produto = 'Kibon'
-                  ORDER BY c.nome_categoria";
-$categorias = $conn->query($sqlCategorias)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlCategorias = "SELECT DISTINCT c.nome_categoria 
+                      FROM RECEITA r
+                      JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+                      WHERE r.nome_produto = :produto
+                      ORDER BY c.nome_categoria";
+    $stmt = $conn->prepare($sqlCategorias);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $categorias = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlSabores = "SELECT DISTINCT s.nome_sabor 
-               FROM RECEITA r
-               JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
-               WHERE r.nome_produto = 'Kibon'
-               ORDER BY s.nome_sabor";
-$sabores = $conn->query($sqlSabores)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlSabores = "SELECT DISTINCT s.nome_sabor 
+                   FROM RECEITA r
+                   JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+                   WHERE r.nome_produto = :produto
+                   ORDER BY s.nome_sabor";
+    $stmt = $conn->prepare($sqlSabores);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $sabores = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlQuantidades = "SELECT DISTINCT qtd_produto FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY qtd_produto";
-$quantidades = $conn->query($sqlQuantidades)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlQuantidades = "SELECT DISTINCT qtd_produto 
+                       FROM RECEITA 
+                       WHERE nome_produto = :produto 
+                       ORDER BY qtd_produto";
+    $stmt = $conn->prepare($sqlQuantidades);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $quantidades = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlValoresUnit = "SELECT DISTINCT val_unitario FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY val_unitario";
-$valoresUnit = $conn->query($sqlValoresUnit)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlValoresUnit = "SELECT DISTINCT val_unitario 
+                       FROM RECEITA 
+                       WHERE nome_produto = :produto 
+                       ORDER BY val_unitario";
+    $stmt = $conn->prepare($sqlValoresUnit);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $valoresUnit = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlTotais = "SELECT DISTINCT total_receita FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY total_receita";
-$totais = $conn->query($sqlTotais)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlTotais = "SELECT DISTINCT total_receita 
+                  FROM RECEITA 
+                  WHERE nome_produto = :produto 
+                  ORDER BY total_receita";
+    $stmt = $conn->prepare($sqlTotais);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $totais = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$sqlDatas = "SELECT DISTINCT data_venda FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY data_venda DESC";
-$datasVenda = $conn->query($sqlDatas)->fetchAll(PDO::FETCH_COLUMN);
+    $sqlDatas = "SELECT DISTINCT data_venda 
+                 FROM RECEITA 
+                 WHERE nome_produto = :produto 
+                 ORDER BY data_venda DESC";
+    $stmt = $conn->prepare($sqlDatas);
+    $stmt->execute(['produto' => $nomeProduto]);
+    $datasVenda = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+} catch (PDOException $e) {
+    echo "Erro ao buscar dados: " . $e->getMessage();
+}
 ?>
 
 <!DOCTYPE html>
@@ -123,58 +159,60 @@ $datasVenda = $conn->query($sqlDatas)->fetchAll(PDO::FETCH_COLUMN);
 
     <!-- Div de Filtros -->
     <div class="nav-filter-category">
-      <div class="filters">
-        <input type="date" id="data-filter" name="data" />
+      <form id="filtro-form" method="GET">
+        <div class="filters">
+          <input type="date" id="data-filter" name="data" />
 
-        <select id="cliente-filter" name="cliente">
-          <option value="">Cliente</option>
-          <?php foreach ($clientes as $cliente): ?>
-            <option value="<?= htmlspecialchars($cliente) ?>"><?= htmlspecialchars($cliente) ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="cliente-filter" name="cliente">
+            <option value="">Cliente</option>
+            <?php foreach ($clientes as $cliente): ?>
+              <option value="<?= htmlspecialchars($cliente) ?>"><?= htmlspecialchars($cliente) ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="pagamento-filter" name="pagamento">
-          <option value="">Pagamento</option>
-          <?php foreach ($pagamentos as $pagamento): ?>
-            <option value="<?= htmlspecialchars($pagamento) ?>"><?= htmlspecialchars($pagamento) ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="pagamento-filter" name="pagamento">
+            <option value="">Pagamento</option>
+            <?php foreach ($pagamentos as $pagamento): ?>
+              <option value="<?= htmlspecialchars($pagamento) ?>"><?= htmlspecialchars($pagamento) ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="categoria-filter" name="categoria">
-          <option value="">Categoria</option>
-          <?php foreach ($categorias as $categoria): ?>
-            <option value="<?= htmlspecialchars($categoria) ?>"><?= htmlspecialchars($categoria) ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="categoria-filter" name="categoria">
+            <option value="">Categoria</option>
+            <?php foreach ($categorias as $categoria): ?>
+              <option value="<?= htmlspecialchars($categoria) ?>"><?= htmlspecialchars($categoria) ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="sabor-filter" name="sabor">
-          <option value="">Sabor</option>
-          <?php foreach ($sabores as $sabor): ?>
-            <option value="<?= htmlspecialchars($sabor) ?>"><?= htmlspecialchars($sabor) ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="sabor-filter" name="sabor">
+            <option value="">Sabor</option>
+            <?php foreach ($sabores as $sabor): ?>
+              <option value="<?= htmlspecialchars($sabor) ?>"><?= htmlspecialchars($sabor) ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="quantidade-filter" name="quantidade">
-          <option value="">Quantidade</option>
-          <?php foreach ($quantidades as $quant): ?>
-            <option value="<?= htmlspecialchars($quant) ?>"><?= htmlspecialchars($quant) ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="quantidade-filter" name="quantidade">
+            <option value="">Quantidade</option>
+            <?php foreach ($quantidades as $quant): ?>
+              <option value="<?= htmlspecialchars($quant) ?>"><?= htmlspecialchars($quant) ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="valor-unit-filter" name="valor_unit">
-          <option value="">Valor Unitário</option>
-          <?php foreach ($valoresUnit as $valor): ?>
-            <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
-          <?php endforeach; ?>
-        </select>
+          <select id="valor-unit-filter" name="valor_unit">
+            <option value="">Valor Unitário</option>
+            <?php foreach ($valoresUnit as $valor): ?>
+              <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
+            <?php endforeach; ?>
+          </select>
 
-        <select id="total-filter" name="total">
-          <option value="">Total</option>
-          <?php foreach ($valoresTotais as $valor): ?>
-            <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+          <select id="total-filter" name="total">
+            <option value="">Total</option>
+            <?php foreach ($valoresTotais as $valor): ?>
+              <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </form>
     </div>
 
     <!-- Tabela de Receitas -->
@@ -299,6 +337,15 @@ $datasVenda = $conn->query($sqlDatas)->fetchAll(PDO::FETCH_COLUMN);
       if (e.target.classList.contains("modal-overlay")) {
         e.target.classList.add("hidden");
       }
+    });
+  </script>
+
+  <script>
+    const form = document.getElementById('filtro-form');
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        form.submit();
+      });
     });
   </script>
 
