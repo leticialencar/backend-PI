@@ -80,6 +80,7 @@
                     <div class="form-group">
                         <label for="nova-senha">Nova senha</label>
                         <input type="password" id="nova-senha" name="nova_senha" placeholder="Crie uma senha" required>
+                        <small id="forca-senha" class="senha-status"></small>
                     </div>
 
                     <div class="form-group">
@@ -238,45 +239,42 @@
 
       </script>
       <script>
-           const senhaInput = document.getElementById("nova-senha");
-            const indicador = document.createElement("p");
-            indicador.className = "forca-senha";
-            senhaInput.parentNode.appendChild(indicador);
+            document.getElementById("nova-senha").addEventListener("input", function () {
+                const senha = this.value;
+                const statusEl = document.getElementById("forca-senha");
 
-            senhaInput.addEventListener("input", () => {
-                const senha = senhaInput.value;
+                // Remove classes anteriores
+                statusEl.classList.remove("senha-fraca", "senha-media", "senha-forte");
+
                 let forca = 0;
 
                 if (senha.length >= 8) forca++;
-                if (/[A-Z]/.test(senha)) forca++;
                 if (/[a-z]/.test(senha)) forca++;
+                if (/[A-Z]/.test(senha)) forca++;
                 if (/\d/.test(senha)) forca++;
                 if (/[^A-Za-z0-9]/.test(senha)) forca++;
 
-                let texto = '';
-                let cor = '';
-
-                switch (forca) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        texto = "Senha fraca";
-                        cor = "red";
-                        break;
-                    case 3:
-                    case 4:
-                        texto = "Senha média";
-                        cor = "orange";
-                        break;
-                    case 5:
-                        texto = "Senha forte";
-                        cor = "green";
-                        break;
+                if (senha.length === 0) {
+                    statusEl.textContent = "";
+                    return;
                 }
 
-                indicador.textContent = texto;
-                indicador.style.color = cor;
+                if (forca <= 2) {
+                    statusEl.textContent = "Senha fraca";
+                    statusEl.classList.add("senha-fraca");
+                } else if (forca === 3 || forca === 4) {
+                    statusEl.textContent = "Senha média";
+                    statusEl.classList.add("senha-media");
+                } else {
+                    statusEl.textContent = "Senha forte";
+                    statusEl.classList.add("senha-forte");
+                }
             });
-      </script>
+     </script>
 </body>
+<?php if (isset($_GET['senha']) && $_GET['senha'] === 'ok'): ?>
+    <div class="alert-success">
+        Senha redefinida com sucesso!
+    </div>
+<?php endif; ?>
 </html>
