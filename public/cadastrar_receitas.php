@@ -11,6 +11,9 @@ $produtos = $queryProd->fetchAll(PDO::FETCH_ASSOC);
 
 $sabores = $conn->query("SELECT id_sabor, nome_sabor FROM SABOR_PRODUTO")->fetchAll(PDO::FETCH_ASSOC);
 
+$sql = "SELECT id_pgto_receita, descricao FROM PGTO_RECEITA";
+$pagamentos = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -162,9 +165,9 @@ $sabores = $conn->query("SELECT id_sabor, nome_sabor FROM SABOR_PRODUTO")->fetch
                         <label for="pagamento">Forma de Pagamento</label>
                         <select id="pagamento" name="pagamento" required>
                             <option value="">Selecione</option>
-                            <option value="dinheiro">Dinheiro</option>
-                            <option value="cartao">Cartão</option>
-                            <option value="pix">PIX</option>
+                            <?php foreach ($pagamentos as $pg): ?>
+                                <option value="<?= $pg['id_pgto_receita'] ?>"><?= htmlspecialchars($pg['descricao']) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
