@@ -4,140 +4,84 @@ require __DIR__ . '/../config/config.php';
 
 try {
     $conn = Conexao::getConn();
-
-    /* ───────────────────────────────
-       1. Listas para popular os filtros
-    ────────────────────────────────*/
     $nomeProduto = 'Kibon';
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT nome_cliente
-           FROM RECEITA
-          WHERE nome_produto = :produto
-            AND nome_cliente IS NOT NULL
-       ORDER BY nome_cliente"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT nome_cliente FROM RECEITA WHERE nome_produto = :produto AND nome_cliente IS NOT NULL ORDER BY nome_cliente");
     $stmt->execute(['produto' => $nomeProduto]);
     $clientes = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT f.descricao
-           FROM RECEITA r
-           JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
-          WHERE r.nome_produto = :produto
-       ORDER BY f.descricao"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT f.descricao FROM RECEITA r JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento WHERE r.nome_produto = :produto ORDER BY f.descricao");
     $stmt->execute(['produto' => $nomeProduto]);
     $pagamentos = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT c.nome_categoria
-           FROM RECEITA r
-           JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
-          WHERE r.nome_produto = :produto
-       ORDER BY c.nome_categoria"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT c.nome_categoria FROM RECEITA r JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria WHERE r.nome_produto = :produto ORDER BY c.nome_categoria");
     $stmt->execute(['produto' => $nomeProduto]);
     $categorias = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT s.nome_sabor
-           FROM RECEITA r
-           JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
-          WHERE r.nome_produto = :produto
-       ORDER BY s.nome_sabor"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT s.nome_sabor FROM RECEITA r JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor WHERE r.nome_produto = :produto ORDER BY s.nome_sabor");
     $stmt->execute(['produto' => $nomeProduto]);
     $sabores = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT qtd_produto
-           FROM RECEITA
-          WHERE nome_produto = :produto
-       ORDER BY qtd_produto"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT qtd_produto FROM RECEITA WHERE nome_produto = :produto ORDER BY qtd_produto");
     $stmt->execute(['produto' => $nomeProduto]);
     $quantidades = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT val_unitario
-           FROM RECEITA
-          WHERE nome_produto = :produto
-       ORDER BY val_unitario"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT val_unitario FROM RECEITA WHERE nome_produto = :produto ORDER BY val_unitario");
     $stmt->execute(['produto' => $nomeProduto]);
     $valoresUnit = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $stmt = $conn->prepare(
-        "SELECT DISTINCT total_receita
-           FROM RECEITA
-          WHERE nome_produto = :produto
-       ORDER BY total_receita"
-    );
+    $stmt = $conn->prepare("SELECT DISTINCT total_receita FROM RECEITA WHERE nome_produto = :produto ORDER BY total_receita");
     $stmt->execute(['produto' => $nomeProduto]);
     $totais = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    /* ───────────────────────────────
-       2. Constroi a consulta PRINCIPAL
-          usando os valores do GET
-    ────────────────────────────────*/
-    $baseSql = "
-      SELECT r.data_venda,
-             r.nome_cliente,
-             f.descricao  AS forma_pagamento,
-             r.nome_produto,
-             c.nome_categoria,
-             s.nome_sabor,
-             r.qtd_produto,
-             r.val_unitario,
-             r.total_receita
+    $baseSql = "SELECT r.data_venda, r.nome_cliente, f.descricao AS forma_pagamento, r.nome_produto, c.nome_categoria, s.nome_sabor, r.qtd_produto, r.val_unitario, r.total_receita
         FROM RECEITA r
-   LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria     = c.id_categoria
-   LEFT JOIN SABOR_PRODUTO    s ON r.id_sabor          = s.id_sabor
+   LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+   LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
    LEFT JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
        WHERE r.nome_produto = :produto";
 
-    $params  = ['produto' => $nomeProduto];
+    $params = ['produto' => $nomeProduto];
     $filtros = [];
 
     if (!empty($_GET['data'])) {
-        $filtros[]        = 'r.data_venda = :data';
-        $params['data']   = $_GET['data'];
+        $filtros[] = 'r.data_venda = :data';
+        $params['data'] = $_GET['data'];
     }
 
     if (!empty($_GET['cliente'])) {
-        $filtros[]          = 'r.nome_cliente = :cliente';
-        $params['cliente']  = $_GET['cliente'];
+        $filtros[] = 'r.nome_cliente = :cliente';
+        $params['cliente'] = $_GET['cliente'];
     }
 
     if (!empty($_GET['pagamento'])) {
-        $filtros[]             = 'f.descricao = :pagamento';
-        $params['pagamento']   = $_GET['pagamento'];
+        $filtros[] = 'f.descricao = :pagamento';
+        $params['pagamento'] = $_GET['pagamento'];
     }
 
     if (!empty($_GET['categoria'])) {
-        $filtros[]            = 'c.nome_categoria = :categoria';
-        $params['categoria']  = $_GET['categoria'];
+        $filtros[] = 'c.nome_categoria = :categoria';
+        $params['categoria'] = $_GET['categoria'];
     }
 
     if (!empty($_GET['sabor'])) {
-        $filtros[]         = 's.nome_sabor = :sabor';
-        $params['sabor']   = $_GET['sabor'];
+        $filtros[] = 's.nome_sabor = :sabor';
+        $params['sabor'] = $_GET['sabor'];
     }
 
     if (!empty($_GET['quantidade'])) {
-        $filtros[]                = 'r.qtd_produto = :quantidade';
-        $params['quantidade']     = $_GET['quantidade'];
+        $filtros[] = 'r.qtd_produto = :quantidade';
+        $params['quantidade'] = $_GET['quantidade'];
     }
 
     if (!empty($_GET['valor_unit'])) {
-        $filtros[]                 = 'r.val_unitario = :valor_unit';
-        $params['valor_unit']      = $_GET['valor_unit'];
+        $filtros[] = 'r.val_unitario = :valor_unit';
+        $params['valor_unit'] = $_GET['valor_unit'];
     }
 
     if (!empty($_GET['total'])) {
-        $filtros[]            = 'r.total_receita = :total';
-        $params['total']      = $_GET['total'];
+        $filtros[] = 'r.total_receita = :total';
+        $params['total'] = $_GET['total'];
     }
 
     if ($filtros) {
@@ -149,6 +93,20 @@ try {
     $stmt = $conn->prepare($baseSql);
     $stmt->execute($params);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sqlTotal = "SELECT SUM(r.total_receita) FROM RECEITA r
+   LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+   LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+   LEFT JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+       WHERE r.nome_produto = :produto";
+
+    if ($filtros) {
+        $sqlTotal .= ' AND ' . implode(' AND ', $filtros);
+    }
+
+    $stmtTotal = $conn->prepare($sqlTotal);
+    $stmtTotal->execute($params);
+    $totalReceitaFiltrada = $stmtTotal->fetchColumn() ?? 0;
 
 } catch (PDOException $e) {
     die("Erro ao buscar dados: " . $e->getMessage());
@@ -338,7 +296,7 @@ try {
           </tr>
         <?php endforeach; ?>
       <?php else: ?>
-        <tr><td colspan="9">Nenhum resultado encontrado.</td></tr>
+        <tr><td colspan="9">Nenhum receita encontrada para o filtro sleceionado.</td></tr>
       <?php endif; ?>
     </tbody>
   </table>
@@ -355,7 +313,7 @@ try {
         </div>
       </div>
       <div class="total-gasto-box">
-        <p class="total-gasto">TOTAL GANHO: R$ 3000,00</p>
+        <p class="total-gasto">TOTAL GANHO: R$ <?= number_format($totalReceitaFiltrada, 2, ',', '.') ?></p>
       </div>
     </div>
 
@@ -419,6 +377,71 @@ try {
       });
     });
   </script>
+
+  <script>
+document.querySelector('.btn-imprimir').addEventListener('click', function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const titulo = 'Relatório de Receitas - KIBON';
+    const dataHora = new Date();
+    const dataFormatada = dataHora.toLocaleDateString();
+    const horaFormatada = dataHora.toLocaleTimeString();
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(0);
+    doc.text(titulo, 105, 20, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${dataFormatada} às ${horaFormatada}`, 190, 27, { align: 'right' });
+
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.2);
+    doc.line(20, 30, 190, 30);
+
+    const tabela = document.querySelector('.tabela-receitas');
+
+    doc.autoTable({
+        html: tabela,
+        startY: 35,
+        styles: {
+            font: 'helvetica',
+            fontSize: 9,
+            cellPadding: 3,
+            textColor: 0,
+            valign: 'middle',
+        },
+        headStyles: {
+            fillColor: [230, 230, 230],
+            textColor: 0,
+            fontStyle: 'bold',
+            halign: 'center',
+        },
+        bodyStyles: {
+            halign: 'left'
+        },
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
+        },
+        tableLineColor: [200, 200, 200],
+        tableLineWidth: 0.1,
+        margin: { top: 35 },
+        didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100);
+            doc.text('CashHive System - 2025', doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+        }
+    });
+
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+});
+</script>
 
   <script src="../assets/js/inatividade.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
