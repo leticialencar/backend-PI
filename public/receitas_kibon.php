@@ -168,7 +168,7 @@ try {
                 <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
                 <li><a href="../public/receitas_kibon.php">Receitas</a></li>
                 <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
-                <li><a href="../public/despesas_fixas.html">Despesas</a></li>
+                <li><a href="../public/despesas_fixas.php">Despesas</a></li>
                 <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
               </ul>
             </details>
@@ -184,9 +184,9 @@ try {
     <div class="nav-category">
       <nav class="nav-options">
         <ul>
-          <li class="active"><a href="../public/receitas_kibon.html">Kibon</a></li>
-          <li><a href="../public/receitas_nestle.html">Nestlé</a></li>
-          <li><a href="../public/receitas_mareni.html">Mareni</a></li>
+          <li class="active"><a href="../public/receitas_kibon.php">Kibon</a></li>
+          <li><a href="../public/receitas_nestle.php">Nestlé</a></li>
+          <li><a href="../public/receitas_mareni.php">Mareni</a></li>
         </ul>
       </nav>
     </div>
@@ -383,7 +383,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
 
-    const titulo = 'Relatório de Receitas - KIBON';
+    const titulo = 'Relatório de Receitas - Kibon';
     const dataHora = new Date();
     const dataFormatada = dataHora.toLocaleDateString();
     const horaFormatada = dataHora.toLocaleTimeString();
