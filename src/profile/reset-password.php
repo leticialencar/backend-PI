@@ -47,9 +47,10 @@ $stmt_update = $conn->prepare($sql_update);
 $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 
 if ($executou) {
-    header("Location: ../public/profile.php");
-    exit;
+   header("Location: ../public/profile.php?senha=ok");
+    exit;   
 } else {
     die("Erro ao atualizar a senha.");
 }
+
 ?>
