@@ -1,4 +1,47 @@
-<?php include '../src/login/verify-session.php'; ?>
+<?php 
+include '../src/login/verify-session.php'; 
+require __DIR__ . '/../config/config.php';
+
+$conn = Conexao::getConn();
+
+$filtroProduto = "WHERE nome_produto = 'Kibon'";
+
+$sqlClientes = "SELECT DISTINCT nome_cliente FROM RECEITA $filtroProduto AND nome_cliente IS NOT NULL ORDER BY nome_cliente";
+$clientes = $conn->query($sqlClientes)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlPagamentos = "SELECT DISTINCT f.descricao 
+                  FROM RECEITA r
+                  JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+                  WHERE r.nome_produto = 'Kibon'
+                  ORDER BY f.descricao";
+$pagamentos = $conn->query($sqlPagamentos)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlCategorias = "SELECT DISTINCT c.nome_categoria 
+                  FROM RECEITA r
+                  JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+                  WHERE r.nome_produto = 'Kibon'
+                  ORDER BY c.nome_categoria";
+$categorias = $conn->query($sqlCategorias)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlSabores = "SELECT DISTINCT s.nome_sabor 
+               FROM RECEITA r
+               JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+               WHERE r.nome_produto = 'Kibon'
+               ORDER BY s.nome_sabor";
+$sabores = $conn->query($sqlSabores)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlQuantidades = "SELECT DISTINCT qtd_produto FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY qtd_produto";
+$quantidades = $conn->query($sqlQuantidades)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlValoresUnit = "SELECT DISTINCT val_unitario FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY val_unitario";
+$valoresUnit = $conn->query($sqlValoresUnit)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlTotais = "SELECT DISTINCT total_receita FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY total_receita";
+$totais = $conn->query($sqlTotais)->fetchAll(PDO::FETCH_COLUMN);
+
+$sqlDatas = "SELECT DISTINCT data_venda FROM RECEITA WHERE nome_produto = 'Kibon' ORDER BY data_venda DESC";
+$datasVenda = $conn->query($sqlDatas)->fetchAll(PDO::FETCH_COLUMN);
+?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -84,120 +127,114 @@
         <input type="date" id="data-filter" name="data" />
 
         <select id="cliente-filter" name="cliente">
-          <option value="cliente">Cliente</option>
-          <option value="cliente1">Cliente 1</option>
-          <option value="cliente2">Cliente 2</option>
-          <option value="cliente3">Cliente 3</option>
+          <option value="">Cliente</option>
+          <?php foreach ($clientes as $cliente): ?>
+            <option value="<?= htmlspecialchars($cliente) ?>"><?= htmlspecialchars($cliente) ?></option>
+          <?php endforeach; ?>
         </select>
 
         <select id="pagamento-filter" name="pagamento">
-          <option value="pagamento">Pagamento</option>
-          <option value="pagamento1">Pagamento 1</option>
-          <option value="pagamento2">Pagamento 2</option>
-          <option value="pagamento">Pagamento 3</option>
-        </select>
-
-        <select id="produto-filter" name="produto">
-          <option value="produto">Produto</option>
-          <option value="produto1">Produto 1</option>
-          <option value="produto2">Produto 2</option>
-          <option value="produto3">Produto 3</option>
+          <option value="">Pagamento</option>
+          <?php foreach ($pagamentos as $pagamento): ?>
+            <option value="<?= htmlspecialchars($pagamento) ?>"><?= htmlspecialchars($pagamento) ?></option>
+          <?php endforeach; ?>
         </select>
 
         <select id="categoria-filter" name="categoria">
-          <option value="categoria">Categoria</option>
-          <option value="categoria1">Categoria 1</option>
-          <option value="categoria2">Categoria 2</option>
-          <option value="categoria3">Categoria 3</option>
+          <option value="">Categoria</option>
+          <?php foreach ($categorias as $categoria): ?>
+            <option value="<?= htmlspecialchars($categoria) ?>"><?= htmlspecialchars($categoria) ?></option>
+          <?php endforeach; ?>
         </select>
 
         <select id="sabor-filter" name="sabor">
-          <option value="quantidade">Sabor</option>
-          <option value="quantidade1">Morango</option>
-          <option value="quantidade2">Chocolate</option>
-          <option value="quantidade3">Maracujá</option>
-          <option value="quantidade3">Creme com passas</option>
-          </select>
-
-        <select id="quandtidade-filter" name="quantidade">
-          <option value="quantidade">Quantidade</option>
-          <option value="quantidade1">Quantidade 1</option>
-          <option value="quantidade2">Quantidade 2</option>
-          <option value="quantidade3">Quantidade 3</option>
+          <option value="">Sabor</option>
+          <?php foreach ($sabores as $sabor): ?>
+            <option value="<?= htmlspecialchars($sabor) ?>"><?= htmlspecialchars($sabor) ?></option>
+          <?php endforeach; ?>
         </select>
 
-        <select id="valor-unit-filter" name="valor-unit">
-          <option value="valor-unit">Valor Unitário</option>
-          <option value="valor-unit1">Valor Unitário 1</option>
-          <option value="valor-unit2">Valor Unitário 2</option>
-          <option value="valor-unit3">Valor Unitário 3</option>
+        <select id="quantidade-filter" name="quantidade">
+          <option value="">Quantidade</option>
+          <?php foreach ($quantidades as $quant): ?>
+            <option value="<?= htmlspecialchars($quant) ?>"><?= htmlspecialchars($quant) ?></option>
+          <?php endforeach; ?>
+        </select>
+
+        <select id="valor-unit-filter" name="valor_unit">
+          <option value="">Valor Unitário</option>
+          <?php foreach ($valoresUnit as $valor): ?>
+            <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
+          <?php endforeach; ?>
         </select>
 
         <select id="total-filter" name="total">
-          <option value="total">Total</option>
-          <option value="total1">Total 1</option>
-          <option value="total2">Total 2</option>
-          <option value="total3">Total 3</option>
+          <option value="">Total</option>
+          <?php foreach ($valoresTotais as $valor): ?>
+            <option value="<?= htmlspecialchars($valor) ?>">R$ <?= number_format($valor, 2, ',', '.') ?></option>
+          <?php endforeach; ?>
         </select>
       </div>
     </div>
 
     <!-- Tabela de Receitas -->
     <main class="main-tabela">
-      <table class="tabela-receitas">
-        <thead>
-          <tr>
-            <th>Data da Venda</th>
-            <th>Cliente</th>
-            <th>Pagamento</th>
-            <th>Produto</th>
-            <th>Categoria</th>
-             <th>Sabor</th>
-            <th>Quantidade</th>
-            <th>Valor Unitário</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          require __DIR__ . '/../config/config.php';
+    <table class="tabela-receitas">
+      <thead>
+        <tr>
+          <th>Data da Venda</th>
+          <th>Cliente</th>
+          <th>Pagamento</th>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th>Sabor</th>
+          <th>Quantidade</th>
+          <th>Valor Unitário</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        $sql = "SELECT r.data_venda, r.nome_cliente, f.descricao AS forma_pagamento, r.nome_produto, c.nome_categoria, s.nome_sabor, r.qtd_produto, r.val_unitario, r.total_receita
+          FROM RECEITA r
+          LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+          LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+          LEFT JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+          WHERE r.nome_produto LIKE '%Kibon%'
+          ORDER BY r.data_venda DESC";
 
-          $conn = Conexao::getConn();
+        $stmt = $conn->query($sql);
 
-          $sql = "SELECT r.data_venda, r.nome_cliente, p.descricao AS pagamento, r.nome_produto, c.nome_categoria, r.qtd_produto, r.val_unitario, r.total_receita
-              FROM RECEITA r
-              LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
-              LEFT JOIN PGTO_RECEITA p ON r.id_pgto_receita = p.id_pgto_receita
-              ORDER BY r.data_venda DESC
-          ";
+        if ($stmt) {
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-          $stmt = $conn->query($sql);
+            if (count($rows) > 0) {
+                foreach ($rows as $row) {
+                    echo "<tr>";
+                    echo "<td>" . date("d/m/Y", strtotime($row['data_venda'])) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nome_cliente']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['forma_pagamento']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nome_produto']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nome_categoria']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nome_sabor']) . "</td>";
+                    echo "<td>" . intval($row['qtd_produto']) . "</td>";
+                    echo "<td>R$ " . number_format($row['val_unitario'], 2, ',', '.') . "</td>";
+                    echo "<td>R$ " . number_format($row['total_receita'], 2, ',', '.') . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='9'>Nenhum dado encontrado</td></tr>";
+            }
+        } else {
+            echo "<tr><td colspan='9'>Erro na consulta SQL</td></tr>";
+        }
 
-          if ($stmt) {
-              $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $conn = null;
+        ?>
+      </tbody>
+  </table>
+</main>
 
-              if (count($rows) > 0) {
-                  foreach ($rows as $row) {
-                      echo "<tr>";
-                      echo "<td>" . date("d/m/Y", strtotime($row['data_venda'])) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['nome_cliente']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['pagamento']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['nome_produto']) . "</td>";
-                      echo "<td>" . htmlspecialchars($row['nome_categoria']) . "</td>";
-                      echo "<td>" . intval($row['qtd_produto']) . "</td>";
-                      echo "<td>R$ " . number_format($row['val_unitario'], 2, ',', '.') . "</td>";
-                      echo "<td>R$ " . number_format($row['total_receita'], 2, ',', '.') . "</td>";
-                      echo "</tr>";
-                  }
-              } else {
-                  echo "<tr><td colspan='8'>Nenhum dado encontrado</td></tr>";
-              }
-          } else {
-              echo "<tr><td colspan='8'>Erro na consulta SQL</td></tr>";
-          }
-
-          $conn = null;
-          ?>
-        </tbody>
       </table>
     </main>
 
@@ -266,6 +303,8 @@
   </script>
 
   <script src="../assets/js/inatividade.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 </html>
