@@ -155,7 +155,7 @@ try {
                 <tbody>
                     <tr>
                       
-                        <td>Brenda Evelyn da Silva Vieira</td>
+                        <td><a href="folha_de_pagamento.html">Brenda Evelyn da Silva Vieira</a></td>
                         <td>Caixa</td>
                         <td class="actions">
                             <button class="open-modal" data-modal="modal-cadastro">Editar</button>
