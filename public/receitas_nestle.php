@@ -6,42 +6,34 @@ try {
     $conn = Conexao::getConn();
     $nomeProduto = 'Nestlé';
 
-    // Clientes
     $stmt = $conn->prepare("SELECT DISTINCT nome_cliente FROM RECEITA WHERE nome_produto = :produto AND nome_cliente IS NOT NULL ORDER BY nome_cliente");
     $stmt->execute(['produto' => $nomeProduto]);
     $clientes = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Formas de pagamento
     $stmt = $conn->prepare("SELECT DISTINCT f.descricao FROM RECEITA r JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento WHERE r.nome_produto = :produto ORDER BY f.descricao");
     $stmt->execute(['produto' => $nomeProduto]);
     $pagamentos = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Categorias
     $stmt = $conn->prepare("SELECT DISTINCT c.nome_categoria FROM RECEITA r JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria WHERE r.nome_produto = :produto ORDER BY c.nome_categoria");
     $stmt->execute(['produto' => $nomeProduto]);
     $categorias = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Sabores
     $stmt = $conn->prepare("SELECT DISTINCT s.nome_sabor FROM RECEITA r JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor WHERE r.nome_produto = :produto ORDER BY s.nome_sabor");
     $stmt->execute(['produto' => $nomeProduto]);
     $sabores = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Quantidades
     $stmt = $conn->prepare("SELECT DISTINCT qtd_produto FROM RECEITA WHERE nome_produto = :produto ORDER BY qtd_produto");
     $stmt->execute(['produto' => $nomeProduto]);
     $quantidades = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Valores unitários
     $stmt = $conn->prepare("SELECT DISTINCT val_unitario FROM RECEITA WHERE nome_produto = :produto ORDER BY val_unitario");
     $stmt->execute(['produto' => $nomeProduto]);
     $valoresUnit = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Totais
     $stmt = $conn->prepare("SELECT DISTINCT total_receita FROM RECEITA WHERE nome_produto = :produto ORDER BY total_receita");
     $stmt->execute(['produto' => $nomeProduto]);
     $totais = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // SQL base com filtros
     $baseSql = "SELECT r.data_venda, r.nome_cliente, f.descricao AS forma_pagamento, r.nome_produto, c.nome_categoria, s.nome_sabor, r.qtd_produto, r.val_unitario, r.total_receita
         FROM RECEITA r
         LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
@@ -92,7 +84,6 @@ try {
         $params['total'] = $_GET['total'];
     }
 
-    // Aplica filtros na consulta principal
     if ($filtros) {
         $baseSql .= ' AND ' . implode(' AND ', $filtros);
     }
@@ -103,7 +94,6 @@ try {
     $stmt->execute($params);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Soma total das receitas filtradas
     $sqlTotal = "SELECT SUM(r.total_receita) FROM RECEITA r
         LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
         LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
@@ -167,8 +157,8 @@ try {
               Financeiro
             </summary>
             <ul>
-              <li><a href="../public/cadastrar_funcionario.html">Funcionário</a></li>
-              <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+              <li><a href="../public/cadastrar_funcionario.php">Funcionário</a></li>
+              <li><a href="../public/receitas_kibon.php">Receitas</a></li>
               <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
               <li><a href="../public/despesas_fixas.php">Despesas</a></li>
               <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
@@ -280,7 +270,7 @@ try {
         <?php endforeach; ?>
       <?php else: ?>
         <tr>
-          <td colspan="8" style="text-align: center;">Nenhum resultado encontrado.</td>
+          <td colspan="8" style="text-align: center;">Nenhum resultado encontrado para o filtro especificado.</td>
         </tr>
       <?php endif; ?>
     </tbody>
