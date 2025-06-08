@@ -76,6 +76,14 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
 </script>
 
 <body>
+    <script>
+        // Alerta de sucesso na redefinição de senha
+        <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] === 'senha_alterada'): ?>
+            window.addEventListener('DOMContentLoaded', function() {
+                alert('Senha redefinida com sucesso!');
+            });
+        <?php endif; ?>
+    </script>
    
     <header class="container-header">
         <div class="logo">
