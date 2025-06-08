@@ -10,34 +10,73 @@ if (!$user_id) {
 
 $conn = Conexao::getConn();
 
-// Buscar receitas e despesas do mês atual
 $mesAtual = date('m');
 $anoAtual = date('Y');
 
-// Total receitas
-$stmt = $conn->prepare("SELECT SUM(valor) as total FROM RECEITAS WHERE id_usuario = ? AND MONTH(data_receita) = ? AND YEAR(data_receita) = ?");
-$stmt->execute([$user_id, $mesAtual, $anoAtual]);
+// Total receitas (tabela RECEITA)
+$stmt = $conn->prepare("SELECT SUM(total_receita) as total FROM RECEITA WHERE MONTH(data_venda) = ? AND YEAR(data_venda) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
 $totalReceitas = $stmt->fetchColumn() ?: 0;
 
-// Total despesas
-$stmt = $conn->prepare("SELECT SUM(valor) as total FROM DESPESAS WHERE id_usuario = ? AND MONTH(data_despesa) = ? AND YEAR(data_despesa) = ?");
-$stmt->execute([$user_id, $mesAtual, $anoAtual]);
-$totalDespesas = $stmt->fetchColumn() ?: 0;
+// Total despesas (somando todas as tabelas de despesas)
+$totalDespesas = 0;
+
+// DESPESAS_FIXAS
+$stmt = $conn->prepare("SELECT SUM(valor) FROM DESPESAS_FIXAS WHERE MONTH(data_conta) = ? AND YEAR(data_conta) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$totalDespesas += $stmt->fetchColumn() ?: 0;
+
+// DESPESA_FUNCIONARIO
+$stmt = $conn->prepare("SELECT SUM(total_despesa) FROM DESPESA_FUNCIONARIO WHERE MONTH(data_pagamento) = ? AND YEAR(data_pagamento) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$totalDespesas += $stmt->fetchColumn() ?: 0;
+
+// DESPESA_PRODUTO
+$stmt = $conn->prepare("SELECT SUM(total_despesa) FROM DESPESA_PRODUTO WHERE MONTH(data_compra) = ? AND YEAR(data_compra) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$totalDespesas += $stmt->fetchColumn() ?: 0;
+
+// DESPESA_VARIADOS
+$stmt = $conn->prepare("SELECT SUM(valor) FROM DESPESA_VARIADOS WHERE MONTH(data_conta) = ? AND YEAR(data_conta) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$totalDespesas += $stmt->fetchColumn() ?: 0;
 
 // Saldo
 $saldo = $totalReceitas - $totalDespesas;
 
-// Últimas movimentações (receitas e despesas)
-$stmt = $conn->prepare("
-    SELECT 'Receita' as tipo, descricao, valor, data_receita as data
-    FROM RECEITAS WHERE id_usuario = ? AND MONTH(data_receita) = ? AND YEAR(data_receita) = ?
-    UNION ALL
-    SELECT 'Despesa' as tipo, descricao, valor, data_despesa as data
-    FROM DESPESAS WHERE id_usuario = ? AND MONTH(data_despesa) = ? AND YEAR(data_despesa) = ?
-    ORDER BY data DESC LIMIT 5
-");
-$stmt->execute([$user_id, $mesAtual, $anoAtual, $user_id, $mesAtual, $anoAtual]);
-$movimentacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Últimas movimentações (exemplo: receitas e despesas fixas)
+$movimentacoes = [];
+
+// Receitas
+$stmt = $conn->prepare("SELECT 'Receita' as tipo, nome_produto as descricao, total_receita as valor, data_venda as data FROM RECEITA WHERE MONTH(data_venda) = ? AND YEAR(data_venda) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$movimentacoes = array_merge($movimentacoes, $stmt->fetchAll(PDO::FETCH_ASSOC));
+
+// Despesas Fixas
+$stmt = $conn->prepare("SELECT 'Despesa Fixa' as tipo, descricao, valor, data_conta as data FROM DESPESAS_FIXAS WHERE MONTH(data_conta) = ? AND YEAR(data_conta) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$movimentacoes = array_merge($movimentacoes, $stmt->fetchAll(PDO::FETCH_ASSOC));
+
+// Despesa Funcionário
+$stmt = $conn->prepare("SELECT 'Despesa Funcionário' as tipo, nome_despesa as descricao, total_despesa as valor, data_pagamento as data FROM DESPESA_FUNCIONARIO WHERE MONTH(data_pagamento) = ? AND YEAR(data_pagamento) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$movimentacoes = array_merge($movimentacoes, $stmt->fetchAll(PDO::FETCH_ASSOC));
+
+// Despesa Produto
+$stmt = $conn->prepare("SELECT 'Despesa Produto' as tipo, nome_produto as descricao, total_despesa as valor, data_compra as data FROM DESPESA_PRODUTO WHERE MONTH(data_compra) = ? AND YEAR(data_compra) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$movimentacoes = array_merge($movimentacoes, $stmt->fetchAll(PDO::FETCH_ASSOC));
+
+// Despesa Variados
+$stmt = $conn->prepare("SELECT 'Despesa Variada' as tipo, descricao, valor, data_conta as data FROM DESPESA_VARIADOS WHERE MONTH(data_conta) = ? AND YEAR(data_conta) = ?");
+$stmt->execute([$mesAtual, $anoAtual]);
+$movimentacoes = array_merge($movimentacoes, $stmt->fetchAll(PDO::FETCH_ASSOC));
+
+// Ordena por data desc e pega as 5 mais recentes
+usort($movimentacoes, function($a, $b) {
+    return strtotime($b['data']) - strtotime($a['data']);
+});
+$movimentacoes = array_slice($movimentacoes, 0, 5);
 
 // Progresso (exemplo: meta de receitas/despesas)
 $metaReceita = 5000; // valor de meta mensal de receita (pode ser dinâmico)
