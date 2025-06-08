@@ -244,7 +244,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
           </div>
 
           <div class="modal-form-new-user">
-              <form action="../src/profile/register-user.php" method="POST">
+              <form>
                   <div class="input-group">
                       <div class="input-box">
                           <label for="cadastro-nome">Nome</label>

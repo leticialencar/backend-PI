@@ -3,7 +3,7 @@ session_start();
 require('../../config/config.php');
 
 if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'admin') {
-    header("Location: ../../public/login.php");
+    echo json_encode(['success' => false, 'message' => 'Acesso não autorizado.']);
     exit;
 }
 
@@ -38,7 +38,12 @@ function inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo) {
     $stmt->bindParam(':senha', $senhaHash);
     $stmt->bindParam(':cargo', $cargo);
 
-    return $stmt->execute();
+    if (!$stmt->execute()) {
+        $erro = $stmt->errorInfo();
+        throw new Exception("Erro ao executar INSERT: " . $erro[2]);
+    }
+
+    return true;
 }
 
 function verificarDuplicidade($pdo, $cpf, $email) {
@@ -51,12 +56,19 @@ function verificarDuplicidade($pdo, $cpf, $email) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = trim($_POST['nome']);
-    $sobrenome = trim($_POST['sobrenome']);
-    $cpf = preg_replace('/\D/', '', $_POST['cpf']);
-    $email = trim($_POST['email']);
-    $cargo = intval($_POST['cargo']);
-    $senha = $_POST['senha'];
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if (!is_array($input)) {
+        echo json_encode(['success' => false, 'message' => 'Dados JSON inválidos.']);
+        exit;
+    }
+
+    $nome = trim($input['nome'] ?? '');
+    $sobrenome = trim($input['sobrenome'] ?? '');
+    $cpf = preg_replace('/\D/', '', $input['cpf'] ?? '');
+    $email = trim($input['email'] ?? '');
+    $cargo = intval($input['cargo'] ?? 0);
+    $senha = $input['senha'] ?? '';
 
     $validacao = validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha);
     if (!$validacao['success']) {
@@ -75,22 +87,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        if (inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo)) {
-    header("Location: ../../public/homepage.php?msg=usuario_cadastrado");
-    exit;
-} else {
-    $erro = $pdo->errorInfo();
-    echo json_encode([
-        'success' => false,
-        'message' => 'Erro ao cadastrar usuário: ' . $erro[2]
-    ]);
-    exit;
-}
+        inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo);
+
+        echo json_encode(['success' => true, 'message' => 'Usuário cadastrado com sucesso!']);
+        exit;
+
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Erro ao conectar ao banco de dados: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Erro com o banco: ' . $e->getMessage()]);
+        exit;
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         exit;
     }
 } else {
-    header("Location: ../../public/homepage.php");
+    echo json_encode(['success' => false, 'message' => 'Requisição inválida.']);
     exit;
 }
