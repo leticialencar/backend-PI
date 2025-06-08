@@ -281,19 +281,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       </div>
 
                       <div class="input-box">
-
-                        <label for="nivel">Nível de permissão</label>
-                        <select id="nivel" name="nivel" required>
-                            <option value="">Selecione o nível de permissão</option>
-                            <option value="1" <?= ($nivelPermissao == 1) ? 'selected' : '' ?>>Nível 1</option>
-                            <option value="2" <?= ($nivelPermissao == 2) ? 'selected' : '' ?>>Nível 2</option>
-                            <option value="3" <?= ($nivelPermissao == 3) ? 'selected' : '' ?>>Nível 3</option>
-                        </select>
-                    </div>
-
-                      <div class="input-box">
-                          <label for="senha">Senha</label>
-                          <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
                           <label for="cadastro-nivel">Nível de permissão</label>
                           <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
                       </div>
