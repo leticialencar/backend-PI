@@ -1,4 +1,5 @@
 <?php
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
@@ -10,6 +11,20 @@ try {
     echo "Erro ao buscar cargos: " . $e->getMessage();
     exit;
 }
+
+try {
+    $stmt = $conn->query("
+        SELECT f.id_funcionario, f.nome_funcionario, c.nome_cargo
+        FROM FUNCIONARIO f
+        JOIN CARGO c ON f.id_cargo = c.id_cargo
+        ORDER BY f.nome_funcionario ASC
+    ");
+    $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar funcionários: " . $e->getMessage();
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -119,10 +134,8 @@ try {
             <div class="left-content">
                 <img src="../assets/img/profileadiction.svg" alt="Ícone usuário" />
                 <span>Editar informações do funcionário</span>
-            </div> <!-- FECHA left-content -->
-        </div> <!-- FECHA header-card -->
-
-         
+            </div>
+        </div> 
 
         <div class="card">
 
@@ -154,25 +167,20 @@ try {
 
             <table>
                 <tbody>
+                    <?php foreach ($funcionarios as $funcionario): ?>
                     <tr>
-                        <td><a href="folha_de_pagamento.html">Brenda Evelyn da Silva Vieira</a></td>
-                        <td>Caixa</td>
+                        <td>
+                            <a href="folha_de_pagamento.php?id=<?= $funcionario['id_funcionario'] ?>">
+                                <?= htmlspecialchars($funcionario['nome_funcionario']) ?>
+                            </a>
+                        </td>
+                        <td><?= htmlspecialchars($funcionario['nome_cargo']) ?></td>
                         <td class="actions">
-                            <button class="open-modal" data-modal="modal-cadastro">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar"
-                                data-modal="modal-1">Desativar</button>
+                            <button class="open-modal" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-cadastro">Editar</button>
+                            <button class="btn-desativar-conta js-open-modal-desativar" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-1">Desativar</button>
                         </td>
                     </tr>
-                    <tr>
-                       
-                        <td>Ramon Pietro Felizado Neymar Junior</td>
-                        <td>Vendedor</td>
-                        <td class="actions">
-                            <button class="open-modal" data-modal="modal-cadastro">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar"
-                                data-modal="modal-1">Desativar</button>
-                        </td>
-                    </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

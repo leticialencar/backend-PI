@@ -1,3 +1,42 @@
+<?php
+require __DIR__ . '/../config/config.php';
+
+$conn = Conexao::getConn();
+
+// 1. Verificar se veio o ID pela URL
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("Funcionário inválido.");
+}
+
+$id = (int) $_GET['id'];
+
+// 2. Buscar os dados do funcionário e cargo
+$sql = "
+    SELECT f.nome_funcionario, f.salario, f.data_admissao, c.nome_cargo
+    FROM FUNCIONARIO f
+    JOIN CARGO c ON f.id_cargo = c.id_cargo
+    WHERE f.id_funcionario = :id
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':id', $id, PDO::PARAM_INT);
+$stmt->execute();
+
+$funcionario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$funcionario) {
+    die("Funcionário não encontrado.");
+}
+
+// 3. Cálculo simples
+$salario = $funcionario['salario'];
+$fgts = $salario * 0.08;   // 8%
+$inss = $salario * 0.09;   // 9%
+$ir = $salario * 0.01;     // 1%
+$descontos = $fgts + $inss + $ir;
+$salario_liquido = $salario - $descontos;
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
