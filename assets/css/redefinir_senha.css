@@ -192,6 +192,34 @@ body {
     background-color: #93A2B7;
     color: #F8F8F8;
 }
-   
+.forca-senha {
+    font-size: 0.9rem;
+    margin-top: 5px;
+}  
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    margin: 1rem;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+}
 
+.senha-status {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
 
+.senha-fraca {
+    color: #dc3545; /* vermelho */
+}
+
+.senha-media {
+    color: #ffc107; /* amarelo */
+}
+
+.senha-forte {
+    color: #28a745; /* verde */
+}

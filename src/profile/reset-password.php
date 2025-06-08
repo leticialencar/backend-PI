@@ -21,10 +21,9 @@ if ($nova_senha !== $repetir_senha) {
     die("As novas senhas não coincidem.");
 }
 
-if (strlen($nova_senha) < 8) {
-    die("A nova senha deve ter pelo menos 8 caracteres.");
+if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/", $nova_senha)) {
+    die("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
 }
-
 // Consulta a senha atual
 $sql = "SELECT senha_usuario FROM USUARIO WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
@@ -43,16 +42,21 @@ if (!password_verify($senha_antiga, $senha_hash)) {
 
 $nova_senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
-// Atualiza a nova senha
 $sql_update = "UPDATE USUARIO SET senha_usuario = ? WHERE id_usuario = ?";
 $stmt_update = $conn->prepare($sql_update);
 $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 
 if ($executou) {
+<<<<<<< HEAD
     // Redireciona para perfil com sucesso
     header("Location: /backend-PI/public/profile.php?sucesso=senha_alterada");
     exit;
+=======
+   header("Location: ../public/profile.php?senha=ok");
+    exit;   
+>>>>>>> f0ac93ed2ed881a718231952cf85700d19bcd9ed
 } else {
     die("Erro ao atualizar a senha.");
 }
+
 ?>

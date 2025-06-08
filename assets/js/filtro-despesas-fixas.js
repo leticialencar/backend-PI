@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   const filtros = {
-    cliente: document.getElementById('pagamento-filter'),        // Data de Pagamento
-    pagamento: document.getElementById('categoria-filter'),       // Categoria
-    produto: document.getElementById('formadepagamento-filter'),  // Forma de Pagamento
-    quantidade: document.getElementById('vencimento-filter'),     // Data de Vencimento
-    valorUnit: document.getElementById('valor-unit-filter'),      // Valor
+    cliente: document.getElementById('pagamento-filter'),       
+    pagamento: document.getElementById('categoria-filter'),     
+    produto: document.getElementById('formadepagamento-filter'),  
+    quantidade: document.getElementById('vencimento-filter'),     
+    valorUnit: document.getElementById('valor-unit-filter'),   
   };
 
   const tabela = document.querySelector('.tabela-receitas tbody');

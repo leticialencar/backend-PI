@@ -47,32 +47,36 @@ CREATE TABLE produtos (
     nome_produto VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE CATEGORIA_RECEITA (
-    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
-    nome_categoria VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE RECEITA (
-    id_venda INT AUTO_INCREMENT PRIMARY KEY,
+    id_receita INT AUTO_INCREMENT PRIMARY KEY,
     data_venda DATE NOT NULL,
-    nome_cliente VARCHAR(100) NOT NULL,
-    nome_produto VARCHAR(100) NOT NULL,
+    nome_cliente VARCHAR(100),
+    nome_produto VARCHAR(100),
     qtd_produto INT NOT NULL,
-    val_unitario DECIMAL(10, 2) NOT NULL,
-    id_categoria INT,
-    total_receita DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (id_categoria) REFERENCES CATEGORIA_RECEITA(id_categoria)
+    val_unitario DECIMAL(10,2) NOT NULL,
+    total_receita DECIMAL(10,2) NOT NULL,
+    id_categoria INT NOT NULL,
+    id_sabor INT NOT NULL,
+    id_forma_pagamento INT NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES CATEGORIA_RECEITA(id_categoria),
+    FOREIGN KEY (id_sabor) REFERENCES SABOR_PRODUTO(id_sabor),
+    FOREIGN KEY (id_forma_pagamento) REFERENCES FORMAS_PAGAMENTO(id_forma_pagamento)
 );
 
-CREATE TABLE PGTO_RECEITA (
-    id_pgto_receita INT AUTO_INCREMENT PRIMARY KEY,
-    descricao VARCHAR(255) NOT NULL
+CREATE TABLE SABOR_PRODUTO (
+    id_sabor INT AUTO_INCREMENT PRIMARY KEY,
+    nome_sabor VARCHAR(100) NOT NULL
 );
 
 ALTER TABLE RECEITA
-ADD COLUMN id_pgto_receita INT,
-ADD FOREIGN KEY (id_pgto_receita) REFERENCES PGTO_RECEITA(id_pgto_receita);
+ADD COLUMN id_sabor INT,
+ADD FOREIGN KEY (id_sabor) REFERENCES SABOR_PRODUTO(id_sabor);
 
+INSERT INTO SABOR_PRODUTO (nome_sabor) VALUES
+('Morango'),
+('Chocolate'),
+('Napolitano'),
+('Maracujá');
 
 CREATE TABLE DESPESA_FUNCIONARIO (
     id_despesa_func INT AUTO_INCREMENT PRIMARY KEY,

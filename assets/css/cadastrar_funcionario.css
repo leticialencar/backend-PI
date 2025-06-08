@@ -270,13 +270,13 @@ body {
     padding: 20px 0;
 }
 
-input[type="text"], input[type="email"] {
+input[type="text"], input[type="email"] select {
     padding: 10px;
     border: 1px solid #0a214c;
     border-radius: 5px;
     width: 100%;
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 14px; 
 }
 
 .btn {

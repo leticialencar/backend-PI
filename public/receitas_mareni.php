@@ -43,11 +43,11 @@
                             Financeiro
                         </summary>
                         <ul>
-                            <li><a href="cadastrar_funcionario.html">Funcionário</a></li>
-                            <li><a href="../public/receitas_kibon.html">Receitas</a></li>
+                            <li><a href="cadastrar_funcionario.php">Funcionário</a></li>
+                            <li><a href="../public/receitas_kibon.php">Receitas</a></li>
                             <li><a href="../public/cadastrar_receitas.php">Cadastro de Receitas</a></li>
-                            <li><a href="despesas_fixas.html">Despesas</a></li>
-                            <li><a href="cadastrar_despesas_fixas.html">Cadastro de Despesas</a></li>
+                            <li><a href="../public/despesas_fixas.php">Despesas</a></li>
+                            <li><a href="../public/cadastrar_despesas_fixas.php">Cadastro de Despesas</a></li>
                         </ul>
                     </details>
                 </li>
@@ -62,9 +62,9 @@
     <div class="nav-category">
         <nav class="nav-options">
             <ul>
-                <li><a href="../public/receitas_kibon.html">Kibon</a></li>
-                <li><a href="../public/receitas_nestle.html">Nestlé</a></li>
-                <li class="active"><a href="../public/receitas_mareni.html">Mareni</a></li>
+                <li><a href="../public/receitas_kibon.php">Kibon</a></li>
+                <li><a href="../public/receitas_nestle.php">Nestlé</a></li>
+                <li class="active"><a href="../public/receitas_mareni.php">Mareni</a></li>
             </ul>
         </nav>
     </div>
@@ -100,6 +100,14 @@
                 <option value="categoria1">Categoria 1</option>
                 <option value="categoria2">Categoria 2</option>
                 <option value="categoria3">Categoria 3</option>
+            </select>
+
+            <select id="sabor-filter" name="sabor">
+                <option value="quantidade">Sabor</option>
+                <option value="quantidade1">Morango</option>
+                <option value="quantidade2">Chocolate</option>
+                <option value="quantidade3">Maracujá</option>
+                <option value="quantidade3">Creme com passas</option>
             </select>
 
             <select id="quandtidade-filter" name="quantidade">

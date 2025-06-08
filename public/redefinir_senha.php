@@ -80,6 +80,7 @@
                     <div class="form-group">
                         <label for="nova-senha">Nova senha</label>
                         <input type="password" id="nova-senha" name="nova_senha" placeholder="Crie uma senha" required>
+                        <small id="forca-senha" class="senha-status"></small>
                     </div>
 
                     <div class="form-group">
@@ -149,28 +150,24 @@
                     <button type="button">Não</button>
                 </div>
             </div>
-            
         </div>
     </div>
     
 
     <script>
-        // Abre o modal ao clicar no botão com data-modal
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
                 document.getElementById(modalId).classList.remove("hidden");
             });
         });
-    
-        // Fecha o modal ao clicar no botão de fechar
+
         document.querySelectorAll(".close-modal").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
-    
-        // Fecha ao clicar fora da caixa
+
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
@@ -182,10 +179,10 @@
 
         document.querySelectorAll(".open-modal2").forEach(button => {
             button.addEventListener("click", (e) => {
-                e.preventDefault(); // Prevent default button behavior
+                e.preventDefault();
                 const novaSenha = document.getElementById("nova-senha").value.trim();
                 const repetirSenha = document.getElementById("repetir-senha").value.trim();
-                const minLength = 8; // Minimum password length
+                const minLength = 8; 
 
                 if (novaSenha && repetirSenha) {
                     if (novaSenha.length < minLength || repetirSenha.length < minLength) {
@@ -209,14 +206,12 @@
             });
         });
       
-      
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal2-overlay")) {
                 e.target.classList.add("hidden");
             }
         });
       
-       
         document.querySelectorAll(".modal2-btn-sim").forEach(button => {
             button.addEventListener("click", () => {
                 console.log("Sim clicado");
@@ -231,6 +226,7 @@
             });
         });
       </script>
+      
       <script>
         document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
             const form = document.querySelector("main .form-container form");
@@ -242,5 +238,43 @@
         });
 
       </script>
+      <script>
+            document.getElementById("nova-senha").addEventListener("input", function () {
+                const senha = this.value;
+                const statusEl = document.getElementById("forca-senha");
+
+                // Remove classes anteriores
+                statusEl.classList.remove("senha-fraca", "senha-media", "senha-forte");
+
+                let forca = 0;
+
+                if (senha.length >= 8) forca++;
+                if (/[a-z]/.test(senha)) forca++;
+                if (/[A-Z]/.test(senha)) forca++;
+                if (/\d/.test(senha)) forca++;
+                if (/[^A-Za-z0-9]/.test(senha)) forca++;
+
+                if (senha.length === 0) {
+                    statusEl.textContent = "";
+                    return;
+                }
+
+                if (forca <= 2) {
+                    statusEl.textContent = "Senha fraca";
+                    statusEl.classList.add("senha-fraca");
+                } else if (forca === 3 || forca === 4) {
+                    statusEl.textContent = "Senha média";
+                    statusEl.classList.add("senha-media");
+                } else {
+                    statusEl.textContent = "Senha forte";
+                    statusEl.classList.add("senha-forte");
+                }
+            });
+     </script>
 </body>
+<?php if (isset($_GET['senha']) && $_GET['senha'] === 'ok'): ?>
+    <div class="alert-success">
+        Senha redefinida com sucesso!
+    </div>
+<?php endif; ?>
 </html>
