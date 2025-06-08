@@ -27,7 +27,7 @@ body {
 .user p {
     font-size: 14px;
     font-style: italic;
-    margin: 0;
+    margin: 80px;
 }
 
 .menu {
@@ -242,6 +242,7 @@ body {
 .btn-excluir:hover {
   background-color: #c9302c;
 }
+
 .input-box label::after {
     content: " *";
     color: red;
