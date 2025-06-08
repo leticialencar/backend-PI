@@ -35,6 +35,11 @@ $inss = $salario * 0.09;   // 9%
 $ir = $salario * 0.01;     // 1%
 $descontos = $fgts + $inss + $ir;
 $salario_liquido = $salario - $descontos;
+
+// 4. Formatação
+function formatar($valor) {
+    return number_format($valor, 2, ',', '.');
+}
 ?>
 
 <!DOCTYPE html>
@@ -49,9 +54,9 @@ $salario_liquido = $salario - $descontos;
     <h2>Folha de Pagamento</h2>
 
     <section class="info-funcionario">
-      <div><strong>Funcionário:</strong> Brenda Evelyn da Silva Vieira</div>
-      <div><strong>Cargo:</strong> Caixa</div>
-      <div><strong>Data de admissão:</strong> 02/01/2025</div>
+      <div><strong>Funcionário:</strong> <?= htmlspecialchars($funcionario['nome_funcionario']) ?></div>
+      <div><strong>Cargo:</strong> <?= htmlspecialchars($funcionario['nome_cargo']) ?></div>
+      <div><strong>Data de admissão:</strong> <?= date('d/m/Y', strtotime($funcionario['data_admissao'])) ?></div>
     </section>
 
     <table class="tabela-pagamento">
@@ -65,29 +70,30 @@ $salario_liquido = $salario - $descontos;
       <tbody>
         <tr>
           <td>Salário Base</td>
-          <td>2.000,00</td>
+          <td><?= formatar($salario) ?></td>
           <td>-</td>
         </tr>
         <tr>
           <td>FGTS</td>
           <td>-</td>
-          <td>150,00</td>
+          <td><?= formatar($fgts) ?></td>
         </tr>
         <tr>
           <td>INSS</td>
           <td>-</td>
-          <td>180,00</td>
+          <td><?= formatar($inss) ?></td>
         </tr>
-
-         <tr>
-          <td>Imposto de renda</td>
+        <tr>
+          <td>Imposto de Renda</td>
           <td>-</td>
-          <td>20,00</td>
+          <td><?= formatar($ir) ?></td>
         </tr>
-
         <tr class="total">
           <td>Salário Líquido</td>
-          <td colspan="2">R$ 1.650,00</td>
+          <td colspan="2">R$ <?= formatar($salario_liquido) ?></td>
         </tr>
       </tbody>
     </table>
+  </div>
+</body>
+</html>
