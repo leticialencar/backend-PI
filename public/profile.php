@@ -126,7 +126,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
               <img src="../assets/img/profileicon.svg" alt="Ícone Perfil">
               <h3>Editar meu perfil</h3>
             </div>
-             <button class="add-user-btn"><a href="redefinir_senha.html">Alterar senha</a></button>
+             <button class="add-user-btn"><a href="redefinir_senha.php">Alterar senha</a></button>
           </div>
           <main class="main">
             <form id="form-dados" class="form-grid" method="post" action="../src/profile/save-profile.php">

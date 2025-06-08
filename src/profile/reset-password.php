@@ -49,7 +49,7 @@ $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 if ($executou) {
 
     // Redireciona para perfil com sucesso
-    header("Location: /backend-PI/public/profile.php?sucesso=senha_alterada");
+    header("Location: /backend-PI-leticia/public/profile.php?sucesso=senha_alterada");
     exit;
 
 } else {
