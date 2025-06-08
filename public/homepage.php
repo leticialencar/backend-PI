@@ -1,4 +1,50 @@
-<?php include '../src/login/verify-session.php'; ?>
+<?php
+include '../src/login/verify-session.php';
+include __DIR__ . '/../config/config.php';
+
+$user_id = $_SESSION['id_usuario'] ?? null;
+if (!$user_id) {
+    header('Location: login.html');
+    exit;
+}
+
+$conn = Conexao::getConn();
+
+// Buscar receitas e despesas do mês atual
+$mesAtual = date('m');
+$anoAtual = date('Y');
+
+// Total receitas
+$stmt = $conn->prepare("SELECT SUM(valor) as total FROM RECEITAS WHERE id_usuario = ? AND MONTH(data_receita) = ? AND YEAR(data_receita) = ?");
+$stmt->execute([$user_id, $mesAtual, $anoAtual]);
+$totalReceitas = $stmt->fetchColumn() ?: 0;
+
+// Total despesas
+$stmt = $conn->prepare("SELECT SUM(valor) as total FROM DESPESAS WHERE id_usuario = ? AND MONTH(data_despesa) = ? AND YEAR(data_despesa) = ?");
+$stmt->execute([$user_id, $mesAtual, $anoAtual]);
+$totalDespesas = $stmt->fetchColumn() ?: 0;
+
+// Saldo
+$saldo = $totalReceitas - $totalDespesas;
+
+// Últimas movimentações (receitas e despesas)
+$stmt = $conn->prepare("
+    SELECT 'Receita' as tipo, descricao, valor, data_receita as data
+    FROM RECEITAS WHERE id_usuario = ? AND MONTH(data_receita) = ? AND YEAR(data_receita) = ?
+    UNION ALL
+    SELECT 'Despesa' as tipo, descricao, valor, data_despesa as data
+    FROM DESPESAS WHERE id_usuario = ? AND MONTH(data_despesa) = ? AND YEAR(data_despesa) = ?
+    ORDER BY data DESC LIMIT 5
+");
+$stmt->execute([$user_id, $mesAtual, $anoAtual, $user_id, $mesAtual, $anoAtual]);
+$movimentacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Progresso (exemplo: meta de receitas/despesas)
+$metaReceita = 5000; // valor de meta mensal de receita (pode ser dinâmico)
+$metaDespesa = 3000; // valor de meta mensal de despesa (pode ser dinâmico)
+$progressoReceita = min(100, $metaReceita > 0 ? round(($totalReceitas / $metaReceita) * 100) : 0);
+$progressoDespesa = min(100, $metaDespesa > 0 ? round(($totalDespesas / $metaDespesa) * 100) : 0);
+?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -12,8 +58,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="../assets/css/modalsair.css">
+    <style>
+        .dashboard-cards { display: flex; gap: 2rem; margin-bottom: 2rem; }
+        .dashboard-card { flex: 1; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 1.5rem; }
+        .dashboard-card h3 { margin: 0 0 1rem 0; font-size: 1.2rem; }
+        .saldo { font-size: 2rem; font-weight: bold; color: #2e7d32; }
+        .barra-status { background: #eee; border-radius: 8px; height: 18px; margin: 0.5rem 0 1rem 0; position: relative; }
+        .barra-status-inner { height: 100%; border-radius: 8px; transition: width 0.5s; }
+        .barra-receita { background: #4caf50; }
+        .barra-despesa { background: #e53935; }
+        .barra-status span { position: absolute; right: 10px; top: 0; font-size: 0.9rem; color: #333; }
+        .ultimas-movimentacoes { margin-top: 2rem; }
+        .ultimas-movimentacoes table { width: 100%; border-collapse: collapse; }
+        .ultimas-movimentacoes th, .ultimas-movimentacoes td { padding: 0.5rem; text-align: left; }
+        .ultimas-movimentacoes th { background: #f5f5f5; }
+        .ultimas-movimentacoes tr:nth-child(even) { background: #fafafa; }
+        .tipo-receita { color: #388e3c; font-weight: bold; }
+        .tipo-despesa { color: #d32f2f; font-weight: bold; }
+        .detalhe-btn { background: #1976d2; color: #fff; border: none; border-radius: 5px; padding: 0.3rem 0.8rem; cursor: pointer; }
+        .detalhe-btn:hover { background: #1565c0; }
+        .saldo-negativo { color: #d32f2f; }
+        .tooltip { position: relative; cursor: pointer; }
+        .tooltip .tooltiptext {
+            visibility: hidden; width: 180px; background: #333; color: #fff; text-align: center;
+            border-radius: 6px; padding: 5px 0; position: absolute; z-index: 1; bottom: 125%; left: 50%;
+            margin-left: -90px; opacity: 0; transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
 </head>
 <body>
     <header class="container-header">
@@ -62,32 +136,88 @@
         </aside>
 
         <main class="dashboard">
-            <div class="card">
-                <div class="card-header">Para Hoje (Receita/Despesas)</div>
-                <div class="card-body">
-                    <p>✅ Nenhum lançamento para hoje</p>
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <h3>
+                        <span class="tooltip">Receitas do mês
+                            <span class="tooltiptext">Total de receitas cadastradas neste mês</span>
+                        </span>
+                    </h3>
+                    <div class="saldo">R$ <?= number_format($totalReceitas, 2, ',', '.') ?></div>
+                    <div class="barra-status">
+                        <div class="barra-status-inner barra-receita" style="width: <?= $progressoReceita ?>%"></div>
+                        <span><?= $progressoReceita ?>% da meta (<?= number_format($metaReceita, 2, ',', '.') ?>)</span>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>
+                        <span class="tooltip">Despesas do mês
+                            <span class="tooltiptext">Total de despesas cadastradas neste mês</span>
+                        </span>
+                    </h3>
+                    <div class="saldo saldo-negativo">R$ <?= number_format($totalDespesas, 2, ',', '.') ?></div>
+                    <div class="barra-status">
+                        <div class="barra-status-inner barra-despesa" style="width: <?= $progressoDespesa ?>%"></div>
+                        <span><?= $progressoDespesa ?>% da meta (<?= number_format($metaDespesa, 2, ',', '.') ?>)</span>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>
+                        <span class="tooltip">Saldo do mês
+                            <span class="tooltiptext">Receitas menos despesas</span>
+                        </span>
+                    </h3>
+                    <div class="saldo <?= $saldo < 0 ? 'saldo-negativo' : '' ?>">R$ <?= number_format($saldo, 2, ',', '.') ?></div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">Movimentações Atrasadas (Receita/Despesas)</div>
-                <div class="card-body">
-                    <p>✅ Nenhum lançamento em atraso</p>
-                </div>
-            </div>
+            <section class="ultimas-movimentacoes">
+                <h3>Últimas movimentações</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Data</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($movimentacoes) === 0): ?>
+                            <tr><td colspan="5">Nenhuma movimentação encontrada.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($movimentacoes as $mov): ?>
+                                <tr>
+                                    <td class="<?= $mov['tipo'] === 'Receita' ? 'tipo-receita' : 'tipo-despesa' ?>">
+                                        <?= htmlspecialchars($mov['tipo']) ?>
+                                    </td>
+                                    <td><?= htmlspecialchars($mov['descricao']) ?></td>
+                                    <td>R$ <?= number_format($mov['valor'], 2, ',', '.') ?></td>
+                                    <td><?= date('d/m/Y', strtotime($mov['data'])) ?></td>
+                                    <td>
+                                        <button class="detalhe-btn" onclick="mostrarDetalhes('<?= htmlspecialchars(addslashes($mov['tipo'])) ?>', '<?= htmlspecialchars(addslashes($mov['descricao'])) ?>', '<?= number_format($mov['valor'], 2, ',', '.') ?>', '<?= date('d/m/Y', strtotime($mov['data'])) ?>')">
+                                            Detalhes
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </section>
         </main>
     </div>
+
     <div class="modal-overlay hidden" id="modal-1">
         <div class="modal-box">
             <button class="modal-close close-modal" type="button">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-    
             <div class="modal-subject">
                 <div class="modal-header">
                     <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
                 </div>
-    
                 <div class="modal-form">
                     <form action="../src/login/logout.php" method="post">
                         <div class="sim-btn">
@@ -103,31 +233,61 @@
     </div>
 
     <div id="session-expired-toast" class="toast hidden">
-    Sua sessão expirou! Faça o login novamente.
+        Sua sessão expirou! Faça o login novamente.
+    </div>
+
+    <!-- Modal de detalhes -->
+    <div id="modal-detalhes" class="modal-overlay hidden">
+        <div class="modal-box">
+            <button class="modal-close close-modal-detalhes" type="button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-header">
+                <h3>Detalhes da Movimentação</h3>
+            </div>
+            <div class="modal-body" id="detalhes-body">
+                <!-- Conteúdo preenchido via JS -->
+            </div>
+        </div>
     </div>
 
     <script>
+        // Modal sair
         document.querySelectorAll(".open-modal").forEach(button => {
             button.addEventListener("click", () => {
                 const modalId = button.getAttribute("data-modal");
                 document.getElementById(modalId).classList.remove("hidden");
             });
         });
-    
         document.querySelectorAll(".close-modal").forEach(button => {
             button.addEventListener("click", () => {
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
-
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {
                 e.target.classList.add("hidden");
             }
         });
+
+        // Modal detalhes
+        function mostrarDetalhes(tipo, descricao, valor, data) {
+            document.getElementById('detalhes-body').innerHTML =
+                `<p><strong>Tipo:</strong> ${tipo}</p>
+                 <p><strong>Descrição:</strong> ${descricao}</p>
+                 <p><strong>Valor:</strong> R$ ${valor}</p>
+                 <p><strong>Data:</strong> ${data}</p>`;
+            document.getElementById('modal-detalhes').classList.remove('hidden');
+        }
+        document.querySelectorAll(".close-modal-detalhes").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".modal-overlay").classList.add("hidden");
+            });
+        });
+
+        // Atualização dinâmica do saldo (exemplo de interação extra)
+        // Você pode expandir para buscar dados via AJAX se desejar
     </script>
-
     <script src="../assets/js/inatividade.js"></script>
-
 </body>
 </html>
