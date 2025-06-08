@@ -22,6 +22,7 @@ if ($nova_senha !== $repetir_senha) {
 }
 
 if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/", $nova_senha)) {
+    // Apenas retorna erro sem redirecionar
     die("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
 }
 // Consulta a senha atual
