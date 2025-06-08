@@ -1,10 +1,53 @@
 <?php
 session_start();
-include('../../config/config.php'); 
+require('../../config/config.php');
 
 if (!isset($_SESSION['tipo_usuario']) || $_SESSION['tipo_usuario'] !== 'admin') {
     header("Location: ../../public/login.php");
     exit;
+}
+
+function validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha) {
+    if (empty($nome) || empty($sobrenome) || empty($cargo) || empty($senha)) {
+        return ['success' => false, 'message' => 'Preencha todos os campos obrigatórios.'];
+    }
+    if (strlen($cpf) !== 11) {
+        return ['success' => false, 'message' => 'CPF inválido.'];
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'Email inválido.'];
+    }
+    return ['success' => true];
+}
+
+function inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo) {
+    $sql = "INSERT INTO USUARIO (
+                nome_usuario, cpf_usuario, cnpj_usuario,
+                email_usuario, senha_usuario, data_adicao,
+                tipo_usuario, id_cargo, ativo
+            ) VALUES (
+                :nome, :cpf, '', 
+                :email, :senha, NOW(), 
+                'padrao', :cargo, 1
+            )";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':nome', $nomeCompleto);
+    $stmt->bindParam(':cpf', $cpf);
+    $stmt->bindParam(':email', $email);
+    $stmt->bindParam(':senha', $senhaHash);
+    $stmt->bindParam(':cargo', $cargo);
+
+    return $stmt->execute();
+}
+
+function verificarDuplicidade($pdo, $cpf, $email) {
+    $sqlCheck = "SELECT COUNT(*) FROM USUARIO WHERE cpf_usuario = :cpf OR email_usuario = :email";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->bindParam(':cpf', $cpf);
+    $stmtCheck->bindParam(':email', $email);
+    $stmtCheck->execute();
+    return $stmtCheck->fetchColumn() > 0;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,52 +55,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sobrenome = trim($_POST['sobrenome']);
     $cpf = preg_replace('/\D/', '', $_POST['cpf']);
     $email = trim($_POST['email']);
-    $cargo = trim($_POST['cargo']);  
+    $cargo = intval($_POST['cargo']);
     $senha = $_POST['senha'];
 
-    if (strlen($cpf) !== 11) {
-        die("CPF inválido");
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Email inválido");
-    }
-
-    if (!$nome || !$sobrenome || !$cargo || !$senha) {
-        die("Preencha todos os campos.");
+    $validacao = validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha);
+    if (!$validacao['success']) {
+        echo json_encode($validacao);
+        exit;
     }
 
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-    $data_adicao = date('Y-m-d');
+    $nomeCompleto = $nome . ' ' . $sobrenome;
 
     try {
         $pdo = Conexao::getConn();
 
-        $nome_completo = $nome;
+        if (verificarDuplicidade($pdo, $cpf, $email)) {
+            echo json_encode(['success' => false, 'message' => 'CPF ou Email já cadastrados.']);
+            exit;
+        }
 
-        $sql = "INSERT INTO USUARIO (
-                    nome_usuario, cpf_usuario, email_usuario, senha_usuario, data_adicao, id_cargo
-                ) VALUES (
-                    :nome, :cpf, :email, :senha, :data_adicao, :cargo
-                )";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':nome', $nome_completo);
-        $stmt->bindParam(':cpf', $cpf);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':senha', $senhaHash);
-        $stmt->bindParam(':data_adicao', $data_adicao);
-        $stmt->bindParam(':cargo', $cargo);
-
-        $stmt->execute();
-
-        header("Location: ../../public/homepage.php?msg=usuario_cadastrado");
-        exit;
+        if (inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo)) {
+            header("Location: ../../public/homepage.php?msg=usuario_cadastrado");
+            exit;
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar usuário.']);
+            exit;
+        }
     } catch (PDOException $e) {
-        die("Erro ao cadastrar usuário: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erro ao conectar ao banco de dados: ' . $e->getMessage()]);
+        exit;
     }
 } else {
     header("Location: ../../public/homepage.php");
     exit;
 }
-?>
