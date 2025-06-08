@@ -249,6 +249,7 @@ try {
           <th>Pagamento</th>
           <th>Produto</th>
           <th>Categoria</th>
+          <th>Sabor</th>
           <th>Quantidade</th>
           <th>Valor Unitário</th>
           <th>Total</th>
@@ -263,6 +264,7 @@ try {
             <td><?= htmlspecialchars($row['forma_pagamento']) ?></td>
             <td><?= htmlspecialchars($row['nome_produto']) ?></td>
             <td><?= htmlspecialchars($row['nome_categoria']) ?></td>
+            <td><?= htmlspecialchars($row['nome_sabor']) ?></td>
             <td><?= htmlspecialchars($row['qtd_produto']) ?></td>
             <td>R$ <?= number_format($row['val_unitario'], 2, ',', '.') ?></td>
             <td>R$ <?= number_format($row['total_receita'], 2, ',', '.') ?></td>
@@ -374,7 +376,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
         startY: 35,
         styles: {
             font: 'helvetica',
-            fontSize: 9,
+            fontSize: 7,
             cellPadding: 3,
             textColor: 0,
             valign: 'middle',
@@ -386,7 +388,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
             halign: 'center',
         },
         bodyStyles: {
-            halign: 'left'
+            halign: 'center'
         },
         alternateRowStyles: {
             fillColor: [245, 245, 245]

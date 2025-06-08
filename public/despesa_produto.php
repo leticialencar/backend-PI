@@ -355,7 +355,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
         startY: 35,
         styles: {
             font: 'helvetica',
-            fontSize: 9,
+            fontSize: 7,
             cellPadding: 3,
             textColor: 0,
             valign: 'middle',
@@ -367,7 +367,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
             halign: 'center',
         },
         bodyStyles: {
-            halign: 'left'
+            halign: 'center'
         },
         alternateRowStyles: {
             fillColor: [245, 245, 245]

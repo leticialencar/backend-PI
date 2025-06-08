@@ -179,7 +179,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
             <thead>
                 <tr>
                     <th>Data</th>
-                    <th>Categoria</th>
+                    <th>Variado</th>
                     <th>Descrição</th>
                     <th>Valor</th>
                 </tr>
@@ -301,7 +301,7 @@ document.querySelector('.btn-imprimir').addEventListener('click', function () {
         startY: 35,
         styles: {
             font: 'helvetica',
-            fontSize: 9,
+            fontSize: 7,
             cellPadding: 3,
             textColor: 0,
             valign: 'middle',
