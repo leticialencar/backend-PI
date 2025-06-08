@@ -91,7 +91,7 @@
 
                 <div class="form-buttons">
                     <button type="button" class="open-modal2" data-modal-2="meuModal2">Salvar</button>
-                  <a href="../public/profile.php"><button type="button" class="btn-voltar">Voltar</button></a>
+                    <a href="../public/profile.php" class="btn-voltar">Voltar</a>
                 </div>
 
               </form>
@@ -138,16 +138,17 @@
         </div>
         
     </div>
+    <!-- Modal de redefinição de senha -->
     <div id="meuModal2" class="modal2-overlay hidden">
         <div class="modal2-box">
-            <button class="modal2-close close-modal2">&times;</button>
+            <button class="modal2-close close-modal2" type="button">&times;</button>
             <p class="modal-title">Deseja mesmo <span>redefinir</span> sua senha?</p>
             <div class="modal2-form">
                 <div class="modal2-btn-sim">
                     <button type="button" id="confirmar-redefinicao">Sim</button>
                 </div>
                 <div class="modal2-btn-nao">
-                    <button type="button">Não</button>
+                    <button type="button" class="close-modal2">Não</button>
                 </div>
             </div>
         </div>
