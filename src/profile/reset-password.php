@@ -47,14 +47,11 @@ $stmt_update = $conn->prepare($sql_update);
 $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 
 if ($executou) {
-<<<<<<< HEAD
+
     // Redireciona para perfil com sucesso
     header("Location: /backend-PI/public/profile.php?sucesso=senha_alterada");
     exit;
-=======
-   header("Location: ../public/profile.php?senha=ok");
-    exit;   
->>>>>>> f0ac93ed2ed881a718231952cf85700d19bcd9ed
+
 } else {
     die("Erro ao atualizar a senha.");
 }
