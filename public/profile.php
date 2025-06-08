@@ -35,6 +35,18 @@ $sqlCargos = "SELECT id_cargo AS id, nome_cargo AS nome, nivel_permissao FROM CA
 $stmtCargos = $conn->prepare($sqlCargos);
 $stmtCargos->execute();
 $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_GET['verificarCPF'])) {
+    $cpf = $_GET['verificarCPF'];
+
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM USUARIO WHERE cpf_usuario = :cpf");
+    $stmt->bindParam(':cpf', $cpf);
+    $stmt->execute();
+
+    echo json_encode(['existe' => $stmt->fetchColumn() > 0]);
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -257,9 +269,17 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                       </div>
 
                       <div class="input-box">
-                          <label for="cadastro-cpf">CPF</label>
-                          <input type="text" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
-                      </div>
+                        <label for="cadastro-cpf">CPF</label>
+                        <input type="number" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                        <small id="cpf-feedback" style="display: block;
+                            margin-top: 4px;
+                            font-size: 0.9rem;
+                            font-weight: 500;
+                            opacity: 0;
+                            transform: translateY(-5px);
+                            transition: opacity 0.3s ease, transform 0.3s ease;
+                        "></small>
+                        </div>
 
                       <div class="input-box">
                           <label for="cadastro-email">E-mail</label>
@@ -398,16 +418,151 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         const nivel = selectedOption.getAttribute("data-nivel") || "";
         document.getElementById("cadastro-nivel").value = nivel;
         });
-</script>
+    </script>
 
     <script src="../assets/js/cep-enter-prevent.js"></script>
     <script src="../assets/js/cep.js"></script>
     <script src="../assets/js/user-update.js"></script>
-    <script src="../assets/js/user-insert.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const formCadastro = document.querySelector("#modal-cadastro .modal-form-new-user form");
+    const tabelaUsuarios = document.querySelector(".card table tbody");
+
+    document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
+        document.querySelectorAll("#modal-cadastro input").forEach(input => input.value = "");
+        document.getElementById("cadastro-cargo").value = "";
+        document.getElementById("cadastro-nivel").value = "";
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Criar Conta";
+
+        document.getElementById("modal-cadastro").classList.remove("hidden");
+    });
+
+    tabelaUsuarios.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-edit")) {
+        const row = e.target.closest("tr");
+        const nomeCompleto = row.children[1].textContent.trim().split(" ");
+        const email = row.children[2].textContent.trim();
+
+        document.getElementById("cadastro-nome").value = nomeCompleto[0];
+        document.getElementById("cadastro-sobrenome").value = nomeCompleto.slice(1).join(" ");
+        document.getElementById("cadastro-cpf").value = ""; 
+        document.getElementById("cadastro-email").value = email;
+        document.getElementById("cadastro-cargo").value = "";
+        document.getElementById("cadastro-nivel").value = "";
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Alterar Informações";
+
+        document.getElementById("modal-cadastro").classList.remove("hidden");
+        }
+    });
+
+    formCadastro.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formCadastro);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+        const response = await fetch('../src/profile/register-user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+            alert(result.message || "Usuário salvo com sucesso!");
+            location.reload();
+        } else {
+            alert(result.message || "Erro ao salvar o usuário.");
+        }
+        } catch (error) {
+        console.error("Erro ao salvar o usuário:", error);
+        alert("Erro de conexão.");
+        }
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Criar Conta";
+
+        document.getElementById("modal-cadastro").classList.add("hidden");
+    });
+    });
+    </script>
     <script src="../assets/js/modal-close.js"></script>
     <script src="../assets/js/form-handler.js"></script>
     <script src="../assets/js/update-username.js"></script>
     <script src="../assets/js/user-deactivate.js"></script>
+
+    <script>
+function validarCPFFormato(cpf) {
+    return /^\d{11}$/.test(cpf);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const cpfInput = document.getElementById('cadastro-cpf');
+    const feedback = document.getElementById('cpf-feedback');
+
+    function mostrarFeedback(mensagem, cor) {
+        feedback.textContent = mensagem;
+        feedback.style.color = cor;
+        feedback.style.opacity = '1';
+        feedback.style.transform = 'translateY(0)';
+    }
+
+    function limparFeedback() {
+        feedback.textContent = '';
+        feedback.style.opacity = '0';
+        feedback.style.transform = 'translateY(-5px)';
+    }
+
+    cpfInput.addEventListener('input', function () {
+        const rawValue = cpfInput.value;
+
+        if (rawValue.trim() === '') {
+            limparFeedback();
+            return;
+        }
+
+        if (/[^0-9]/.test(rawValue)) {
+            mostrarFeedback('Apenas números são permitidos.', 'orange');
+            return;
+        }
+
+        if (rawValue.length < 11) {
+            mostrarFeedback('Digite os 11 dígitos do CPF.', 'gray');
+            return;
+        }
+
+        if (!validarCPFFormato(rawValue)) {
+            mostrarFeedback('CPF inválido.', 'red');
+            return;
+        }
+
+        fetch('?verificarCPF=' + encodeURIComponent(rawValue))
+            .then(response => response.json())
+            .then(data => {
+                if (data.existe) {
+                    mostrarFeedback('CPF já cadastrado.', 'red');
+                } else {
+                    mostrarFeedback('CPF válido.', 'green');
+                }
+            })
+            .catch(err => {
+                mostrarFeedback('Erro ao verificar CPF.', 'orange');
+                console.error(err);
+            });
+    });
+
+    cpfInput.addEventListener('focus', function () {
+        if (cpfInput.value.trim() === '') {
+            limparFeedback();
+        }
+    });
+});
+</script>
 
 </body>
 </html>
