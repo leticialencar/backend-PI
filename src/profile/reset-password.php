@@ -18,6 +18,7 @@ if (empty($senha_antiga) || empty($nova_senha) || empty($repetir_senha)) {
 }
 
 if ($nova_senha !== $repetir_senha) {
+    // Apenas retorna erro sem redirecionar
     die("As novas senhas não coincidem.");
 }
 

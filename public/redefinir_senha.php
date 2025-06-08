@@ -205,8 +205,13 @@
 
         document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
             const novaSenha = document.getElementById("nova-senha").value.trim();
+            const repetirSenha = document.getElementById("repetir-senha").value.trim();
             if (!validarSenhaForte(novaSenha)) {
                 alert("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+                return;
+            }
+            if (novaSenha !== repetirSenha) {
+                alert("As senhas não coincidem. Por favor, tente novamente.");
                 return;
             }
             const form = document.querySelector("main .form-container form");
