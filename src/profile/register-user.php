@@ -76,12 +76,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo)) {
-            header("Location: ../../public/homepage.php?msg=usuario_cadastrado");
-            exit;
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar usuário.']);
-            exit;
-        }
+    header("Location: ../../public/homepage.php?msg=usuario_cadastrado");
+    exit;
+} else {
+    $erro = $pdo->errorInfo();
+    echo json_encode([
+        'success' => false,
+        'message' => 'Erro ao cadastrar usuário: ' . $erro[2]
+    ]);
+    exit;
+}
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Erro ao conectar ao banco de dados: ' . $e->getMessage()]);
         exit;
