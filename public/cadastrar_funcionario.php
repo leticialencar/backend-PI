@@ -91,13 +91,13 @@ try {
         <main class="main">
             <form id="form-dados" class="form-grid">
                 <input name="nome" type="text" placeholder="*Nome" required>
-                <input name="cidade" type="text" placeholder="RG">
-                <input name="cpf" type="text" placeholder="CPF">
-                <input name="estado" type="text" placeholder="Endereço">
-                <input name="cep" type="text" placeholder="CEP">
-                <input name="telefone" type="text" placeholder="Número">
+                <input name="RG" type="text" placeholder="RG">
+                <input name="cpf" type="number" placeholder="CPF">
+                <input name="endereço" type="text" placeholder="Endereço">
+                <input name="cep" type="number" placeholder="CEP">
+                <input name="numero" type="number" placeholder="Número">
                 <input name="rua" type="text" placeholder="Cidade">
-                <input name="ddd" type="text" placeholder="Bairro">
+                <input name="bairro" type="text" placeholder="Bairro">
                 <select  id="cargo" name="cargo">
                     <option value="cargo">Cargo</option>
                     <?php foreach ($cargos as $cargo): ?>
