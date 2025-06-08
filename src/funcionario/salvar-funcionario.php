@@ -1,9 +1,10 @@
 <?php
-require __DIR__ . '/../config/config.php';
+require __DIR__ . '/../../config/config.php';
 $conn = Conexao::getConn();
 
+header('Content-Type: application/json'); // importante para retorno JSON
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Recebendo e limpando os dados (exemplo simples)
     $nome = trim($_POST['nome'] ?? '');
     $cpf = trim($_POST['cpf'] ?? '');
     $rg = trim($_POST['rg'] ?? '');
@@ -20,15 +21,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ddd = trim($_POST['ddd'] ?? '');
     $telefone = trim($_POST['telefone'] ?? '');
 
-    // Validações simples
-    if (!$nome || !$cpf || !$rg || !$id_cargo || !$data_admissao || !$salario) {
-        die('Por favor, preencha todos os campos obrigatórios.');
+    if (empty($nome) || empty($cpf) || empty($rg) || empty($id_cargo) || empty($data_admissao) || empty($salario)) {
+        echo json_encode(['success' => false, 'message' => 'Por favor, preencha todos os campos obrigatórios.']);
+        exit;
+    }
+
+    $sqlCheck = "SELECT COUNT(*) FROM funcionario WHERE cpf_funcionario = :cpf OR nome_funcionario = :nome";
+    $stmtCheck = $conn->prepare($sqlCheck);
+    $stmtCheck->execute([':cpf' => $cpf, ':nome' => $nome]);
+    $exists = $stmtCheck->fetchColumn();
+
+    if ($exists) {
+        echo json_encode(['success' => false, 'message' => 'Já existe um funcionário cadastrado com esse CPF.']);
+        exit;
     }
 
     try {
         $conn->beginTransaction();
 
-        // Inserir na tabela FUNCIONARIO
         $sqlFuncionario = "INSERT INTO FUNCIONARIO (nome_funcionario, cpf_funcionario, rg_funcionario, id_cargo, data_admissao, salario)
                            VALUES (:nome, :cpf, :rg, :id_cargo, :data_admissao, :salario)";
         $stmt = $conn->prepare($sqlFuncionario);
@@ -41,10 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':salario' => $salario
         ]);
 
-        // Pegar id_funcionario inserido
         $id_funcionario = $conn->lastInsertId();
 
-        // Inserir endereço do funcionário
         $sqlEndereco = "INSERT INTO endereco_funcionario (cep_funcionario, rua_funcionario, bairro_funcionario, cidade_funcionario, estado_funcionario, id_funcionario)
                         VALUES (:cep, :rua, :bairro, :cidade, :estado, :id_funcionario)";
         $stmt = $conn->prepare($sqlEndereco);
@@ -57,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':id_funcionario' => $id_funcionario
         ]);
 
-        // Inserir telefone do funcionário
         $sqlTelefone = "INSERT INTO telefone_funcionario (ddd_funcionario, num_telefone_funcionario, id_funcionario)
                         VALUES (:ddd, :telefone, :id_funcionario)";
         $stmt = $conn->prepare($sqlTelefone);
@@ -69,14 +76,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $conn->commit();
 
-        echo "Funcionário cadastrado com sucesso!";
-        // header('Location: funcionarios.php'); // Descomente para redirecionar
+        echo json_encode(['success' => true, 'message' => 'Funcionário cadastrado com sucesso!']);
 
     } catch (PDOException $e) {
         $conn->rollBack();
-        echo "Erro ao cadastrar funcionário: " . $e->getMessage();
+        echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar funcionário: ' . $e->getMessage()]);
     }
-
 } else {
-    echo "Método inválido.";
+    echo json_encode(['success' => false, 'message' => 'Método inválido.']);
 }
+
+

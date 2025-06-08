@@ -11,27 +11,12 @@ if (!$user_id) {
 
 $conn = Conexao::getConn();
 
-$sql = "SELECT 
-    u.nome_usuario, 
-    u.cpf_usuario, 
-    u.cnpj_usuario, 
-    u.email_usuario, 
-    u.tipo_usuario,
-    e.cep, 
-    e.rua, 
-    e.bairro, 
-    e.cidade, 
-    e.estado,
-    t.num_telefone, 
-    t.ddd,
-    c.nome_cargo, 
-    c.nivel_permissao
+$sql = "SELECT u.nome_usuario, u.cpf_usuario, u.cnpj_usuario, u.email_usuario, u.tipo_usuario, e.cep, e.rua, e.bairro, e.cidade, e.estado, t.num_telefone, t.ddd, c.nome_cargo, c.nivel_permissao
 FROM USUARIO u
 LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
 LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
 LEFT JOIN CARGO c ON u.id_cargo = c.id_cargo
-WHERE u.id_usuario = :user_id
-";
+WHERE u.id_usuario = :user_id";
 
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -164,7 +149,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
 
           <?php 
             if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
-                // Consulta apenas usuários com status 'ativo'
                 $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao 
                         FROM USUARIO 
                         WHERE ativo = 1";
@@ -376,10 +360,8 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
             }
         });
 
-    // Variável global para armazenar o id do usuário a ser desativado
     let usuarioParaDesativar = null;
 
-    // Ao clicar no botão "Desativar", abre o modal e armazena o id
     document.querySelectorAll('.btn-desativar-conta').forEach(btn => {
         btn.addEventListener('click', function() {
             usuarioParaDesativar = this.getAttribute('data-id');
@@ -387,7 +369,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         });
     });
 
-    // Ao clicar no botão "Sim" do modal, faz a requisição para desativar o usuário
     document.getElementById('confirmarDesativacao').addEventListener('click', function () {
         if (!usuarioParaDesativar) return;
         fetch('desativar_conta.php', {
@@ -408,7 +389,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         });
     });
 
-    // Botão "Não" fecha o modal
     document.querySelectorAll('.nao-btn-desativar button').forEach(btn => {
         btn.addEventListener('click', function() {
             document.getElementById('modal-1').classList.add('hidden');
