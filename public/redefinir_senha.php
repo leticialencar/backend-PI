@@ -176,59 +176,39 @@
     </script>
     
     <script>
+        // Função para validar a senha conforme os requisitos
+        function validarSenhaForte(senha) {
+            // Pelo menos 8 caracteres, uma maiúscula, uma minúscula, um número e um caractere especial
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(senha);
+        }
 
         document.querySelectorAll(".open-modal2").forEach(button => {
             button.addEventListener("click", (e) => {
                 e.preventDefault();
                 const novaSenha = document.getElementById("nova-senha").value.trim();
                 const repetirSenha = document.getElementById("repetir-senha").value.trim();
-                const minLength = 8; 
 
                 if (novaSenha && repetirSenha) {
-                    if (novaSenha.length < minLength || repetirSenha.length < minLength) {
-                        alert(`A senha deve ter pelo menos ${minLength} caracteres.`);
-                    } else if (novaSenha === repetirSenha) {
+                    if (!validarSenhaForte(novaSenha)) {
+                        alert("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+                    } else if (novaSenha !== repetirSenha) {
+                        alert("As senhas não coincidem. Por favor, tente novamente.");
+                    } else {
                         const modalId = button.getAttribute("data-modal-2");
                         document.getElementById(modalId).classList.remove("hidden");
-                    } else {
-                        alert("As senhas não coincidem. Por favor, tente novamente.");
                     }
                 } else {
                     alert("Por favor, preencha todos os campos.");
                 }
             });
         });
-      
-      
-        document.querySelectorAll(".close-modal2").forEach(button => {
-            button.addEventListener("click", () => {
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      
-        window.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal2-overlay")) {
-                e.target.classList.add("hidden");
-            }
-        });
-      
-        document.querySelectorAll(".modal2-btn-sim").forEach(button => {
-            button.addEventListener("click", () => {
-                console.log("Sim clicado");
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      
-        document.querySelectorAll(".modal2-btn-nao").forEach(button => {
-            button.addEventListener("click", () => {
-                console.log("Não clicado");
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      </script>
-      
-      <script>
+
         document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
+            const novaSenha = document.getElementById("nova-senha").value.trim();
+            if (!validarSenhaForte(novaSenha)) {
+                alert("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+                return;
+            }
             const form = document.querySelector("main .form-container form");
             if (form) {
                 form.submit();
@@ -237,7 +217,7 @@
             }
         });
 
-      </script>
+    </script>
       <script>
             document.getElementById("nova-senha").addEventListener("input", function () {
                 const senha = this.value;
