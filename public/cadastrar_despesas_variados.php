@@ -97,7 +97,7 @@
         <div class="input-receitas">
             <div class="form-title">
                 <h2>Cadastrar Despesas</h2>
-                <a href="../public/despesas_variadas.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
+                <a href="../public/despesas_variadas.php"><button type="button" class="ver-despesas">Ver Despesas</button></a>
             </div>
 
             <form action="../src/despesas/cadastrar-despesa-variados.php" method="POST">
@@ -290,7 +290,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-
+    <script src="../assets/js/inatividade.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 </html>

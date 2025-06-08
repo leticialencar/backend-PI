@@ -74,7 +74,7 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <ul>
         <li class="active"><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
         <li><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
-        <li><a href="../public/cadastrar_despesas_variados.html">Variados</a></li>
+        <li><a href="../public/cadastrar_despesas_variados.php">Variados</a></li>
       </ul>
     </nav>
   </div>
@@ -254,7 +254,7 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
   const dataVencimento = document.querySelector('input[name="data_vencimento"]').value;
 
   if (dataVencimento < dataPagamento) {
-    e.preventDefault(); // Impede o envio do form
+    e.preventDefault(); 
     alert('A data de vencimento não pode ser menor do que a data de pagamento.');
   }
 });
@@ -284,7 +284,7 @@ document.getElementById('form-despesas').addEventListener('submit', function(e) 
       mensagemDiv.style.color = 'green';
       mensagemDiv.textContent = "Receita foi salva com sucesso!";
       mensagemDiv.style.display = 'block';
-      this.reset(); // Limpa o formulário
+      this.reset(); 
     } else {
       mensagemDiv.style.color = 'red';
       mensagemDiv.textContent = "Erro ao salvar a receita.";

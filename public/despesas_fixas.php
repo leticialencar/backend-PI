@@ -1,5 +1,5 @@
 <?php
-// include '../src/login/verify-session.php';
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 $conn = Conexao::getConn();
 
@@ -387,7 +387,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
                   doc.setFontSize(9);
                   doc.setFont('helvetica', 'normal');
                   doc.setTextColor(100);
-                  doc.text('CashHive System - 2025', data.settings.margin.left, pageHeight - 10);
+                  doc.text('CashHive System - 2025', doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
               }
           });
 

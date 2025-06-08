@@ -79,7 +79,7 @@ try {
             <ul>
                 <li><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
                 <li class="active"><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
-                <li><a href="../public/cadastrar_despesas_variados.html">Variados</a></li>
+                <li><a href="../public/cadastrar_despesas_variados.php">Variados</a></li>
             </ul>
         </nav>
     </div>
@@ -136,7 +136,7 @@ try {
         <div class="input-receitas">
             <div class="form-title">
                 <h2>Cadastrar Despesas</h2>
-                <a href="/html/despesa_produto.html"><button type="button" class="ver-despesas">Ver Despesas</button></a>
+                <a href="../public/despesa_produto.php"><button type="button" class="ver-despesas">Ver Despesas</button></a>
             </div>
 
             <form action="../src/despesas/cadastrar-despesa-produto.php" method="post">
@@ -198,7 +198,6 @@ try {
 </div>
 
 <script>
-    // Modal sair
     document.querySelectorAll(".open-modal").forEach(button => {
         button.addEventListener("click", () => {
             const modalId = button.getAttribute("data-modal");
@@ -217,8 +216,6 @@ try {
             e.target.classList.add("hidden");
         }
     });
-
-    // Modal excluir com validação
     const botaoAbrirModalExcluir = document.querySelector(".abrir-modal-excluir");
     botaoAbrirModalExcluir.addEventListener("click", (e) => {
         e.preventDefault();
@@ -238,7 +235,6 @@ try {
         }
     });
 
-    // Validação do formulário no envio
     const form = document.querySelector("form");
     form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -261,7 +257,6 @@ try {
         }
     });
 
-    // Cálculo automático do total
     const valorUnitario = document.getElementById("valor-unitario");
     const quantidade = document.getElementById("quantidade");
     const total = document.getElementById("total");
