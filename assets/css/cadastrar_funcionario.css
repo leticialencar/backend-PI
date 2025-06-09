@@ -270,7 +270,7 @@ body {
     padding: 20px 0;
 }
 
-input[type="text"], input[type="email"], input[type="date"], select {
+input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="date"] select {
     padding: 10px;
     border: 1px solid #0a214c;
     border-radius: 5px;
