@@ -210,16 +210,16 @@ if (isset($_GET['getUserById'])) {
             </thead>
             <tbody>
                 <?php foreach($usuarios as $usuario): ?>
-                    <tr>
-                        <td><?= date('d/m/Y', strtotime($usuario['data_adicao'])); ?></td>
-                        <td><?= htmlspecialchars($usuario['nome_usuario']); ?></td>
-                        <td><?= htmlspecialchars($usuario['email_usuario']); ?></td>
-                        <td class="actions">
-                            <button class="btn-edit" data-id="<?= $usuario['id_usuario']; ?>">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1" data-id="<?= $usuario['id_usuario']; ?>">Desativar</button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+    <tr>
+        <td><?= date('d/m/Y', strtotime($usuario['data_adicao'])); ?></td>
+        <td><?= htmlspecialchars($usuario['nome_usuario']); ?></td>
+        <td><?= htmlspecialchars($usuario['email_usuario']); ?></td>
+        <td class="actions">
+            <button class="btn-edit" type="button" data-id="<?= $usuario['id_usuario']; ?>">Editar</button>
+            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1" data-id="<?= $usuario['id_usuario']; ?>">Desativar</button>
+        </td>
+    </tr>
+<?php endforeach; ?>
             </tbody>
         </table>
     <?php else: ?>
@@ -565,6 +565,51 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+    // Função para preencher o modal de cadastro com dados do usuário para edição
+    function abrirModalEditarUsuario(idUsuario) {
+        fetch('?getUserById=' + encodeURIComponent(idUsuario))
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cadastro-id-usuario').value = data.id_usuario || '';
+                document.getElementById('cadastro-nome').value = data.nome_usuario || '';
+                document.getElementById('cadastro-sobrenome').value = ''; // ajuste se tiver sobrenome separado
+                document.getElementById('cadastro-cpf').value = data.cpf_usuario || '';
+                document.getElementById('cadastro-email').value = data.email_usuario || '';
+                document.getElementById('cadastro-cargo').value = data.id_cargo || '';
+                document.getElementById('cadastro-nivel').value = ''; // pode preencher se desejar
+                document.getElementById('cadastro-senha').value = '';
+                document.getElementById('cadastro-repetir-senha').value = '';
+                document.getElementById('btn-cadastro-usuario').textContent = 'Alterar Informações';
+                document.getElementById('modal-cadastro').classList.remove('hidden');
+            });
+    }
+
+    // Adiciona evento para todos os botões .btn-edit
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                abrirModalEditarUsuario(userId);
+            });
+        });
+
+        // Ao abrir para novo usuário, limpa campos e botão
+        document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
+            document.getElementById('cadastro-id-usuario').value = '';
+            document.getElementById('cadastro-nome').value = '';
+            document.getElementById('cadastro-sobrenome').value = '';
+            document.getElementById('cadastro-cpf').value = '';
+            document.getElementById('cadastro-email').value = '';
+            document.getElementById('cadastro-cargo').value = '';
+            document.getElementById('cadastro-nivel').value = '';
+            document.getElementById('cadastro-senha').value = '';
+            document.getElementById('cadastro-repetir-senha').value = '';
+            document.getElementById('btn-cadastro-usuario').textContent = 'Criar Conta';
+        });
+    });
+    </script>
 
 </body>
 </html>
