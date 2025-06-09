@@ -446,8 +446,8 @@ try {
 
             simBtnDesativar.addEventListener("click", () => {
                 if (currentRow) {
-                    currentRow.remove(); // Remove a linha da tabela
-                    alert("Conta desativada com sucesso!");
+                    currentRow.remove(); 
+                    alert("Funcinário desativado com sucesso!");
                 }
                 modalDesativar.classList.add("hidden");
             });
@@ -459,7 +459,6 @@ try {
             });
         </script>
         <script>
-            // Script para cadastrar novo usuário
             const formCadastro = document.querySelector("#modal-cadastro .modal-form-new-user form");
             const tabelaUsuarios = document.querySelector(".card table tbody");
 
@@ -490,16 +489,13 @@ try {
           </td>`;
                         tabelaUsuarios.appendChild(novaLinha);
 
-                        // Reatribui eventos aos botões "Desativar" para novos usuários
                         novaLinha.querySelector(".js-open-modal-desativar").addEventListener("click", (e) => {
                             currentRow = e.target.closest("tr");
                             modalDesativar.classList.remove("hidden");
                         });
 
-                        // Fecha o modal de cadastro
                         document.getElementById("modal-cadastro").classList.add("hidden");
 
-                        // Limpa o formulário
                         formCadastro.reset();
 
                         alert("Usuário cadastrado com sucesso!");
@@ -677,6 +673,63 @@ try {
                 }
             });
         </script>
+
+        <script>
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                const modalId = button.getAttribute("data-modal");
+                document.getElementById(modalId).classList.remove("hidden");
+            });
+        });
+    
+        document.querySelectorAll(".close-modal").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".modal-overlay").classList.add("hidden");
+            });
+        });
+
+        window.addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) {
+                e.target.classList.add("hidden");
+            }
+        });
+
+    let usuarioParaDesativar = null;
+
+    document.querySelectorAll('.btn-desativar-conta').forEach(btn => {
+        btn.addEventListener('click', function() {
+            usuarioParaDesativar = this.getAttribute('data-id');
+            document.getElementById('modal-1').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
+        if (!usuarioParaDesativar) return;
+        fetch('desativar_conta.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'id_usuario=' + encodeURIComponent(usuarioParaDesativar)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            alert('conta desativada com sucesso.');
+            console.error(error);
+        });
+    });
+
+    document.querySelectorAll('.nao-btn-desativar button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('modal-1').classList.add('hidden');
+            usuarioParaDesativar = null;
+        });
+    });
+    </script>
 
         <script src="../assets/js/inatividade.js"></script>
 
