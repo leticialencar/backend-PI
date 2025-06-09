@@ -1,4 +1,5 @@
 <?php
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
@@ -132,5 +133,8 @@ function formatar($valor) {
       </tbody>
     </table>
   </div>
+
+  <script src="../assets/js/inatividade.js"></script>
+
 </body>
 </html>

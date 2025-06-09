@@ -633,5 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     </script>
 
+    <script src="../assets/js/inatividade.js"></script>
+
 </body>
 </html>

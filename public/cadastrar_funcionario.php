@@ -678,6 +678,8 @@ try {
             });
         </script>
 
+        <script src="../assets/js/inatividade.js"></script>
+
 </body>
 
 </html>

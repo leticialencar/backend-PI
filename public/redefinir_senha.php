@@ -1,3 +1,6 @@
+
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -257,6 +260,7 @@
                 }
             });
      </script>
+     <script src="../assets/js/inatividade.js"></script>
 </body>
 <?php if (isset($_GET['senha']) && $_GET['senha'] === 'ok'): ?>
     <div class="alert-success">

@@ -1,3 +1,5 @@
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html> 
 <html lang="pt-br">
 <head>

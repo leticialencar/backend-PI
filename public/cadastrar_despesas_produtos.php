@@ -1,4 +1,5 @@
 <?php
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
@@ -274,6 +275,8 @@ try {
     valorUnitario.addEventListener("input", calcularTotal);
     quantidade.addEventListener("input", calcularTotal);
 </script>
+
+<script src="../assets/js/inatividade.js"></script>
 
 </body>
 </html>

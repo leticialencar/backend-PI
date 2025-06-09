@@ -323,9 +323,6 @@ $progressoDespesa = min(100, $metaDespesa > 0 ? round(($totalDespesas / $metaDes
                 button.closest(".modal-overlay").classList.add("hidden");
             });
         });
-
-        // Atualização dinâmica do saldo (exemplo de interação extra)
-        // Você pode expandir para buscar dados via AJAX se desejar
     </script>
     <script src="../assets/js/inatividade.js"></script>
 </body>
