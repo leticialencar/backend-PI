@@ -27,13 +27,53 @@ if (!$funcionario) {
 }
 
 $salario = $funcionario['salario'];
-$fgts = $salario * 0.08;   // 8%
-$inss = $salario * 0.09;   // 9%
-$ir = $salario * 0.01;     // 1%
-$descontos = $fgts + $inss + $ir;
+
+$fgts = $salario * 0.08;
+
+function calcularINSS($salario) {
+    $faixas = [
+        [0.00, 1518.00, 0.075],
+        [1518.01, 2793.88, 0.09],
+        [2793.89, 4190.83, 0.12],
+        [4190.84, 8157.41, 0.14]
+    ];
+
+    $inss = 0;
+    foreach ($faixas as $faixa) {
+        list($min, $max, $aliquota) = $faixa;
+
+        if ($salario > $max) {
+            $inss += ($max - $min) * $aliquota;
+        } else {
+            $inss += ($salario - $min) * $aliquota;
+            break;
+        }
+    }
+
+    return min($inss, 908.85); 
+}
+
+function calcularIR($salario, $inss) {
+    $base = $salario - $inss;
+
+    if ($base <= 2259.20) {
+        return 0;
+    } elseif ($base <= 2826.65) {
+        return ($base * 0.075) - 169.44;
+    } elseif ($base <= 3751.05) {
+        return ($base * 0.15) - 381.44;
+    } elseif ($base <= 4664.68) {
+        return ($base * 0.225) - 662.77;
+    } else {
+        return ($base * 0.275) - 896.00;
+    }
+}
+
+$inss = calcularINSS($salario);
+$ir = calcularIR($salario, $inss);
+$descontos = $inss + $ir;
 $salario_liquido = $salario - $descontos;
 
-// 4. Formatação
 function formatar($valor) {
     return number_format($valor, 2, ',', '.');
 }
@@ -71,7 +111,7 @@ function formatar($valor) {
           <td>-</td>
         </tr>
         <tr>
-          <td>FGTS</td>
+          <td>FGTS (depositado pela empresa)</td>
           <td>-</td>
           <td><?= formatar($fgts) ?></td>
         </tr>
