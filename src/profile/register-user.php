@@ -3,17 +3,14 @@ require('../../config/config.php');
 
 header('Content-Type: application/json');
 
-// Lê o corpo da requisição JSON
 $inputJSON = file_get_contents('php://input');
 $input = json_decode($inputJSON, true);
 
-// Verifica se JSON é válido
 if (!$input) {
     echo json_encode(['success' => false, 'message' => 'Dados inválidos (JSON malformado).']);
     exit;
 }
 
-// Extrai e sanitiza os dados
 $nome = trim($input['nome'] ?? '');
 $sobrenome = trim($input['sobrenome'] ?? '');
 $cpf = preg_replace('/\D/', '', $input['cpf'] ?? '');
@@ -21,7 +18,6 @@ $email = trim($input['email'] ?? '');
 $cargo = intval($input['cargo'] ?? 0);
 $senha = $input['senha'] ?? '';
 
-// Função de validação
 function validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha) {
     if (empty($nome) || empty($sobrenome) || empty($cargo) || empty($senha)) {
         return ['success' => false, 'message' => 'Preencha todos os campos obrigatórios.'];
@@ -35,7 +31,6 @@ function validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha) {
     return ['success' => true];
 }
 
-// Função para inserir
 function inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo) {
     $sql = "INSERT INTO USUARIO (
                 nome_usuario, cpf_usuario, cnpj_usuario,
@@ -62,7 +57,6 @@ function inserirUsuario($pdo, $nomeCompleto, $cpf, $email, $senhaHash, $cargo) {
     return true;
 }
 
-// Verifica duplicidade
 function verificarDuplicidade($pdo, $cpf, $email) {
     $sqlCheck = "SELECT COUNT(*) FROM USUARIO WHERE cpf_usuario = :cpf OR email_usuario = :email";
     $stmtCheck = $pdo->prepare($sqlCheck);
@@ -72,7 +66,6 @@ function verificarDuplicidade($pdo, $cpf, $email) {
     return $stmtCheck->fetchColumn() > 0;
 }
 
-// Processa
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $validacao = validarDados($nome, $sobrenome, $cpf, $email, $cargo, $senha);
     if (!$validacao['success']) {
