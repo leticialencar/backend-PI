@@ -47,6 +47,17 @@ if (isset($_GET['verificarCPF'])) {
     exit;
 }
 
+// Endpoint AJAX para buscar dados do usuário por ID
+if (isset($_GET['getUserById'])) {
+    $id = intval($_GET['getUserById']);
+    $stmt = $conn->prepare("SELECT id_usuario, nome_usuario, email_usuario, cpf_usuario, cnpj_usuario, id_cargo FROM USUARIO WHERE id_usuario = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    echo json_encode($user ?: []);
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -249,25 +260,22 @@ if (isset($_GET['verificarCPF'])) {
       <button class="modal-close close-modal close-modal-cadastro" type="button">
           <i class="fa-solid fa-xmark"></i>
       </button>
-
       <div class="modal-subject">
           <div class="modal-header">
               <p class="modal-title">Cadastre um novo usuário</p>
           </div>
-
           <div class="modal-form-new-user">
-              <form>
+              <form id="form-cadastro-usuario" action="../src/profile/register-user.php" method="POST">
+                  <input type="hidden" id="cadastro-id-usuario" name="id_usuario" value="">
                   <div class="input-group">
                       <div class="input-box">
                           <label for="cadastro-nome">Nome</label>
                           <input type="text" id="cadastro-nome" name="nome" placeholder="Digite o nome do novo usuário" required>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-sobrenome">Sobrenome</label>
                           <input type="text" id="cadastro-sobrenome" name="sobrenome" placeholder="Digite o sobrenome do novo usuário" required>
                       </div>
-
                       <div class="input-box">
                         <label for="cadastro-cpf">CPF</label>
                         <input type="number" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
@@ -279,13 +287,11 @@ if (isset($_GET['verificarCPF'])) {
                             transform: translateY(-5px);
                             transition: opacity 0.3s ease, transform 0.3s ease;
                         "></small>
-                        </div>
-
+                      </div>
                       <div class="input-box">
                           <label for="cadastro-email">E-mail</label>
                           <input type="email" id="cadastro-email" name="email" placeholder="Digite o e-mail do novo usuário" required>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-cargo">Cargo</label>
                           <select id="cadastro-cargo" name="cargo" required>
@@ -299,25 +305,21 @@ if (isset($_GET['verificarCPF'])) {
                               <?php endforeach; ?>
                           </select>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-nivel">Nível de permissão</label>
                           <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-senha">Senha</label>
-                          <input type="password" id="cadastro-senha" name="senha" placeholder="Crie uma senha" required>
+                          <input type="password" id="cadastro-senha" name="senha" placeholder="Crie uma senha">
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-repetir-senha">Repetir senha</label>
-                          <input type="password" id="cadastro-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada" required>
+                          <input type="password" id="cadastro-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada">
                       </div>
                   </div>
-
                   <div class="criar-btn">
-                      <button type="submit">Criar Conta</button>
+                      <button type="submit" id="btn-cadastro-usuario">Criar Conta</button>
                   </div>
               </form>
           </div>
