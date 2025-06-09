@@ -1,3 +1,6 @@
+
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +94,7 @@
 
                 <div class="form-buttons">
                     <button type="button" class="open-modal2" data-modal-2="meuModal2">Salvar</button>
-                  <a href="../public/profile.php"><button type="button" class="btn-voltar">Voltar</button></a>
+                    <a href="../public/profile.php" class="btn-voltar">Voltar</a>
                 </div>
 
               </form>
@@ -138,16 +141,17 @@
         </div>
         
     </div>
+    <!-- Modal de redefinição de senha -->
     <div id="meuModal2" class="modal2-overlay hidden">
         <div class="modal2-box">
-            <button class="modal2-close close-modal2">&times;</button>
+            <button class="modal2-close close-modal2" type="button">&times;</button>
             <p class="modal-title">Deseja mesmo <span>redefinir</span> sua senha?</p>
             <div class="modal2-form">
                 <div class="modal2-btn-sim">
                     <button type="button" id="confirmar-redefinicao">Sim</button>
                 </div>
                 <div class="modal2-btn-nao">
-                    <button type="button">Não</button>
+                    <button type="button" class="close-modal2">Não</button>
                 </div>
             </div>
         </div>
@@ -176,59 +180,44 @@
     </script>
     
     <script>
+        // Função para validar a senha conforme os requisitos
+        function validarSenhaForte(senha) {
+            // Pelo menos 8 caracteres, uma maiúscula, uma minúscula, um número e um caractere especial
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(senha);
+        }
 
         document.querySelectorAll(".open-modal2").forEach(button => {
             button.addEventListener("click", (e) => {
                 e.preventDefault();
                 const novaSenha = document.getElementById("nova-senha").value.trim();
                 const repetirSenha = document.getElementById("repetir-senha").value.trim();
-                const minLength = 8; 
 
                 if (novaSenha && repetirSenha) {
-                    if (novaSenha.length < minLength || repetirSenha.length < minLength) {
-                        alert(`A senha deve ter pelo menos ${minLength} caracteres.`);
-                    } else if (novaSenha === repetirSenha) {
+                    if (!validarSenhaForte(novaSenha)) {
+                        alert("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+                    } else if (novaSenha !== repetirSenha) {
+                        alert("As senhas não coincidem. Por favor, tente novamente.");
+                    } else {
                         const modalId = button.getAttribute("data-modal-2");
                         document.getElementById(modalId).classList.remove("hidden");
-                    } else {
-                        alert("As senhas não coincidem. Por favor, tente novamente.");
                     }
                 } else {
                     alert("Por favor, preencha todos os campos.");
                 }
             });
         });
-      
-      
-        document.querySelectorAll(".close-modal2").forEach(button => {
-            button.addEventListener("click", () => {
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      
-        window.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal2-overlay")) {
-                e.target.classList.add("hidden");
-            }
-        });
-      
-        document.querySelectorAll(".modal2-btn-sim").forEach(button => {
-            button.addEventListener("click", () => {
-                console.log("Sim clicado");
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      
-        document.querySelectorAll(".modal2-btn-nao").forEach(button => {
-            button.addEventListener("click", () => {
-                console.log("Não clicado");
-                button.closest(".modal2-overlay").classList.add("hidden");
-            });
-        });
-      </script>
-      
-      <script>
+
         document.getElementById("confirmar-redefinicao").addEventListener("click", () => {
+            const novaSenha = document.getElementById("nova-senha").value.trim();
+            const repetirSenha = document.getElementById("repetir-senha").value.trim();
+            if (!validarSenhaForte(novaSenha)) {
+                alert("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
+                return;
+            }
+            if (novaSenha !== repetirSenha) {
+                alert("As senhas não coincidem. Por favor, tente novamente.");
+                return;
+            }
             const form = document.querySelector("main .form-container form");
             if (form) {
                 form.submit();
@@ -237,7 +226,7 @@
             }
         });
 
-      </script>
+    </script>
       <script>
             document.getElementById("nova-senha").addEventListener("input", function () {
                 const senha = this.value;
@@ -271,6 +260,7 @@
                 }
             });
      </script>
+     <script src="../assets/js/inatividade.js"></script>
 </body>
 <?php if (isset($_GET['senha']) && $_GET['senha'] === 'ok'): ?>
     <div class="alert-success">

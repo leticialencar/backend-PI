@@ -1,5 +1,5 @@
 <?php
-// include '../src/login/verify-session.php';
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 $conn = Conexao::getConn();
 
@@ -362,7 +362,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
               startY: 35,
               styles: {
                   font: 'helvetica',
-                  fontSize: 9,
+                  fontSize: 7,
                   cellPadding: 3,
                   textColor: 0,
                   valign: 'middle',
@@ -374,7 +374,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
                   halign: 'center',
               },
               bodyStyles: {
-                  halign: 'left'
+                  halign: 'center'
               },
               alternateRowStyles: {
                   fillColor: [245, 245, 245]
@@ -387,7 +387,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
                   doc.setFontSize(9);
                   doc.setFont('helvetica', 'normal');
                   doc.setTextColor(100);
-                  doc.text('CashHive System - 2025', data.settings.margin.left, pageHeight - 10);
+                  doc.text('CashHive System - 2025', doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
               }
           });
 
@@ -397,6 +397,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
       });
   </script>
     
+    <script src="../assets/js/inatividade.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 

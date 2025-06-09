@@ -1,4 +1,5 @@
 <?php
+include '../src/login/verify-session.php';
 require __DIR__ . '/../config/config.php';
 
 $conn = Conexao::getConn();
@@ -10,6 +11,20 @@ try {
     echo "Erro ao buscar cargos: " . $e->getMessage();
     exit;
 }
+
+try {
+    $stmt = $conn->query("
+        SELECT f.id_funcionario, f.nome_funcionario, c.nome_cargo
+        FROM FUNCIONARIO f
+        JOIN CARGO c ON f.id_cargo = c.id_cargo
+        ORDER BY f.nome_funcionario ASC
+    ");
+    $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Erro ao buscar funcionários: " . $e->getMessage();
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -88,17 +103,20 @@ try {
                 <h3>Cadastrar funcionário</h3>
             </div>
         </div>
+
+
         <main class="main">
-            <form id="form-dados" class="form-grid">
+            <div id="msg-erro" style="color: red; margin-bottom: 10px;"></div>
+            <form id="form-dados" class="form-grid" method="POST" action="../src/funcionario/salvar-funcionario.php">
                 <input name="nome" type="text" placeholder="*Nome" required>
-                <input name="RG" type="text" placeholder="RG">
-                <input name="cpf" type="number" placeholder="CPF">
-                <input name="endereço" type="text" placeholder="Endereço">
-                <input name="cep" type="number" placeholder="CEP">
-                <input name="numero" type="number" placeholder="Número">
-                <input name="rua" type="text" placeholder="Cidade">
-                <input name="bairro" type="text" placeholder="Bairro">
-                <select  id="cargo" name="cargo">
+                <input id="rg" name="rg" type="text" placeholder="RG" pattern="\d+" title="Por favor, insira apenas números" required>
+                <input name="cpf" type="number" placeholder="CPF" required>
+                <input name="endereço" type="text" placeholder="Endereço" required>
+                <input name="cep" type="number" placeholder="CEP" required>
+                <input name="numero" type="number" placeholder="Número" required>
+                <input name="rua" type="text" placeholder="Cidade" required>
+                <input name="bairro" type="text" placeholder="Bairro" required>
+                <select  id="cargo" name="cargo" required>
                     <option value="cargo">Cargo</option>
                     <?php foreach ($cargos as $cargo): ?>
                     <option value="<?= htmlspecialchars($cargo['id_cargo']) ?>">
@@ -106,21 +124,18 @@ try {
                     </option>
                 <?php endforeach; ?>
                 </select>
-                <input name="data" type="email" placeholder="Data de admissão">
-                 <input name="ddd" type="text" placeholder="Contato">
-                  <input name="ddd" type="text" placeholder="Salário">
+                <input name="data_admissao" type="date" placeholder="Data de admissão" required>
+                 <input name="ddd" type="text" placeholder="Contato" required>
+                 <input id="salario" name="salario" type="number" placeholder="Salário" min="0" step="0.01" required />
                 <button type="submit" class="btn">Salvar</button>
-                <!-- ...existing code... -->
             </form>
         </main>
         <div class="header-card">
             <div class="left-content">
                 <img src="../assets/img/profileadiction.svg" alt="Ícone usuário" />
                 <span>Editar informações do funcionário</span>
-            </div> <!-- FECHA left-content -->
-        </div> <!-- FECHA header-card -->
-
-         
+            </div>
+        </div> 
 
         <div class="card">
 
@@ -151,38 +166,25 @@ try {
             </div>
 
             <table>
-              
                 <tbody>
+                    <?php foreach ($funcionarios as $funcionario): ?>
                     <tr>
-                      
-                        <td><a href="folha_de_pagamento.html">Brenda Evelyn da Silva Vieira</a></td>
-                        <td>Caixa</td>
+                        <td>
+                            <a href="folha_de_pagamento.php?id=<?= $funcionario['id_funcionario'] ?>">
+                                <?= htmlspecialchars($funcionario['nome_funcionario']) ?>
+                            </a>
+                        </td>
+                        <td><?= htmlspecialchars($funcionario['nome_cargo']) ?></td>
                         <td class="actions">
-                            <button class="open-modal" data-modal="modal-cadastro">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar"
-                                data-modal="modal-1">Desativar</button>
+                            <button class="open-modal" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-cadastro">Editar</button>
+                            <button class="btn-desativar-conta js-open-modal-desativar" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-1">Desativar</button>
                         </td>
                     </tr>
-                    <tr>
-                       
-                        <td>Ramon Pietro Felizado Neymar Junior</td>
-                        <td>Vendedor</td>
-                        <td class="actions">
-                            <button class="open-modal" data-modal="modal-cadastro">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar"
-                                data-modal="modal-1">Desativar</button>
-                        </td>
-                    </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
-
         </div>
-
-
-        
-            
     </div>
-
 
         <!-- Modal de Sair -->
         <div class="modal-overlay hidden" id="modal-sair">
@@ -326,7 +328,69 @@ try {
             </div>
         </div>
 
-        <!-- JavaScript -->
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const cepInput = document.querySelector("input[name='cep']");
+                const ruaInput = document.querySelector("input[name='endereço']");
+                const bairroInput = document.querySelector("input[name='bairro']");
+                const cidadeInput = document.querySelector("input[name='rua']");
+
+                cepInput.addEventListener("blur", function () {
+                    const cep = cepInput.value.replace(/\D/g, '');
+
+                    if (cep.length === 8) {
+                        fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.erro) {
+                                    ruaInput.value = data.logradouro || '';
+                                    bairroInput.value = data.bairro || '';
+                                    cidadeInput.value = data.localidade || '';
+                                } else {
+                                    alert("CEP não encontrado.");
+                                }
+                            })
+                            .catch(() => {
+                                alert("Erro ao buscar o CEP.");
+                            });
+                    }
+                });
+            });
+            </script>
+
+            <script>
+            document.getElementById('form-dados').addEventListener('submit', function(e) {
+                e.preventDefault(); 
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const msgErro = document.getElementById('msg-erro');
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        msgErro.style.color = 'green';
+                        msgErro.textContent = data.message;
+                        form.reset(); 
+                    } else {
+                        msgErro.style.color = 'red';
+                        msgErro.textContent = data.message;
+                    }
+                })
+                .catch(() => {
+                    msgErro.style.color = 'red';
+                    msgErro.textContent = 'Erro ao comunicar com o servidor.';
+                });
+            });
+            </script>
+
+            JS FUNCIONARIO
+
+<!-- JavaScript -->
         <script>
             document.querySelectorAll(".open-modal").forEach(button => {
                 button.addEventListener("click", () => {
@@ -338,10 +402,9 @@ try {
                 });
             });
 
-            // Fecha o modal ao clicar em qualquer botão com a classe modal-close ou na classe nao-btn
             document.querySelectorAll(".close-modal, .nao-btn button").forEach(button => {
                 button.addEventListener("click", (e) => {
-                    e.preventDefault(); // Evita o comportamento padrão do botão
+                    e.preventDefault(); 
                     const modal = e.target.closest(".modal-overlay");
                     if (modal) {
                         modal.classList.add("hidden");
@@ -349,34 +412,11 @@ try {
                 });
             });
 
-            // Fecha o modal ao clicar fora da caixa do modal
             window.addEventListener("click", (e) => {
                 if (e.target.classList.contains("modal-overlay")) {
                     e.target.classList.add("hidden");
                 }
             });
-        </script>
-        <script>
-            document.getElementById('form-dados').addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-
-                const response = await fetch('/api/salvar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    alert('Dados salvos com sucesso!');
-                } else {
-                    alert('Erro ao salvar os dados.');
-                }
-            });
-            // Script para o botão de editar
-
         </script>
 
         <script>
@@ -447,8 +487,7 @@ try {
           <td class="actions">
             <button class="btn-edit">Editar</button>
             <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1">Desativar</button>
-          </td>
-        `;
+          </td>`;
                         tabelaUsuarios.appendChild(novaLinha);
 
                         // Reatribui eventos aos botões "Desativar" para novos usuários
@@ -570,8 +609,6 @@ try {
                     document.getElementById("modal-cadastro").classList.remove("hidden");
                 });
             });
-
-            // Submissão do formulário de cadastro/edição
             document.querySelector("#modal-cadastro .modal-form-new-user form").addEventListener("submit", async (e) => {
                 e.preventDefault();
 
@@ -587,7 +624,7 @@ try {
 
                     if (response.ok) {
                         alert("Usuário salvo com sucesso!");
-                        location.reload(); // Atualiza a página para refletir as alterações
+                        location.reload(); 
                     } else {
                         alert("Erro ao salvar o usuário.");
                     }
@@ -596,11 +633,9 @@ try {
                     alert("Erro de conexão.");
                 }
 
-                // Restaura o texto do botão para "Criar Conta"
                 const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
                 submitButton.textContent = "Criar Conta";
 
-                // Fecha o modal de cadastro
                 document.getElementById("modal-cadastro").classList.add("hidden");
             });
         </script>
@@ -632,7 +667,7 @@ try {
 
                     if (response.ok) {
                         alert('Reajuste aplicado com sucesso!');
-                        location.reload(); // Recarrega a lista atualizada
+                        location.reload(); 
                     } else {
                         alert('Erro ao aplicar o reajuste.');
                     }
@@ -643,6 +678,7 @@ try {
             });
         </script>
 
+        <script src="../assets/js/inatividade.js"></script>
 
 </body>
 

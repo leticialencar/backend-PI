@@ -24,7 +24,7 @@ if ($nova_senha !== $repetir_senha) {
 if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/", $nova_senha)) {
     die("A nova senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.");
 }
-// Consulta a senha atual
+
 $sql = "SELECT senha_usuario FROM USUARIO WHERE id_usuario = ?";
 $stmt = $conn->prepare($sql);
 $stmt->execute([$id_usuario]);
@@ -47,8 +47,9 @@ $stmt_update = $conn->prepare($sql_update);
 $executou = $stmt_update->execute([$nova_senha_hash, $id_usuario]);
 
 if ($executou) {
-   header("Location: ../public/profile.php?senha=ok");
-    exit;   
+    header("Location: /backend-PI-leticia/public/profile.php?sucesso=senha_alterada");
+    exit;
+
 } else {
     die("Erro ao atualizar a senha.");
 }

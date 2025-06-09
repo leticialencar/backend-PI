@@ -27,7 +27,7 @@ body {
 .user p {
     font-size: 14px;
     font-style: italic;
-    margin: 0;
+    margin: 80px;
 }
 
 .menu {
@@ -191,6 +191,18 @@ body {
 .btn-voltar {
     background-color: #93A2B7;
     color: #F8F8F8;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 180px;
+    height: 40px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 .forca-senha {
     font-size: 0.9rem;

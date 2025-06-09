@@ -11,27 +11,12 @@ if (!$user_id) {
 
 $conn = Conexao::getConn();
 
-$sql = "SELECT 
-    u.nome_usuario, 
-    u.cpf_usuario, 
-    u.cnpj_usuario, 
-    u.email_usuario, 
-    u.tipo_usuario,
-    e.cep, 
-    e.rua, 
-    e.bairro, 
-    e.cidade, 
-    e.estado,
-    t.num_telefone, 
-    t.ddd,
-    c.nome_cargo, 
-    c.nivel_permissao
+$sql = "SELECT u.nome_usuario, u.cpf_usuario, u.cnpj_usuario, u.email_usuario, u.tipo_usuario, e.cep, e.rua, e.bairro, e.cidade, e.estado, t.num_telefone, t.ddd, c.nome_cargo, c.nivel_permissao
 FROM USUARIO u
 LEFT JOIN ENDERECO e ON u.id_usuario = e.id_usuario
 LEFT JOIN TELEFONE t ON u.id_usuario = t.id_usuario
 LEFT JOIN CARGO c ON u.id_cargo = c.id_cargo
-WHERE u.id_usuario = :user_id
-";
+WHERE u.id_usuario = :user_id";
 
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -50,6 +35,43 @@ $sqlCargos = "SELECT id_cargo AS id, nome_cargo AS nome, nivel_permissao FROM CA
 $stmtCargos = $conn->prepare($sqlCargos);
 $stmtCargos->execute();
 $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_GET['verificarCPF'])) {
+    $cpf = $_GET['verificarCPF'];
+
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM USUARIO WHERE cpf_usuario = :cpf");
+    $stmt->bindParam(':cpf', $cpf);
+    $stmt->execute();
+
+    echo json_encode(['existe' => $stmt->fetchColumn() > 0]);
+    exit;
+}
+
+// Endpoint AJAX para buscar dados do usuário por ID
+if (isset($_GET['getUserById'])) {
+    $id = intval($_GET['getUserById']);
+    $stmt = $conn->prepare("SELECT id_usuario, nome_usuario, email_usuario, cpf_usuario, cnpj_usuario, id_cargo, ativo FROM USUARIO WHERE id_usuario = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Buscar telefone e endereço
+    $telefone = $conn->prepare("SELECT num_telefone, ddd FROM TELEFONE WHERE id_usuario = :id");
+    $telefone->bindParam(':id', $id, PDO::PARAM_INT);
+    $telefone->execute();
+    $tel = $telefone->fetch(PDO::FETCH_ASSOC);
+
+    $endereco = $conn->prepare("SELECT cep, rua, bairro, cidade, estado FROM ENDERECO WHERE id_usuario = :id");
+    $endereco->bindParam(':id', $id, PDO::PARAM_INT);
+    $endereco->execute();
+    $end = $endereco->fetch(PDO::FETCH_ASSOC);
+
+    // Junta tudo
+    $user = array_merge($user ?: [], $tel ?: [], $end ?: []);
+    echo json_encode($user);
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -91,6 +113,14 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
 </script>
 
 <body>
+    <script>
+        // Alerta de sucesso na redefinição de senha
+        <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] === 'senha_alterada'): ?>
+            window.addEventListener('DOMContentLoaded', function() {
+                alert('Senha redefinida com sucesso!');
+            });
+        <?php endif; ?>
+    </script>
    
     <header class="container-header">
         <div class="logo">
@@ -141,7 +171,7 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
               <img src="../assets/img/profileicon.svg" alt="Ícone Perfil">
               <h3>Editar meu perfil</h3>
             </div>
-             <button class="add-user-btn"><a href="redefinir_senha.html">Alterar senha</a></button>
+             <button class="add-user-btn"><a href="redefinir_senha.php">Alterar senha</a></button>
           </div>
           <main class="main">
             <form id="form-dados" class="form-grid" method="post" action="../src/profile/save-profile.php">
@@ -164,7 +194,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
 
           <?php 
             if (isset($_SESSION['tipo_usuario']) && $_SESSION['tipo_usuario'] === 'admin'): 
-                // Consulta apenas usuários com status 'ativo'
                 $sql = "SELECT id_usuario, nome_usuario, email_usuario, data_adicao 
                         FROM USUARIO 
                         WHERE ativo = 1";
@@ -195,16 +224,16 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
             </thead>
             <tbody>
                 <?php foreach($usuarios as $usuario): ?>
-                    <tr>
-                        <td><?= date('d/m/Y', strtotime($usuario['data_adicao'])); ?></td>
-                        <td><?= htmlspecialchars($usuario['nome_usuario']); ?></td>
-                        <td><?= htmlspecialchars($usuario['email_usuario']); ?></td>
-                        <td class="actions">
-                            <button class="btn-edit" data-id="<?= $usuario['id_usuario']; ?>">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1" data-id="<?= $usuario['id_usuario']; ?>">Desativar</button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+    <tr>
+        <td><?= date('d/m/Y', strtotime($usuario['data_adicao'])); ?></td>
+        <td><?= htmlspecialchars($usuario['nome_usuario']); ?></td>
+        <td><?= htmlspecialchars($usuario['email_usuario']); ?></td>
+        <td class="actions">
+            <button class="btn-edit" type="button" data-id="<?= $usuario['id_usuario']; ?>">Editar</button>
+            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1" data-id="<?= $usuario['id_usuario']; ?>">Desativar</button>
+        </td>
+    </tr>
+<?php endforeach; ?>
             </tbody>
         </table>
     <?php else: ?>
@@ -245,35 +274,38 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
       <button class="modal-close close-modal close-modal-cadastro" type="button">
           <i class="fa-solid fa-xmark"></i>
       </button>
-
       <div class="modal-subject">
           <div class="modal-header">
               <p class="modal-title">Cadastre um novo usuário</p>
           </div>
-
           <div class="modal-form-new-user">
-              <form action="../src/profile/register-user.php" method="POST">
+              <form id="form-cadastro-usuario" action="../src/profile/register-user.php" method="POST">
+                  <input type="hidden" id="cadastro-id-usuario" name="id_usuario" value="">
                   <div class="input-group">
                       <div class="input-box">
                           <label for="cadastro-nome">Nome</label>
                           <input type="text" id="cadastro-nome" name="nome" placeholder="Digite o nome do novo usuário" required>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-sobrenome">Sobrenome</label>
                           <input type="text" id="cadastro-sobrenome" name="sobrenome" placeholder="Digite o sobrenome do novo usuário" required>
                       </div>
-
                       <div class="input-box">
-                          <label for="cadastro-cpf">CPF</label>
-                          <input type="text" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                        <label for="cadastro-cpf">CPF</label>
+                        <input type="number" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                        <small id="cpf-feedback" style="display: block;
+                            margin-top: 4px;
+                            font-size: 0.9rem;
+                            font-weight: 500;
+                            opacity: 0;
+                            transform: translateY(-5px);
+                            transition: opacity 0.3s ease, transform 0.3s ease;
+                        "></small>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-email">E-mail</label>
                           <input type="email" id="cadastro-email" name="email" placeholder="Digite o e-mail do novo usuário" required>
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-cargo">Cargo</label>
                           <select id="cadastro-cargo" name="cargo" required>
@@ -287,38 +319,21 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
                               <?php endforeach; ?>
                           </select>
                       </div>
-
                       <div class="input-box">
-
-                        <label for="nivel">Nível de permissão</label>
-                        <select id="nivel" name="nivel" required>
-                            <option value="">Selecione o nível de permissão</option>
-                            <option value="1" <?= ($nivelPermissao == 1) ? 'selected' : '' ?>>Nível 1</option>
-                            <option value="2" <?= ($nivelPermissao == 2) ? 'selected' : '' ?>>Nível 2</option>
-                            <option value="3" <?= ($nivelPermissao == 3) ? 'selected' : '' ?>>Nível 3</option>
-                        </select>
-                    </div>
-
-                      <div class="input-box">
-                          <label for="senha">Senha</label>
-                          <input type="password" id="senha" name="senha" placeholder="Crie uma senha" required>
                           <label for="cadastro-nivel">Nível de permissão</label>
                           <input type="text" id="cadastro-nivel" name="nivel" readonly placeholder="Selecione um cargo">
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-senha">Senha</label>
-                          <input type="password" id="cadastro-senha" name="senha" placeholder="Crie uma senha" required>
+                          <input type="password" id="cadastro-senha" name="senha" placeholder="Crie uma senha">
                       </div>
-
                       <div class="input-box">
                           <label for="cadastro-repetir-senha">Repetir senha</label>
-                          <input type="password" id="cadastro-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada" required>
+                          <input type="password" id="cadastro-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada">
                       </div>
                   </div>
-
                   <div class="criar-btn">
-                      <button type="submit">Criar Conta</button>
+                      <button type="submit" id="btn-cadastro-usuario">Criar Conta</button>
                   </div>
               </form>
           </div>
@@ -376,10 +391,8 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
             }
         });
 
-    // Variável global para armazenar o id do usuário a ser desativado
     let usuarioParaDesativar = null;
 
-    // Ao clicar no botão "Desativar", abre o modal e armazena o id
     document.querySelectorAll('.btn-desativar-conta').forEach(btn => {
         btn.addEventListener('click', function() {
             usuarioParaDesativar = this.getAttribute('data-id');
@@ -387,7 +400,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         });
     });
 
-    // Ao clicar no botão "Sim" do modal, faz a requisição para desativar o usuário
     document.getElementById('confirmarDesativacao').addEventListener('click', function () {
         if (!usuarioParaDesativar) return;
         fetch('desativar_conta.php', {
@@ -408,7 +420,6 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         });
     });
 
-    // Botão "Não" fecha o modal
     document.querySelectorAll('.nao-btn-desativar button').forEach(btn => {
         btn.addEventListener('click', function() {
             document.getElementById('modal-1').classList.add('hidden');
@@ -423,16 +434,206 @@ $cargos = $stmtCargos->fetchAll(PDO::FETCH_ASSOC);
         const nivel = selectedOption.getAttribute("data-nivel") || "";
         document.getElementById("cadastro-nivel").value = nivel;
         });
-</script>
+    </script>
 
     <script src="../assets/js/cep-enter-prevent.js"></script>
     <script src="../assets/js/cep.js"></script>
     <script src="../assets/js/user-update.js"></script>
-    <script src="../assets/js/user-insert.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const formCadastro = document.querySelector("#modal-cadastro .modal-form-new-user form");
+    const tabelaUsuarios = document.querySelector(".card table tbody");
+
+    document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
+        document.querySelectorAll("#modal-cadastro input").forEach(input => input.value = "");
+        document.getElementById("cadastro-cargo").value = "";
+        document.getElementById("cadastro-nivel").value = "";
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Criar Conta";
+
+        document.getElementById("modal-cadastro").classList.remove("hidden");
+    });
+
+    tabelaUsuarios.addEventListener("click", (e) => {
+        if (e.target.classList.contains("btn-edit")) {
+        const row = e.target.closest("tr");
+        const nomeCompleto = row.children[1].textContent.trim().split(" ");
+        const email = row.children[2].textContent.trim();
+
+        document.getElementById("cadastro-nome").value = nomeCompleto[0];
+        document.getElementById("cadastro-sobrenome").value = nomeCompleto.slice(1).join(" ");
+        document.getElementById("cadastro-cpf").value = ""; 
+        document.getElementById("cadastro-email").value = email;
+        document.getElementById("cadastro-cargo").value = "";
+        document.getElementById("cadastro-nivel").value = "";
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Alterar Informações";
+
+        document.getElementById("modal-cadastro").classList.remove("hidden");
+        }
+    });
+
+    formCadastro.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formCadastro);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+        const response = await fetch('../src/profile/register-user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+            alert(result.message || "Usuário salvo com sucesso!");
+            location.reload();
+        } else {
+            alert(result.message || "Erro ao salvar o usuário.");
+        }
+        } catch (error) {
+        console.error("Erro ao salvar o usuário:", error);
+        alert("Erro de conexão.");
+        }
+
+        const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
+        submitButton.textContent = "Criar Conta";
+
+        document.getElementById("modal-cadastro").classList.add("hidden");
+    });
+    });
+    </script>
     <script src="../assets/js/modal-close.js"></script>
     <script src="../assets/js/form-handler.js"></script>
     <script src="../assets/js/update-username.js"></script>
     <script src="../assets/js/user-deactivate.js"></script>
+
+    <script>
+function validarCPFFormato(cpf) {
+    return /^\d{11}$/.test(cpf);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const cpfInput = document.getElementById('cadastro-cpf');
+    const feedback = document.getElementById('cpf-feedback');
+
+    function mostrarFeedback(mensagem, cor) {
+        feedback.textContent = mensagem;
+        feedback.style.color = cor;
+        feedback.style.opacity = '1';
+        feedback.style.transform = 'translateY(0)';
+    }
+
+    function limparFeedback() {
+        feedback.textContent = '';
+        feedback.style.opacity = '0';
+        feedback.style.transform = 'translateY(-5px)';
+    }
+
+    cpfInput.addEventListener('input', function () {
+        const rawValue = cpfInput.value;
+
+        if (rawValue.trim() === '') {
+            limparFeedback();
+            return;
+        }
+
+        if (/[^0-9]/.test(rawValue)) {
+            mostrarFeedback('Apenas números são permitidos.', 'orange');
+            return;
+        }
+
+        if (rawValue.length < 11) {
+            mostrarFeedback('Digite os 11 dígitos do CPF.', 'gray');
+            return;
+        }
+
+        if (!validarCPFFormato(rawValue)) {
+            mostrarFeedback('CPF inválido.', 'red');
+            return;
+        }
+
+        fetch('?verificarCPF=' + encodeURIComponent(rawValue))
+            .then(response => response.json())
+            .then(data => {
+                if (data.existe) {
+                    mostrarFeedback('CPF já cadastrado.', 'red');
+                } else {
+                    mostrarFeedback('CPF válido.', 'green');
+                }
+            })
+            .catch(err => {
+                mostrarFeedback('Erro ao verificar CPF.', 'orange');
+                console.error(err);
+            });
+    });
+
+    cpfInput.addEventListener('focus', function () {
+        if (cpfInput.value.trim() === '') {
+            limparFeedback();
+        }
+    });
+});
+</script>
+
+<script>
+    // Função para preencher o modal de cadastro com dados do usuário para edição
+    function abrirModalEditarUsuario(idUsuario) {
+        fetch('?getUserById=' + encodeURIComponent(idUsuario))
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('cadastro-id-usuario').value = data.id_usuario || '';
+                document.getElementById('cadastro-nome').value = data.nome_usuario || '';
+                document.getElementById('cadastro-sobrenome').value = ''; // ajuste se tiver sobrenome separado
+                document.getElementById('cadastro-cpf').value = data.cpf_usuario || '';
+                document.getElementById('cadastro-email').value = data.email_usuario || '';
+                document.getElementById('cadastro-cargo').value = data.id_cargo || '';
+                document.getElementById('cadastro-nivel').value = ''; // pode preencher se desejar
+                document.getElementById('cadastro-senha').value = '';
+                document.getElementById('cadastro-repetir-senha').value = '';
+                // Novos campos
+                if (document.getElementById('cadastro-cep')) document.getElementById('cadastro-cep').value = data.cep || '';
+                if (document.getElementById('cadastro-rua')) document.getElementById('cadastro-rua').value = data.rua || '';
+                if (document.getElementById('cadastro-bairro')) document.getElementById('cadastro-bairro').value = data.bairro || '';
+                if (document.getElementById('cadastro-cidade')) document.getElementById('cadastro-cidade').value = data.cidade || '';
+                if (document.getElementById('cadastro-estado')) document.getElementById('cadastro-estado').value = data.estado || '';
+                if (document.getElementById('cadastro-telefone')) document.getElementById('cadastro-telefone').value = data.num_telefone || '';
+                if (document.getElementById('cadastro-ddd')) document.getElementById('cadastro-ddd').value = data.ddd || '';
+                document.getElementById('btn-cadastro-usuario').textContent = 'Alterar Informações';
+                document.getElementById('modal-cadastro').classList.remove('hidden');
+            });
+    }
+
+    // Adiciona evento para todos os botões .btn-edit
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                abrirModalEditarUsuario(userId);
+            });
+        });
+
+        // Ao abrir para novo usuário, limpa campos e botão
+        document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
+            document.getElementById('cadastro-id-usuario').value = '';
+            document.getElementById('cadastro-nome').value = '';
+            document.getElementById('cadastro-sobrenome').value = '';
+            document.getElementById('cadastro-cpf').value = '';
+            document.getElementById('cadastro-email').value = '';
+            document.getElementById('cadastro-cargo').value = '';
+            document.getElementById('cadastro-nivel').value = '';
+            document.getElementById('cadastro-senha').value = '';
+            document.getElementById('cadastro-repetir-senha').value = '';
+            document.getElementById('btn-cadastro-usuario').textContent = 'Criar Conta';
+        });
+    });
+    </script>
+
+    <script src="../assets/js/inatividade.js"></script>
 
 </body>
 </html>

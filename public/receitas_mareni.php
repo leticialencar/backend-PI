@@ -1,3 +1,5 @@
+<?php include '../src/login/verify-session.php'; ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -236,5 +238,8 @@
         }
     });
 </script>
+
+<script src="../assets/js/inatividade.js"></script>
+
 </body>
 </html>
