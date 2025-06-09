@@ -128,7 +128,7 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
       <ul>
         <li>
           <img src="../assets/img/homeicon.svg" alt="Início">
-          <a href="homepage.html">Página inicial</a>
+          <a href="../public/homepage.php">Página inicial</a>
         </li>
         <li>
           <img src="../assets/img/profileicon.svg" alt="Perfil">
