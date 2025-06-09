@@ -50,11 +50,25 @@ if (isset($_GET['verificarCPF'])) {
 // Endpoint AJAX para buscar dados do usuário por ID
 if (isset($_GET['getUserById'])) {
     $id = intval($_GET['getUserById']);
-    $stmt = $conn->prepare("SELECT id_usuario, nome_usuario, email_usuario, cpf_usuario, cnpj_usuario, id_cargo FROM USUARIO WHERE id_usuario = :id");
+    $stmt = $conn->prepare("SELECT id_usuario, nome_usuario, email_usuario, cpf_usuario, cnpj_usuario, id_cargo, ativo FROM USUARIO WHERE id_usuario = :id");
     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    echo json_encode($user ?: []);
+
+    // Buscar telefone e endereço
+    $telefone = $conn->prepare("SELECT num_telefone, ddd FROM TELEFONE WHERE id_usuario = :id");
+    $telefone->bindParam(':id', $id, PDO::PARAM_INT);
+    $telefone->execute();
+    $tel = $telefone->fetch(PDO::FETCH_ASSOC);
+
+    $endereco = $conn->prepare("SELECT cep, rua, bairro, cidade, estado FROM ENDERECO WHERE id_usuario = :id");
+    $endereco->bindParam(':id', $id, PDO::PARAM_INT);
+    $endereco->execute();
+    $end = $endereco->fetch(PDO::FETCH_ASSOC);
+
+    // Junta tudo
+    $user = array_merge($user ?: [], $tel ?: [], $end ?: []);
+    echo json_encode($user);
     exit;
 }
 
@@ -581,6 +595,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('cadastro-nivel').value = ''; // pode preencher se desejar
                 document.getElementById('cadastro-senha').value = '';
                 document.getElementById('cadastro-repetir-senha').value = '';
+                // Novos campos
+                if (document.getElementById('cadastro-cep')) document.getElementById('cadastro-cep').value = data.cep || '';
+                if (document.getElementById('cadastro-rua')) document.getElementById('cadastro-rua').value = data.rua || '';
+                if (document.getElementById('cadastro-bairro')) document.getElementById('cadastro-bairro').value = data.bairro || '';
+                if (document.getElementById('cadastro-cidade')) document.getElementById('cadastro-cidade').value = data.cidade || '';
+                if (document.getElementById('cadastro-estado')) document.getElementById('cadastro-estado').value = data.estado || '';
+                if (document.getElementById('cadastro-telefone')) document.getElementById('cadastro-telefone').value = data.num_telefone || '';
+                if (document.getElementById('cadastro-ddd')) document.getElementById('cadastro-ddd').value = data.ddd || '';
                 document.getElementById('btn-cadastro-usuario').textContent = 'Alterar Informações';
                 document.getElementById('modal-cadastro').classList.remove('hidden');
             });
