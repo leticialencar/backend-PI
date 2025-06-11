@@ -212,96 +212,95 @@ try {
             </div>
         </div>
 
-        <!-- Modal de Cadastro -->
-        <div class="modal-overlay hidden" id="modal-cadastro">
-            <div class="modal-box">
-                <button class="modal-close close-modal close-modal-cadastro" type="button">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+        <!-- Modal de Atualização -->
+<div class="modal-overlay hidden" id="modal-cadastro">
+    <div class="modal-box">
+        <button class="modal-close close-modal close-modal-cadastro" type="button">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
 
-                <div class="modal-subject">
-                    <div class="modal-header">
-                        <p class="modal-title">Editar cadastro do funcionário</p>
+        <div class="modal-subject">
+            <div class="modal-header">
+                <p class="modal-title">Editar cadastro do funcionário</p>
+            </div>
+
+            <div class="modal-form-new-user">
+                <form action="../src/funcionario/editar-funcionario.php" method="POST">
+                    <div class="input-group">
+                        <div class="input-box">
+                            <label for="nome">Nome</label>
+                            <input type="text" id="nome" name="nome" placeholder="Digite o nome" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="rg">RG</label>
+                            <input type="text" id="rg" name="rg" placeholder="Digite o RG" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="cpf">CPF</label>
+                            <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="endereco">Endereço</label>
+                            <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="cep">CEP</label>
+                            <input type="text" id="cep" name="cep" placeholder="Digite o CEP" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="numero">Número</label>
+                            <input type="text" id="numero" name="numero" placeholder="Digite o número" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="bairro">Bairro</label>
+                            <input type="text" id="bairro" name="bairro" placeholder="Digite o bairro" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="data_admissao">Data de Admissão</label>
+                            <input type="date" id="data_admissao" name="data_admissao" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="cargo">Cargo</label>
+                            <select id="cargo" name="cargo" required>
+                                <option value="">Selecione o cargo</option>
+                                <option value="admin">Administrador</option>
+                                <option value="gerente">Gerente</option>
+                                <option value="analista">Analista</option>
+                            </select>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="contato">Contato</label>
+                            <input type="text" id="contato" name="contato" placeholder="Digite o número do celular" required>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="salario">Salário</label>
+                            <input type="text" id="salario" name="salario" placeholder="Digite o salário" required>
+                        </div>
                     </div>
 
-                    <div class="modal-form-new-user">
-    <form action="#">
-        <div class="input-group">
-            <div class="input-box">
-                <label for="nome">Nome</label>
-                <input type="text" id="nome" name="nome" placeholder="Digite o nome " required>
-            </div>
-
-
-            <div class="input-box">
-                <label for="cpf">RG</label>
-                <input type="text" id="cpf" name="cpf" placeholder="Digite o RG" required>
-            </div>
-
-            <div class="input-box">
-                <label for="cpf">CPF</label>
-                <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF" required>
-            </div>
-
-            <div class="input-box">
-                <label for="Endereço">Endereço</label>
-                <input type="Endereço" id="Endereço" name="Endereço" placeholder="Digite o endereço" required>
-            </div>
-
-            <div class="input-box">
-                <label for="sobrenome">CEP</label>
-                <input type="cep" id="cep" name="sobrenome" placeholder="Digite o CEP " required>
-            </div>
-
-            <div class="input-box">
-                <label for="numero">Número</label>
-                <input type="Número" id="Número" name="Número" placeholder="Digite o número" required>
-            </div>
-
-            <div class="input-box">
-                <label for="cidade">Cidade</label>
-                <input type="cidade" id="cidade" name="cidade" placeholder="Digite a cidade" required>
-            </div>
-
-            <div class="input-box">
-                <label for="bairro">Bairro</label>
-                <input type="bairro" id="bairro" name="bairro" placeholder="Digite o bairro" required>
-            </div>
-
-             <div class="input-box">
-                <label for="bairro">Data de Admissão</label>
-                <input type="date" id="data" name="data" required>
-            </div>
-
-            <div class="input-box">
-                <label for="cargo">Cargo</label>
-                <select id="cargo" name="cargo" required>
-                    <option value="">Selecione o cargo</option>
-                    <option value="admin">Administrador</option>
-                    <option value="gerente">Gerente</option>
-                    <option value="analista">Analista</option>
-                </select>
-            </div>
-
-            <div class="input-box">
-                <label for="bairro">Contato</label>
-                <input type="contato" id="contato" name="contato" placeholder="Digite o número do celular" required>
-            </div>
-
-
-            <div class="input-box">
-                <label for="nivel">Salário</label>
-                <input type="text" id="salario" name="salario" placeholder="Digite o salário" required>
+                    <div class="criar-btn">
+                        <button type="submit">Salvar edições</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="criar-btn">
-            <button type="submit">Salvar edições</button>
-        </div>
-    </form>
+    </div>
 </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Modal Desativar Conta -->
         <div class="modal-overlay-desativar hidden" id="modal-1">
