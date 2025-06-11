@@ -199,9 +199,9 @@ try {
                     </div>
 
                     <div class="modal-form">
-                        <form action="#">
+                        <form action="../src/login/logout.php" method="post">
                             <div class="sim-btn">
-                                <a href="/html/login.html"><button type="button">Sim</button></a>
+                                <button type="submit">Sim</button>
                             </div>
                             <div class="nao-btn">
                                 <button type="button" class="close-modal">Não</button>
@@ -516,24 +516,19 @@ try {
                     const nomeCompleto = row.children[1].textContent.trim().split(" ");
                     const email = row.children[2].textContent.trim();
 
-                    // Preenche os campos do modal de cadastro
                     document.getElementById("nome").value = nomeCompleto[0];
                     document.getElementById("sobrenome").value = nomeCompleto.slice(1).join(" ");
-                    document.getElementById("cpf").value = ""; // Preencha com o CPF se disponível
+                    document.getElementById("cpf").value = ""; 
                     document.getElementById("email").value = email;
-                    document.getElementById("cargo").value = ""; // Preencha com o cargo se disponível
-                    document.getElementById("nivel").value = ""; // Preencha com o nível de permissão se disponível
-
-                    // Altera o texto do botão para "Alterar Informações"
+                    document.getElementById("cargo").value = ""; 
+                    document.getElementById("nivel").value = ""; 
                     const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
                     submitButton.textContent = "Alterar Informações";
 
-                    // Abre o modal de cadastro
                     document.getElementById("modal-cadastro").classList.remove("hidden");
                 });
             });
 
-            // Submissão do formulário de cadastro/edição
             document.querySelector("#modal-cadastro .modal-form-new-user form").addEventListener("submit", async (e) => {
                 e.preventDefault();
 

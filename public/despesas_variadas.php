@@ -226,9 +226,9 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
                     <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
                 </div>
                 <div class="modal-form">
-                    <form>
+                    <form action="../src/login/logout.php" method="post">
                         <div class="sim-btn">
-                            <a href="login.html"><button type="button" id="btn-sim">Sim</button></a>
+                            <button type="submit">Sim</button>
                         </div>
                         <div class="nao-btn">
                             <button type="button" id="btn-nao">Não</button>

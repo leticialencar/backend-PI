@@ -122,11 +122,10 @@
                 </div>
 
                 <div class="modal-form">
-                    <form action="#">
-                        
-                        <div class="sim-btn">
-                            <a href="login.html"><button type="button">Sim</button></a>
-                        </div>
+                    <form action="../src/login/logout.php" method="post">
+                            <div class="sim-btn">
+                                <button type="submit">Sim</button>
+                            </div>
 
                         <div class="nao-btn">
                             <a href="redefinir_senha.html"><button type="button">Não</button></a>

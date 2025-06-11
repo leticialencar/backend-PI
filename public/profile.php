@@ -255,9 +255,9 @@ if (isset($_GET['getUserById'])) {
         </div>
 
         <div class="modal-form">
-          <form action="#">
+          <form action="../src/login/logout.php" method="post">
             <div class="sim-btn">
-              <a href="/html/login.html"><button type="button">Sim</button></a>
+                <button type="submit">Sim</button>
             </div>
             <div class="nao-btn">
               <button type="button" class="close-modal">Não</button>

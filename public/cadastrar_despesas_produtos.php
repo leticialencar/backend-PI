@@ -97,9 +97,9 @@ try {
                         <p class="modal-title">Deseja mesmo <span>sair</span> da conta?</p>
                     </div>
                     <div class="modal-form">
-                        <form>
+                        <form action="../src/login/logout.php" method="post">
                             <div class="sim-btn">
-                                <button type="button" id="btn-sim">Sim</button>
+                                <button type="submit">Sim</button>
                             </div>
                             <div class="nao-btn">
                                 <button type="button" id="btn-nao">Não</button>
