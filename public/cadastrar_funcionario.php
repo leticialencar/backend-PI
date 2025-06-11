@@ -212,7 +212,7 @@ try {
             </div>
         </div>
 
-        <!-- Modal de Atualização -->
+<!-- Modal de Atualização -->
 <div class="modal-overlay hidden" id="modal-cadastro">
     <div class="modal-box">
         <button class="modal-close close-modal close-modal-cadastro" type="button">
@@ -226,6 +226,9 @@ try {
 
             <div class="modal-form-new-user">
                 <form action="../src/funcionario/editar-funcionario.php" method="POST">
+                    <!-- Campo oculto para o ID do funcionário -->
+                    <input type="hidden" name="id_funcionario" id="id_funcionario">
+
                     <div class="input-group">
                         <div class="input-box">
                             <label for="nome">Nome</label>
@@ -301,6 +304,7 @@ try {
         </div>
     </div>
 </div>
+
 
         <!-- Modal Desativar Conta -->
         <div class="modal-overlay-desativar hidden" id="modal-1">
@@ -458,178 +462,7 @@ try {
                 }
             });
         </script>
-        <script>
-            const formCadastro = document.querySelector("#modal-cadastro .modal-form-new-user form");
-            const tabelaUsuarios = document.querySelector(".card table tbody");
-
-            formCadastro.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(formCadastro);
-                const data = Object.fromEntries(formData.entries());
-
-                try {
-                    const response = await fetch('/api/usuarios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-
-                    if (response.ok) {
-                        const novoUsuario = await response.json();
-
-                        const novaLinha = document.createElement("tr");
-                        novaLinha.innerHTML = `
-          <td>${new Date().toLocaleDateString()}</td>
-          <td>${novoUsuario.nome} ${novoUsuario.sobrenome}</td>
-          <td>${novoUsuario.email}</td>
-          <td class="actions">
-            <button class="btn-edit">Editar</button>
-            <button class="btn-desativar-conta js-open-modal-desativar" data-modal="modal-1">Desativar</button>
-          </td>`;
-                        tabelaUsuarios.appendChild(novaLinha);
-
-                        novaLinha.querySelector(".js-open-modal-desativar").addEventListener("click", (e) => {
-                            currentRow = e.target.closest("tr");
-                            modalDesativar.classList.remove("hidden");
-                        });
-
-                        document.getElementById("modal-cadastro").classList.add("hidden");
-
-                        formCadastro.reset();
-
-                        alert("Usuário cadastrado com sucesso!");
-                    } else {
-                        alert("Erro ao cadastrar o usuário.");
-                    }
-                } catch (error) {
-                    console.error("Erro ao cadastrar o usuário:", error);
-                    alert("Erro ao cadastrar o usuário.");
-                }
-            });
-        </script>
-        <script>
-            // Script para abrir o modal de cadastro com informações preenchidas para edição
-            document.querySelectorAll(".btn-edit").forEach(button => {
-                button.addEventListener("click", (e) => {
-                    const row = e.target.closest("tr");
-                    const nomeCompleto = row.children[1].textContent.trim().split(" ");
-                    const email = row.children[2].textContent.trim();
-
-                    document.getElementById("nome").value = nomeCompleto[0];
-                    document.getElementById("sobrenome").value = nomeCompleto.slice(1).join(" ");
-                    document.getElementById("cpf").value = ""; 
-                    document.getElementById("email").value = email;
-                    document.getElementById("cargo").value = ""; 
-                    document.getElementById("nivel").value = ""; 
-                    const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
-                    submitButton.textContent = "Alterar Informações";
-
-                    document.getElementById("modal-cadastro").classList.remove("hidden");
-                });
-            });
-
-            document.querySelector("#modal-cadastro .modal-form-new-user form").addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-
-                try {
-                    const response = await fetch('/api/usuarios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-
-                    if (response.ok) {
-                        alert("Usuário salvo com sucesso!");
-                        location.reload(); // Atualiza a página para refletir as alterações
-                    } else {
-                        alert("Erro ao salvar o usuário.");
-                    }
-                } catch (error) {
-                    console.error("Erro ao salvar o usuário:", error);
-                    alert("Erro de conexão.");
-                }
-
-                // Restaura o texto do botão para "Criar Conta"
-                const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
-                submitButton.textContent = "Criar Conta";
-
-                // Fecha o modal de cadastro
-                document.getElementById("modal-cadastro").classList.add("hidden");
-            });
-        </script>
-        <script>
-            // Script para abrir o modal de cadastro com formulário limpo
-            document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
-                // Limpa os campos do formulário
-                document.querySelectorAll("#modal-cadastro input").forEach(input => input.value = "");
-                document.querySelector("#cargo").value = "";
-                document.querySelector("#nivel").value = "";
-
-                // Restaura o texto do botão para "Criar Conta"
-                const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
-                submitButton.textContent = "Criar Conta";
-
-                // Abre o modal de cadastro
-                document.getElementById("modal-cadastro").classList.remove("hidden");
-            });
-
-            // Script para abrir o modal de cadastro com informações preenchidas para edição
-            document.querySelectorAll(".btn-edit").forEach(button => {
-                button.addEventListener("click", (e) => {
-                    const row = e.target.closest("tr");
-                    const nomeCompleto = row.children[1].textContent.trim().split(" ");
-                    const email = row.children[2].textContent.trim();
-
-                    // Preenche os campos do modal de cadastro
-                    document.getElementById("nome").value = nomeCompleto[0];
-                    document.getElementById("sobrenome").value = nomeCompleto.slice(1).join(" ");
-                    document.getElementById("cpf").value = ""; // Preencha com o CPF se disponível
-                    document.getElementById("email").value = email;
-                    document.getElementById("cargo").value = ""; // Preencha com o cargo se disponível
-                    document.getElementById("nivel").value = ""; // Preencha com o nível de permissão se disponível
-
-                    // Altera o texto do botão para "Alterar Informações"
-                    const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
-                    submitButton.textContent = "Alterar Informações";
-
-                    // Abre o modal de cadastro
-                    document.getElementById("modal-cadastro").classList.remove("hidden");
-                });
-            });
-            document.querySelector("#modal-cadastro .modal-form-new-user form").addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData.entries());
-
-                try {
-                    const response = await fetch('/api/usuarios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-
-                    if (response.ok) {
-                        alert("Usuário salvo com sucesso!");
-                        location.reload(); 
-                    } else {
-                        alert("Erro ao salvar o usuário.");
-                    }
-                } catch (error) {
-                    console.error("Erro ao salvar o usuário:", error);
-                    alert("Erro de conexão.");
-                }
-
-                const submitButton = document.querySelector("#modal-cadastro .criar-btn button");
-                submitButton.textContent = "Criar Conta";
-
-                document.getElementById("modal-cadastro").classList.add("hidden");
-            });
-        </script>
+        
 
             <script>
   document.getElementById('aplicarReajuste').addEventListener('click', () => {
@@ -715,34 +548,38 @@ try {
     </script>
 
 <script>
-document.querySelectorAll('.open-modal[data-modal="modal-cadastro"]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-id');
+document.querySelectorAll('.open-modal[data-modal="modal-cadastro"]').forEach(button => {
+    button.addEventListener('click', async () => {
+        const id = button.getAttribute('data-id');
 
         const response = await fetch(`../src/funcionario/get-funcionario.php?id=${id}`);
-        const data = await response.json();
+        const dados = await response.json();
 
-        if (data.error) {
-            alert(data.error);
-            return;
+        document.querySelector('#modal-cadastro input[name="id_funcionario"]').value = dados.id_funcionario;
+        document.querySelector('#modal-cadastro input[name="nome"]').value = dados.nome_funcionario;
+        document.querySelector('#modal-cadastro input[name="cpf"]').value = dados.cpf;
+        document.querySelector('#modal-cadastro input[name="rg"]').value = dados.rg;
+        document.querySelector('#modal-cadastro input[name="endereco"]').value = dados.endereco;
+        document.querySelector('#modal-cadastro input[name="cep"]').value = dados.cep;
+        document.querySelector('#modal-cadastro input[name="numero"]').value = dados.numero;
+        document.querySelector('#modal-cadastro input[name="cidade"]').value = dados.cidade;
+        document.querySelector('#modal-cadastro input[name="bairro"]').value = dados.bairro;
+        document.querySelector('#modal-cadastro input[name="data_admissao"]').value = dados.data_admissao;
+        document.querySelector('#modal-cadastro input[name="contato"]').value = dados.contato;
+        document.querySelector('#modal-cadastro input[name="salario"]').value = dados.salario;
+
+        // Ajusta o select do cargo (assumindo que dados.cargo vem igual ao value do select)
+        const selectCargo = document.querySelector('#modal-cadastro select[name="cargo"]');
+        if (selectCargo) {
+            selectCargo.value = dados.cargo; 
+            // ou dados.id_cargo se o backend devolver o valor igual ao do select
         }
 
-        document.querySelector('#modal-cadastro input[name="nome"]').value = data.nome_funcionario;
-        document.querySelector('#modal-cadastro input[name="cpf"]').value = data.cpf;
-        document.querySelector('#modal-cadastro input[name="rg"]').value = data.rg;
-        document.querySelector('#modal-cadastro input[name="endereço"]').value = data.endereco;
-        document.querySelector('#modal-cadastro input[name="cep"]').value = data.cep;
-        document.querySelector('#modal-cadastro input[name="numero"]').value = data.numero;
-        document.querySelector('#modal-cadastro input[name="rua"]').value = data.cidade;
-        document.querySelector('#modal-cadastro input[name="bairro"]').value = data.bairro;
-        document.querySelector('#modal-cadastro select[name="cargo"]').value = data.id_cargo;
-        document.querySelector('#modal-cadastro input[name="data_admissao"]').value = data.data_admissao;
-        document.querySelector('#modal-cadastro input[name="ddd"]').value = data.ddd;
-        document.querySelector('#modal-cadastro input[name="salario"]').value = data.salario;
-
-        document.getElementById("modal-cadastro").classList.remove("hidden");
+        // Mostrar modal
+        document.getElementById('modal-cadastro').classList.remove('hidden');
     });
 });
+
 </script>
 
 

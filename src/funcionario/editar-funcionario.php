@@ -5,7 +5,6 @@ $conn = Conexao::getConn();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id_funcionario'];
-
     $nome = $_POST['nome'];
     $cpf = $_POST['cpf'];
     $rg = $_POST['rg'];
