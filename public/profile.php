@@ -92,26 +92,6 @@ if (isset($_GET['getUserById'])) {
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
 </head>
 
-<script>
-    document.getElementById('confirmarDesativacao').addEventListener('click', function () {
-    fetch('desativar_conta.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.success) {
-            window.location.href = 'login.html'; 
-        }
-    })
-    .catch(error => {
-        alert('Erro ao tentar desativar a conta.');
-        console.error(error);
-    });
-});
-</script>
-
 <body>
     <script>
         // Alerta de sucesso na redefinição de senha
@@ -292,7 +272,7 @@ if (isset($_GET['getUserById'])) {
                       </div>
                       <div class="input-box">
                         <label for="cadastro-cpf">CPF</label>
-                        <input type="number" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
+                        <input type="text" id="cadastro-cpf" name="cpf" placeholder="Digite o CPF do novo usuário" required>
                         <small id="cpf-feedback" style="display: block;
                             margin-top: 4px;
                             font-size: 0.9rem;
@@ -415,7 +395,7 @@ if (isset($_GET['getUserById'])) {
             }
         })
         .catch(error => {
-            alert('conta desativada com sucesso.');
+            alert('Erro ao tentar desativar a conta.');
             console.error(error);
         });
     });
@@ -520,7 +500,6 @@ function validarCPFFormato(cpf) {
 document.addEventListener('DOMContentLoaded', function () {
     const cpfInput = document.getElementById('cadastro-cpf');
     const feedback = document.getElementById('cpf-feedback');
-
     function mostrarFeedback(mensagem, cor) {
         feedback.textContent = mensagem;
         feedback.style.color = cor;
@@ -558,12 +537,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         fetch('?verificarCPF=' + encodeURIComponent(rawValue))
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Erro na requisição');
+                return response.json();
+            })
             .then(data => {
-                if (data.existe) {
-                    mostrarFeedback('CPF já cadastrado.', 'red');
+                if (data && typeof data.existe !== "undefined") {
+                    if (data.existe) {
+                        mostrarFeedback('CPF já cadastrado.', 'red');
+                    } else {
+                        mostrarFeedback('CPF válido.', 'green');
+                    }
                 } else {
-                    mostrarFeedback('CPF válido.', 'green');
+                    mostrarFeedback('Resposta inesperada do servidor.', 'orange');
                 }
             })
             .catch(err => {
