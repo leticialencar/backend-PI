@@ -259,7 +259,6 @@ try {
           </option>
         <?php endforeach; ?>
       </select>
-    </select>
         </div>
       </form>
     </div>

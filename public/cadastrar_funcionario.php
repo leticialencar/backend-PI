@@ -13,12 +13,10 @@ try {
 }
 
 try {
-    $stmt = $conn->query("
-        SELECT f.id_funcionario, f.nome_funcionario, c.nome_cargo
+    $stmt = $conn->query("SELECT f.id_funcionario, f.nome_funcionario, c.nome_cargo
         FROM FUNCIONARIO f
         JOIN CARGO c ON f.id_cargo = c.id_cargo
-        ORDER BY f.nome_funcionario ASC
-    ");
+        ORDER BY f.nome_funcionario ASC");
     $funcionarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Erro ao buscar funcionários: " . $e->getMessage();
@@ -126,7 +124,7 @@ try {
                 </select>
                 <input name="data_admissao" type="date" placeholder="Data de admissão" required>
                  <input name="ddd" type="text" placeholder="Contato" required>
-                 <input id="salario" name="salario" type="number" placeholder="Salário" min="0" step="0.01" required />
+                 <input id="salario" name="salario" type="number" placeholder="Salário Bruto" min="0" step="0.01" required />
                 <button type="submit" class="btn">Salvar</button>
             </form>
         </main>
@@ -233,13 +231,13 @@ try {
                         </div>
 
                         <div class="input-box">
-                            <label for="endereco">Endereço</label>
-                            <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço" required>
+                            <label for="cep">CEP</label>
+                            <input type="text" id="cep" name="cep" placeholder="Digite o CEP" required>
                         </div>
 
                         <div class="input-box">
-                            <label for="cep">CEP</label>
-                            <input type="text" id="cep" name="cep" placeholder="Digite o CEP" required>
+                            <label for="endereco">Endereço</label>
+                            <input type="text" id="endereco" name="endereco" placeholder="Digite o endereço" required>
                         </div>
 
                         <div class="input-box">
@@ -264,21 +262,23 @@ try {
 
                         <div class="input-box">
                             <label for="cargo">Cargo</label>
-                            <select id="cargo" name="cargo" required>
-                                <option value="">Selecione o cargo</option>
-                                <option value="admin">Administrador</option>
-                                <option value="gerente">Gerente</option>
-                                <option value="analista">Analista</option>
+                            <select  id="cargo" name="cargo" required>
+                                <option value="cargo">Cargo</option>
+                                <?php foreach ($cargos as $cargo): ?>
+                                <option value="<?= htmlspecialchars($cargo['id_cargo']) ?>">
+                                    <?= htmlspecialchars($cargo['nome_cargo']) ?>
+                                </option>
+                            <?php endforeach; ?>
                             </select>
                         </div>
 
                         <div class="input-box">
-                            <label for="contato">Contato</label>
-                            <input type="text" id="contato" name="contato" placeholder="Digite o número do celular" required>
+                            <label for="telefone">Telefone</label>
+                            <input type="text" id="telefone" name="telefone" placeholder="Digite o número do celular" maxlength="9" required>
                         </div>
 
                         <div class="input-box">
-                            <label for="salario">Salário</label>
+                            <label for="salario">Salário Bruto</label>
                             <input type="text" id="salario" name="salario" placeholder="Digite o salário" required>
                         </div>
                     </div>
@@ -319,7 +319,66 @@ try {
             </div>
         </div>
 
-            <script>
+        <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const cepInput = document.querySelector('#cep');
+
+    if (cepInput) {
+        cepInput.addEventListener('blur', () => {
+            const cep = cepInput.value.replace(/\D/g, '');
+
+            if (cep.length === 8) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            document.querySelector('#endereco').value = data.logradouro || '';
+                            document.querySelector('#bairro').value = data.bairro || '';
+                            document.querySelector('#cidade').value = data.localidade || '';
+                        } else {
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(() => alert("Erro ao buscar o CEP."));
+            }
+        });
+    }
+});
+</script>
+
+        <script>
+document.querySelectorAll('button.open-modal[data-modal="modal-cadastro"]').forEach(btn => {
+  btn.addEventListener('click', async e => {
+    const id = btn.dataset.id;
+    const res = await fetch(`../src/funcionario/get-funcionario.php?id=${id}`);
+    const dados = await res.json();
+    if (dados.erro) return alert(dados.erro);
+
+    const modal = document.getElementById('modal-cadastro');
+    modal.querySelector('input[name="id_funcionario"]').value = dados.id_funcionario;
+    modal.querySelector('input[name="nome"]').value = dados.nome_funcionario;
+    modal.querySelector('input[name="rg"]').value = dados.rg;
+    modal.querySelector('input[name="cpf"]').value = dados.cpf;
+    modal.querySelector('input[name="endereco"]').value = dados.rua;
+    modal.querySelector('input[name="cep"]').value = dados.cep;
+    modal.querySelector('input[name="numero"]').value = dados.numero;
+    modal.querySelector('input[name="cidade"]').value = dados.cidade;
+    modal.querySelector('input[name="bairro"]').value = dados.bairro;
+    modal.querySelector('input[name="data_admissao"]').value = dados.data_admissao;
+    modal.querySelector('select[name="cargo"]').value = dados.id_cargo;
+    modal.querySelector('input[name="contato"]').value = dados.contato;
+    modal.querySelector('input[name="salario"]').value = dados.salario;
+
+    modal.classList.remove('hidden');
+  });
+});
+
+document.querySelectorAll('.close-modal-cadastro').forEach(btn => {
+  btn.addEventListener('click', () => document.getElementById('modal-cadastro').classList.add('hidden'));
+});
+</script>
+
+ <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const cepInput = document.querySelector("input[name='cep']");
                 const ruaInput = document.querySelector("input[name='endereço']");
@@ -533,42 +592,6 @@ try {
         });
     });
     </script>
-
-<script>
-document.querySelectorAll('.open-modal[data-modal="modal-cadastro"]').forEach(button => {
-    button.addEventListener('click', async () => {
-        const id = button.getAttribute('data-id');
-
-        const response = await fetch(`../src/funcionario/get-funcionario.php?id=${id}`);
-        const dados = await response.json();
-
-        document.querySelector('#modal-cadastro input[name="id_funcionario"]').value = dados.id_funcionario;
-        document.querySelector('#modal-cadastro input[name="nome"]').value = dados.nome_funcionario;
-        document.querySelector('#modal-cadastro input[name="cpf"]').value = dados.cpf;
-        document.querySelector('#modal-cadastro input[name="rg"]').value = dados.rg;
-        document.querySelector('#modal-cadastro input[name="endereco"]').value = dados.endereco;
-        document.querySelector('#modal-cadastro input[name="cep"]').value = dados.cep;
-        document.querySelector('#modal-cadastro input[name="numero"]').value = dados.numero;
-        document.querySelector('#modal-cadastro input[name="cidade"]').value = dados.cidade;
-        document.querySelector('#modal-cadastro input[name="bairro"]').value = dados.bairro;
-        document.querySelector('#modal-cadastro input[name="data_admissao"]').value = dados.data_admissao;
-        document.querySelector('#modal-cadastro input[name="contato"]').value = dados.contato;
-        document.querySelector('#modal-cadastro input[name="salario"]').value = dados.salario;
-
-        // Ajusta o select do cargo (assumindo que dados.cargo vem igual ao value do select)
-        const selectCargo = document.querySelector('#modal-cadastro select[name="cargo"]');
-        if (selectCargo) {
-            selectCargo.value = dados.cargo; 
-            // ou dados.id_cargo se o backend devolver o valor igual ao do select
-        }
-
-        // Mostrar modal
-        document.getElementById('modal-cadastro').classList.remove('hidden');
-    });
-});
-
-</script>
-
 
     <script src="../assets/js/inatividade.js"></script>
 

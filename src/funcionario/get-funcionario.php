@@ -1,23 +1,30 @@
 <?php
-require '/../../config/config.php';
-
-if (!isset($_GET['id'])) {
-    http_response_code(400);
-    echo json_encode(['erro' => 'ID não fornecido']);
-    exit;
-}
-
-$id = $_GET['id'];
-
+require __DIR__ . '/../../config/config.php';
 $conn = Conexao::getConn();
-$stmt = $conn->prepare("SELECT * FROM FUNCIONARIO WHERE id_funcionario = ?");
-$stmt->execute([$id]);
-$funcionario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$funcionario) {
-    http_response_code(404);
-    echo json_encode(['erro' => 'Funcionário não encontrado']);
-    exit;
+$id = $_GET['id'] ?? null;
+if (!$id) exit(json_encode(['erro'=>'ID não enviado']));
+
+try {
+  $sql = "
+    SELECT f.id_funcionario, f.nome_funcionario, f.rg_funcionario AS rg,
+           f.cpf_funcionario AS cpf, f.data_admissao,
+           f.salario,
+           e.cep_funcionario AS cep, e.rua_funcionario AS rua,
+           e.numero_funcionario AS numero, e.bairro_funcionario AS bairro,
+           e.cidade_funcionario AS cidade, e.estado_funcionario AS estado,
+           t.ddd_funcionario AS ddd, t.num_telefone_funcionario AS contato,
+           f.id_cargo
+    FROM FUNCIONARIO f
+    LEFT JOIN endereco_funcionario e ON e.id_funcionario = f.id_funcionario
+    LEFT JOIN telefone_funcionario t ON t.id_funcionario = f.id_funcionario
+    WHERE f.id_funcionario = :id
+  ";
+  $stmt = $conn->prepare($sql);
+  $stmt->execute(['id'=>$id]);
+  $dados = $stmt->fetch(PDO::FETCH_ASSOC);
+  exit(json_encode($dados));
+} catch (PDOException $e) {
+  exit(json_encode(['erro'=>$e->getMessage()]));
 }
-
-echo json_encode($funcionario);
+?>

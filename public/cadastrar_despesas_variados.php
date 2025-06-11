@@ -65,7 +65,7 @@
         <nav class="nav-options">
             <ul>
                 <li><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
-                <li><a href="cadastrar_despesas_produtos.html">Produtos</a></li>
+                <li><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
                 <li class="active"><a href="../public/cadastrar_despesas_variados.html">Variados</a></li>
             </ul>
         </nav>

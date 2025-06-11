@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/../config/config.php';
+require __DIR__ . '/../../config/config.php';
 
 $conn = Conexao::getConn();
 
@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numero = $_POST['numero'];
     $bairro = $_POST['bairro'];
     $cidade = $_POST['cidade'];
-    $estado = $_POST['estado'];
 
     $ddd = $_POST['ddd'];
     $telefone = $_POST['telefone'];
@@ -31,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmtEndereco = $conn->prepare("UPDATE endereco_funcionario SET
             cep_funcionario = ?, rua_funcionario = ?, numero_funcionario = ?,
-            bairro_funcionario = ?, cidade_funcionario = ?, estado_funcionario = ?
+            bairro_funcionario = ?, cidade_funcionario = ?
             WHERE id_funcionario = ?");
-        $stmtEndereco->execute([$cep, $rua, $numero, $bairro, $cidade, $estado, $id]);
+        $stmtEndereco->execute([$cep, $rua, $numero, $bairro, $cidade, $id]);
 
         $stmtTelefone = $conn->prepare("UPDATE telefone_funcionario SET
             ddd_funcionario = ?, num_telefone_funcionario = ?

@@ -2,7 +2,7 @@
 require __DIR__ . '/../../config/config.php';
 $conn = Conexao::getConn();
 
-header('Content-Type: application/json'); // importante para retorno JSON
+header('Content-Type: application/json'); 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome'] ?? '');
@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cidade = trim($_POST['cidade'] ?? '');
     $estado = trim($_POST['estado'] ?? '');
 
-    $ddd = trim($_POST['ddd'] ?? '');
     $telefone = trim($_POST['telefone'] ?? '');
 
     if (empty($nome) || empty($cpf) || empty($rg) || empty($id_cargo) || empty($data_admissao) || empty($salario)) {
@@ -65,11 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':id_funcionario' => $id_funcionario
         ]);
 
-        $sqlTelefone = "INSERT INTO telefone_funcionario (ddd_funcionario, num_telefone_funcionario, id_funcionario)
-                        VALUES (:ddd, :telefone, :id_funcionario)";
+        $sqlTelefone = "INSERT INTO telefone_funcionario (num_telefone_funcionario, id_funcionario)
+                        VALUES (:telefone, :id_funcionario)";
         $stmt = $conn->prepare($sqlTelefone);
         $stmt->execute([
-            ':ddd' => $ddd,
             ':telefone' => $telefone,
             ':id_funcionario' => $id_funcionario
         ]);
