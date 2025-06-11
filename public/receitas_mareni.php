@@ -1,4 +1,117 @@
-<?php include '../src/login/verify-session.php'; ?>
+<?php
+include '../src/login/verify-session.php';
+require __DIR__ . '/../config/config.php';
+
+try {
+    $conn = Conexao::getConn();
+    $nomeProduto = 'Mareni';
+
+    $stmt = $conn->prepare("SELECT DISTINCT nome_cliente FROM RECEITA WHERE nome_produto = :produto AND nome_cliente IS NOT NULL ORDER BY nome_cliente");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $clientes = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT f.descricao FROM RECEITA r JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento WHERE r.nome_produto = :produto ORDER BY f.descricao");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $pagamentos = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT c.nome_categoria FROM RECEITA r JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria WHERE r.nome_produto = :produto ORDER BY c.nome_categoria");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $categorias = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT s.nome_sabor FROM RECEITA r JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor WHERE r.nome_produto = :produto ORDER BY s.nome_sabor");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $sabores = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT qtd_produto FROM RECEITA WHERE nome_produto = :produto ORDER BY qtd_produto");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $quantidades = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT val_unitario FROM RECEITA WHERE nome_produto = :produto ORDER BY val_unitario");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $valoresUnit = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $stmt = $conn->prepare("SELECT DISTINCT total_receita FROM RECEITA WHERE nome_produto = :produto ORDER BY total_receita");
+    $stmt->execute(['produto' => $nomeProduto]);
+    $totais = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    $baseSql = "SELECT r.data_venda, r.nome_cliente, f.descricao AS forma_pagamento, r.nome_produto, c.nome_categoria, s.nome_sabor, r.qtd_produto, r.val_unitario, r.total_receita
+        FROM RECEITA r
+   LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+   LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+   LEFT JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+       WHERE r.nome_produto = :produto";
+
+    $params = ['produto' => $nomeProduto];
+    $filtros = [];
+
+    if (!empty($_GET['data'])) {
+        $filtros[] = 'r.data_venda = :data';
+        $params['data'] = $_GET['data'];
+    }
+
+    if (!empty($_GET['cliente'])) {
+        $filtros[] = 'r.nome_cliente = :cliente';
+        $params['cliente'] = $_GET['cliente'];
+    }
+
+    if (!empty($_GET['pagamento'])) {
+        $filtros[] = 'f.descricao = :pagamento';
+        $params['pagamento'] = $_GET['pagamento'];
+    }
+
+    if (!empty($_GET['categoria'])) {
+        $filtros[] = 'c.nome_categoria = :categoria';
+        $params['categoria'] = $_GET['categoria'];
+    }
+
+    if (!empty($_GET['sabor'])) {
+        $filtros[] = 's.nome_sabor = :sabor';
+        $params['sabor'] = $_GET['sabor'];
+    }
+
+    if (!empty($_GET['quantidade'])) {
+        $filtros[] = 'r.qtd_produto = :quantidade';
+        $params['quantidade'] = $_GET['quantidade'];
+    }
+
+    if (!empty($_GET['valor_unit'])) {
+        $filtros[] = 'r.val_unitario = :valor_unit';
+        $params['valor_unit'] = $_GET['valor_unit'];
+    }
+
+    if (!empty($_GET['total'])) {
+        $filtros[] = 'r.total_receita = :total';
+        $params['total'] = $_GET['total'];
+    }
+
+    if ($filtros) {
+        $baseSql .= ' AND ' . implode(' AND ', $filtros);
+    }
+
+    $baseSql .= ' ORDER BY r.data_venda DESC';
+
+    $stmt = $conn->prepare($baseSql);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sqlTotal = "SELECT SUM(r.total_receita) FROM RECEITA r
+   LEFT JOIN CATEGORIA_RECEITA c ON r.id_categoria = c.id_categoria
+   LEFT JOIN SABOR_PRODUTO s ON r.id_sabor = s.id_sabor
+   LEFT JOIN FORMAS_PAGAMENTO f ON r.id_forma_pagamento = f.id_forma_pagamento
+       WHERE r.nome_produto = :produto";
+
+    if ($filtros) {
+        $sqlTotal .= ' AND ' . implode(' AND ', $filtros);
+    }
+
+    $stmtTotal = $conn->prepare($sqlTotal);
+    $stmtTotal->execute($params);
+    $totalReceitaFiltrada = $stmtTotal->fetchColumn() ?? 0;
+
+} catch (PDOException $e) {
+    die("Erro ao buscar dados: " . $e->getMessage());
+}
+?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -73,112 +186,114 @@
 
     <!-- Div de Filtros -->
     <div class="nav-filter-category">
+      <form id="filtro-form" method="GET">
         <div class="filters">
-            <input type="date" id="data-filter" name="data">
+          <input type="date" id="data-filter" name="data" />
 
-            <select id="cliente-filter" name="cliente">
-                <option value="cliente">Cliente</option>
-                <option value="cliente1">Cliente 1</option>
-                <option value="cliente2">Cliente 2</option>
-                <option value="cliente3">Cliente 3</option>
-            </select>
+          <select name="cliente">
+        <option value="">Cliente</option>
+        <?php foreach ($clientes as $cliente): ?>
+          <option value="<?= $cliente ?>">
+            <?= $cliente ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="pagamento-filter" name="pagamento">
-                <option value="pagamento">Pagamento</option>
-                <option value="pagamento1">Pagamento 1</option>
-                <option value="pagamento2">Pagamento 2</option>
-                <option value="pagamento">Pagamento 3</option>
-            </select>
+      <select name="pagamento">
+        <option value="">Pagamento</option>
+        <?php foreach ($pagamentos as $p): ?>
+          <option value="<?= $p ?>">
+            <?= $p ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="produto-filter" name="produto">
-                <option value="produto">Produto</option>
-                <option value="produto1">Produto 1</option>
-                <option value="produto2">Produto 2</option>
-                <option value="produto3">Produto 3</option>
-            </select>
+      <select name="categoria">
+        <option value="">Categoria</option>
+        <?php foreach ($categorias as $c): ?>
+          <option value="<?= $c ?>">
+            <?= $c ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="categoria-filter" name="categoria">
-                <option value="categoria">Categoria</option>
-                <option value="categoria1">Categoria 1</option>
-                <option value="categoria2">Categoria 2</option>
-                <option value="categoria3">Categoria 3</option>
-            </select>
+      <select name="sabor">
+        <option value="">Sabor</option>
+        <?php foreach ($sabores as $s): ?>
+          <option value="<?= $s ?>">
+            <?= $s ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="sabor-filter" name="sabor">
-                <option value="quantidade">Sabor</option>
-                <option value="quantidade1">Morango</option>
-                <option value="quantidade2">Chocolate</option>
-                <option value="quantidade3">Maracujá</option>
-                <option value="quantidade3">Creme com passas</option>
-            </select>
+      <select name="quantidade">
+        <option value="">Quantidade</option>
+        <?php foreach ($quantidades as $q): ?>
+          <option value="<?= $q ?>">
+            <?= $q ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="quandtidade-filter" name="quantidade">
-                <option value="quantidade">Quantidade</option>
-                <option value="quantidade1">Quantidade 1</option>
-                <option value="quantidade2">Quantidade 2</option>
-                <option value="quantidade3">Quantidade 3</option>
-            </select>
+      <select name="valor_unit">
+        <option value="">Valor Unitário</option>
+        <?php foreach ($valoresUnit as $vu): ?>
+          <option value="<?= $vu ?>">
+            R$ <?= number_format($vu, 2, ',', '.') ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
 
-            <select id="valor-unit-filter" name="valor-unit">
-                <option value="valor-unit">Valor Unitário</option>
-                <option value="valor-unit1">Valor Unitário 1</option>
-                <option value="valor-unit2">Valor Unitário 2</option>
-                <option value="valor-unit3">Valor Unitário 3</option>
-            </select>
-
-            <select id="total-filter" name="total">
-                <option value="total">Total</option>
-                <option value="total1">Total 1</option>
-                <option value="total2">Total 2</option>
-                <option value="total3">Total 3</option>
-            </select>
-
-
+      <select name="total">
+        <option value="">Total</option>
+        <?php foreach ($totais as $t): ?>
+          <option value="<?= $t ?>">
+            R$ <?= number_format($t, 2, ',', '.') ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </select>
         </div>
+      </form>
     </div>
 
     <!-- Tabela de Receitas -->
     <main class="main-tabela">
-        <table class="tabela-receitas">
-            <thead>
-                <tr>
-                    <th>Data da Venda</th>
-                    <th>Cliente</th>
-                    <th>Pagamento</th>
-                    <th>Produto</th>
-                    <th>Categoria</th>
-                    <th>Quantidade</th>
-                    <th>Valor Unitário</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- As linhas da tabela serão preenchidas dinamicamente pelo backend -->
-                <tr>
-                    <td>01/01/2025</td>
-                    <td>Cliente 1</td>
-                    <td>Crédito</td>
-                    <td>Produto 1</td>
-                    <td>Categoria 1</td>
-                    <td>10</td>
-                    <td>R$ 20,00</td>
-                    <td>R$ 200,00</td>
-                </tr>
-                <!-- Exemplo de linha -->
-                <tr>
-                    <td>02/01/2025</td>
-                    <td>Cliente 2</td>
-                    <td>Débito</td>
-                    <td>Produto 2</td>
-                    <td>Categoria 2</td>
-                    <td>5</td>
-                    <td>R$ 50,00</td>
-                    <td>R$ 250,00</td>
-                </tr>
-                <!-- As outras linhas virão do banco de dados -->
-            </tbody>
-        </table>
-    </main>
+    <table class="tabela-receitas">
+      <thead>
+        <tr>
+          <th>Data da Venda</th>
+          <th>Cliente</th>
+          <th>Pagamento</th>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th>Sabor</th>
+          <th>Quantidade</th>
+          <th>Valor Unitário</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+      <?php if ($rows): ?>
+        <?php foreach ($rows as $row): ?>
+          <tr>
+            <td><?= date('d/m/Y', strtotime($row['data_venda'])) ?></td>
+            <td><?= htmlspecialchars($row['nome_cliente']) ?></td>
+            <td><?= htmlspecialchars($row['forma_pagamento']) ?></td>
+            <td><?= htmlspecialchars($row['nome_produto']) ?></td>
+            <td><?= htmlspecialchars($row['nome_categoria']) ?></td>
+            <td><?= htmlspecialchars($row['nome_sabor']) ?></td>
+            <td><?= (int)$row['qtd_produto'] ?></td>
+            <td>R$ <?= number_format($row['val_unitario'], 2, ',', '.') ?></td>
+            <td>R$ <?= number_format($row['total_receita'], 2, ',', '.') ?></td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <tr><td colspan="9">Nenhum receita encontrada para o filtro sleceionado.</td></tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</main>
 
     <div class="final-tabela">
         <div class="acoes">
@@ -188,7 +303,7 @@
             </div>
         </div>
         <div class="total-gasto-box">
-            <p class="total-gasto">TOTAL GANHO: R$ 3000,00</p>
+            <p class="total-gasto">TOTAL GANHO: R$ <?= number_format($totalReceitaFiltrada, 2, ',', '.') ?></p>
         </div>
     </div>
 
@@ -237,6 +352,80 @@
             e.target.classList.add("hidden");
         }
     });
+</script>
+
+<script>
+    const form = document.getElementById('filtro-form');
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        form.submit();
+      });
+    });
+  </script>
+
+<script>
+document.querySelector('.btn-imprimir').addEventListener('click', function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const titulo = 'Relatório de Receitas - Mareni';
+    const dataHora = new Date();
+    const dataFormatada = dataHora.toLocaleDateString();
+    const horaFormatada = dataHora.toLocaleTimeString();
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(0);
+    doc.text(titulo, 105, 20, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Gerado em: ${dataFormatada} às ${horaFormatada}`, 190, 27, { align: 'right' });
+
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.2);
+    doc.line(20, 30, 190, 30);
+
+    const tabela = document.querySelector('.tabela-receitas');
+
+    doc.autoTable({
+        html: tabela,
+        startY: 35,
+        styles: {
+            font: 'helvetica',
+            fontSize: 7,
+            cellPadding: 3,
+            textColor: 0,
+            valign: 'middle',
+        },
+        headStyles: {
+            fillColor: [230, 230, 230],
+            textColor: 0,
+            fontStyle: 'bold',
+            halign: 'center',
+        },
+        bodyStyles: {
+            halign: 'center'
+        },
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
+        },
+        tableLineColor: [200, 200, 200],
+        tableLineWidth: 0.1,
+        margin: { top: 35 },
+        didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100);
+            doc.text('CashHive System - 2025', doc.internal.pageSize.getWidth() / 2, pageHeight - 10, { align: 'center' });
+        }
+    });
+
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+});
 </script>
 
 <script src="../assets/js/inatividade.js"></script>
