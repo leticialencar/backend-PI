@@ -1,113 +1,139 @@
-/* Modal Editar Usuário - semelhante aos outros modais */
+/* Modal Editar Usuário - baseado em modalcadastro.css */
 
 .modal-overlay#modal-editar-usuario {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
-.modal-overlay.hidden#modal-editar-usuario {
-    display: none;
+.modal-overlay#modal-editar-usuario:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
 }
 
 .modal-box {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    padding: 32px 28px;
-    min-width: 350px;
-    max-width: 420px;
-    width: 100%;
+    font-family: "Inter", sans-serif;
+    background: #FFFFFF;
+    color: #000000;
+    padding: 24px;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 1000px;
+    height: auto;
     position: relative;
-    animation: modalFadeIn 0.2s;
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-@keyframes modalFadeIn {
+@keyframes fadeIn {
     from { opacity: 0; transform: translateY(-30px);}
     to { opacity: 1; transform: translateY(0);}
 }
 
 .modal-close.close-modal-editar {
     position: absolute;
-    top: 18px;
-    right: 18px;
-    background: none;
-    border: none;
+    top: 1rem;
+    right: 1rem;
     font-size: 1.5rem;
-    color: #888;
+    background: transparent;
+    border: none;
+    color: #2A3645;
     cursor: pointer;
-    transition: color 0.2s;
-}
-.modal-close.close-modal-editar:hover {
-    color: #222;
 }
 
-.modal-header {
-    margin-bottom: 18px;
-}
 .modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #222;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #142747;
+}
+
+.modal-form-edit-user {
+    width: 100%;
 }
 
 .input-group {
     display: flex;
-    flex-direction: column;
-    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 1rem 0;
 }
 
 .input-box {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    width: 48%; 
+    margin-bottom: 1.1rem; 
 }
 
 .input-box label {
-    font-size: 0.97rem;
-    color: #444;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    text-align: left;
 }
 
 .input-box input,
 .input-box select {
-    padding: 8px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #142747;
+    border-radius: 8px;
     font-size: 1rem;
-    background: #f9f9f9;
-    transition: border 0.2s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.input-box input:focus,
-.input-box select:focus {
-    border-color: #7b3ff2;
-    outline: none;
-    background: #fff;
+.input-box input::placeholder {
+    color: #000000be;
 }
 
+/* Botão de Salvar Alterações */
 .criar-btn {
-    margin-top: 18px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 1.5rem;
 }
 
 .criar-btn button {
-    background: #7b3ff2;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 22px;
+    padding: 0.8rem 1.5rem;
     font-size: 1rem;
     font-weight: 600;
+    width: 250px;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    background-color: #142747;
+    color: #F8F8F8;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.3s ease;
 }
 
 .criar-btn button:hover {
-    background: #5c2db3;
+    background-color: #1c3a5c;
+}
+
+/* Responsividade para telas pequenas (celular) */
+@media (max-width: 768px) {
+    .input-box {
+        width: 100%; /* Fica 1 input por linha em telas menores */
+    }
+    .modal-box {
+        padding: 16px;
+    }
+    .modal-title {
+        font-size: 24px;
+    }
 }

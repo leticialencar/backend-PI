@@ -639,51 +639,79 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 document.getElementById('editar-id-usuario').value = data.id_usuario || '';
-                document.getElementById('editar-nome').value = data.nome_usuario || '';
-                document.getElementById('editar-sobrenome').value = ''; // ajuste se tiver sobrenome separado
+                // Nome e sobrenome separados (ajuste conforme seu banco)
+                let nome = '', sobrenome = '';
+                if (data.nome_usuario) {
+                    const partes = data.nome_usuario.trim().split(' ');
+                    nome = partes.shift();
+                    sobrenome = partes.join(' ');
+                }
+                document.getElementById('editar-nome').value = nome;
+                document.getElementById('editar-sobrenome').value = sobrenome;
                 document.getElementById('editar-cpf').value = data.cpf_usuario || '';
                 document.getElementById('editar-email').value = data.email_usuario || '';
                 document.getElementById('editar-cargo').value = data.id_cargo || '';
-                document.getElementById('editar-nivel').value = ''; // pode preencher se desejar
+                // Preencher nível de permissão conforme cargo
+                let selectedCargo = document.querySelector('#editar-cargo option[value="' + data.id_cargo + '"]');
+                document.getElementById('editar-nivel').value = selectedCargo ? selectedCargo.getAttribute('data-nivel') : '';
                 document.getElementById('editar-senha').value = '';
                 document.getElementById('editar-repetir-senha').value = '';
-                // Novos campos
-                if (document.getElementById('cadastro-cep')) document.getElementById('cadastro-cep').value = data.cep || '';
-                if (document.getElementById('cadastro-rua')) document.getElementById('cadastro-rua').value = data.rua || '';
-                if (document.getElementById('cadastro-bairro')) document.getElementById('cadastro-bairro').value = data.bairro || '';
-                if (document.getElementById('cadastro-cidade')) document.getElementById('cadastro-cidade').value = data.cidade || '';
-                if (document.getElementById('cadastro-estado')) document.getElementById('cadastro-estado').value = data.estado || '';
-                if (document.getElementById('cadastro-telefone')) document.getElementById('cadastro-telefone').value = data.num_telefone || '';
-                if (document.getElementById('cadastro-ddd')) document.getElementById('cadastro-ddd').value = data.ddd || '';
-                document.getElementById('btn-cadastro-usuario').textContent = 'Alterar Informações';
-                document.getElementById('modal-cadastro').classList.remove('hidden');
+                // Se quiser adicionar campos de endereço/telefone, adicione aqui
+                document.getElementById('modal-editar-usuario').classList.remove('hidden');
             });
     }
 
-    // Adiciona evento para todos os botões .btn-edit
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-id');
-                abrirModalEditarUsuario(userId);
-            });
-        });
-
-        // Ao abrir para novo usuário, limpa campos e botão
-        document.querySelector(".open-modal[data-modal='modal-cadastro']").addEventListener("click", () => {
-            document.getElementById('cadastro-id-usuario').value = '';
-            document.getElementById('cadastro-nome').value = '';
-            document.getElementById('cadastro-sobrenome').value = '';
-            document.getElementById('cadastro-cpf').value = '';
-            document.getElementById('cadastro-email').value = '';
-            document.getElementById('cadastro-cargo').value = '';
-            document.getElementById('cadastro-nivel').value = '';
-            document.getElementById('cadastro-senha').value = '';
-            document.getElementById('cadastro-repetir-senha').value = '';
-            document.getElementById('btn-cadastro-usuario').textContent = 'Criar Conta';
+    // Evento para abrir modal de edição ao clicar em "Editar"
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            abrirModalEditarUsuario(userId);
         });
     });
-    </script>
+
+    // Atualizar nível de permissão ao trocar cargo no modal editar
+    document.getElementById("editar-cargo").addEventListener("change", function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const nivel = selectedOption.getAttribute("data-nivel") || "";
+        document.getElementById("editar-nivel").value = nivel;
+    });
+
+    // Fechar modal editar
+    document.querySelectorAll('.close-modal-editar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('modal-editar-usuario').classList.add('hidden');
+        });
+    });
+
+    // Submissão do formulário de edição via AJAX
+    document.getElementById('form-editar-usuario').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.success) {
+                alert(result.message || "Usuário alterado com sucesso!");
+                document.getElementById('modal-editar-usuario').classList.add('hidden');
+                window.location.reload();
+            } else {
+                alert(result.message || "Erro ao alterar o usuário.");
+            }
+        })
+        .catch(error => {
+            alert("Erro ao salvar alterações.");
+            console.error(error);
+        });
+    });
+
+    // ...existing code...
+</script>
 
     <script src="../assets/js/inatividade.js"></script>
 
