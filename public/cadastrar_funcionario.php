@@ -639,8 +639,7 @@ try {
       return;
     }
 
-    // Envia a porcentagem para o backend via fetch
-    fetch('reajustar_salario.php', {
+    fetch('../src/funcionario/reajustar-salario.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ percentual: percentual })
@@ -648,10 +647,10 @@ try {
     .then(res => res.json())
     .then(data => {
       if (data.sucesso) {
-        alert('Reajuste aplicado com sucesso!');
-        location.reload();  // Recarrega para mostrar os novos salários
+        alert(data.mensagem);
+        location.reload();
       } else {
-        alert('Erro ao aplicar reajuste.');
+        alert('Erro: ' + data.mensagem);
       }
     })
     .catch(() => alert('Erro na comunicação com o servidor.'));
