@@ -140,24 +140,11 @@ try {
         <div class="card">
 
             <div class="nav-filter-category">
-                <div class="filters">
-        
-
-                    <select id="produto-filter" name="produto">
-                        <option value="produto">Nome </option>
-                        <option value="produto1"></option>
-                        <option value="produto2"></option>
-                        <option value="produto3"></option>
-                    </select>
-
-                    <select id="categoria-filter" name="categoria">
-                        <option value="categoria">Função</option>
-                        <option value="categoria1"></option>
-                        <option value="categoria2"></option>
-                        <option value="categoria3"></option>
-                    </select>
-                </div>
-            </div>
+                
+            <form method="GET" action="funcionarios.php" class="barra-pesquisa">
+                <input type="text" name="busca" id="busca" placeholder="Pesquise por nome ou função do funcionário">
+                <button type="submit" class="pesquisar-button">Pesquisar</button>
+            </form>
 
             <div class="reajuste-salarial">
                 <label for="percentualReajuste">Reajuste Salarial (%):</label>
