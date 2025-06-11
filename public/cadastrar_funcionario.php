@@ -631,43 +631,32 @@ try {
             });
         </script>
 
+            <script>
+  document.getElementById('aplicarReajuste').addEventListener('click', () => {
+    const percentual = parseFloat(document.getElementById('percentualReajuste').value);
+    if (isNaN(percentual)) {
+      alert('Por favor, digite um percentual válido.');
+      return;
+    }
 
-
-
-
-        <!-- CRIPT REAJUSTE SALARIAL -->
-        
-        <script>
-            document.getElementById('aplicarReajuste').addEventListener('click', async () => {
-                const percentual = parseFloat(document.getElementById('percentualReajuste').value);
-
-                if (isNaN(percentual)) {
-                    alert('Digite um valor válido para o reajuste.');
-                    return;
-                }
-
-                const confirmacao = confirm(`Deseja aplicar um reajuste de ${percentual}% a todos os funcionários?`);
-                if (!confirmacao) return;
-
-                try {
-                    const response = await fetch('/api/reajustar_salarios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ percentual })
-                    });
-
-                    if (response.ok) {
-                        alert('Reajuste aplicado com sucesso!');
-                        location.reload(); 
-                    } else {
-                        alert('Erro ao aplicar o reajuste.');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert('Erro inesperado ao aplicar o reajuste.');
-                }
-            });
-        </script>
+    // Envia a porcentagem para o backend via fetch
+    fetch('reajustar_salario.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ percentual: percentual })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.sucesso) {
+        alert('Reajuste aplicado com sucesso!');
+        location.reload();  // Recarrega para mostrar os novos salários
+      } else {
+        alert('Erro ao aplicar reajuste.');
+      }
+    })
+    .catch(() => alert('Erro na comunicação com o servidor.'));
+  });
+</script>
 
         <script>
         document.querySelectorAll(".open-modal").forEach(button => {
