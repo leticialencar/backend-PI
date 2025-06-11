@@ -269,6 +269,7 @@ try {
             </div>
 
              <div class="input-box">
+                <label for="bairro">Data de Admissão</label>
                 <input type="date" id="data" name="data" required>
             </div>
 
@@ -726,7 +727,39 @@ try {
     });
     </script>
 
-        <script src="../assets/js/inatividade.js"></script>
+<script>
+document.querySelectorAll('.open-modal[data-modal="modal-cadastro"]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-id');
+
+        const response = await fetch(`../src/funcionario/get-funcionario.php?id=${id}`);
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.querySelector('#modal-cadastro input[name="nome"]').value = data.nome_funcionario;
+        document.querySelector('#modal-cadastro input[name="cpf"]').value = data.cpf;
+        document.querySelector('#modal-cadastro input[name="rg"]').value = data.rg;
+        document.querySelector('#modal-cadastro input[name="endereço"]').value = data.endereco;
+        document.querySelector('#modal-cadastro input[name="cep"]').value = data.cep;
+        document.querySelector('#modal-cadastro input[name="numero"]').value = data.numero;
+        document.querySelector('#modal-cadastro input[name="rua"]').value = data.cidade;
+        document.querySelector('#modal-cadastro input[name="bairro"]').value = data.bairro;
+        document.querySelector('#modal-cadastro select[name="cargo"]').value = data.id_cargo;
+        document.querySelector('#modal-cadastro input[name="data_admissao"]').value = data.data_admissao;
+        document.querySelector('#modal-cadastro input[name="ddd"]').value = data.ddd;
+        document.querySelector('#modal-cadastro input[name="salario"]').value = data.salario;
+
+        document.getElementById("modal-cadastro").classList.remove("hidden");
+    });
+});
+</script>
+
+
+    <script src="../assets/js/inatividade.js"></script>
 
 </body>
 
