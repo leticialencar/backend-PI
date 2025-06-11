@@ -80,7 +80,7 @@ try {
             <ul>
                 <li><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
                 <li class="active"><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
-                <li><a href="../public/cadastrar_despesas_variados.php">Variados</a></li>
+                <a href="../public/cadastrar_despesas_variados.php"><li>Variados</li></a>
             </ul>
         </nav>
     </div>
