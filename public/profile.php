@@ -680,6 +680,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.close-modal-editar').forEach(btn => {
         btn.addEventListener('click', function() {
             document.getElementById('modal-editar-usuario').classList.add('hidden');
+            // Garante que o modal de cadastro também fique fechado
+            var modalCadastro = document.getElementById('modal-cadastro');
+            if (modalCadastro && !modalCadastro.classList.contains('hidden')) {
+                modalCadastro.classList.add('hidden');
+            }
         });
     });
 
