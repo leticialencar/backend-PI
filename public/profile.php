@@ -90,6 +90,7 @@ if (isset($_GET['getUserById'])) {
   <link rel="stylesheet" href="../assets/css/modalsair.css">
   <link rel="stylesheet" href="../assets/css/modalcadastro.css">
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
+  <link rel="stylesheet" href="../assets/css/modaleditarusuario.css">
 </head>
 
 <body>
@@ -314,6 +315,71 @@ if (isset($_GET['getUserById'])) {
                   </div>
                   <div class="criar-btn">
                       <button type="submit" id="btn-cadastro-usuario">Criar Conta</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Novo Modal Editar Usuário -->
+<div class="modal-overlay hidden" id="modal-editar-usuario">
+  <div class="modal-box">
+      <button class="modal-close close-modal close-modal-editar" type="button">
+          <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="modal-subject">
+          <div class="modal-header">
+              <p class="modal-title">Editar usuário</p>
+          </div>
+          <div class="modal-form-edit-user">
+              <form id="form-editar-usuario" action="../src/profile/update-user.php" method="POST">
+                  <input type="hidden" id="editar-id-usuario" name="id_usuario" value="">
+                  <div class="input-group">
+                      <div class="input-box">
+                          <label for="editar-nome">Nome</label>
+                          <input type="text" id="editar-nome" name="nome" required>
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-sobrenome">Sobrenome</label>
+                          <input type="text" id="editar-sobrenome" name="sobrenome" required>
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-cpf">CPF</label>
+                          <input type="text" id="editar-cpf" name="cpf" required>
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-email">E-mail</label>
+                          <input type="email" id="editar-email" name="email" required>
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-cargo">Cargo</label>
+                          <select id="editar-cargo" name="cargo" required>
+                              <option value="">Selecione o cargo</option>
+                              <?php foreach ($cargos as $cargo): ?>
+                                  <option 
+                                    value="<?= htmlspecialchars($cargo['id']) ?>" 
+                                    data-nivel="<?= htmlspecialchars($cargo['nivel_permissao']) ?>">
+                                      <?= htmlspecialchars($cargo['nome']) ?>
+                                  </option>
+                              <?php endforeach; ?>
+                          </select>
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-nivel">Nível de permissão</label>
+                          <input type="text" id="editar-nivel" name="nivel" readonly placeholder="Selecione um cargo">
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-senha">Senha</label>
+                          <input type="password" id="editar-senha" name="senha" placeholder="(Deixe em branco para não alterar)">
+                      </div>
+                      <div class="input-box">
+                          <label for="editar-repetir-senha">Repetir senha</label>
+                          <input type="password" id="editar-repetir-senha" name="repetir_senha" placeholder="Repita a senha criada">
+                      </div>
+                  </div>
+                  <div class="criar-btn">
+                      <button type="submit" id="btn-editar-usuario">Salvar Alterações</button>
                   </div>
               </form>
           </div>
@@ -572,15 +638,15 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('?getUserById=' + encodeURIComponent(idUsuario))
             .then(res => res.json())
             .then(data => {
-                document.getElementById('cadastro-id-usuario').value = data.id_usuario || '';
-                document.getElementById('cadastro-nome').value = data.nome_usuario || '';
-                document.getElementById('cadastro-sobrenome').value = ''; // ajuste se tiver sobrenome separado
-                document.getElementById('cadastro-cpf').value = data.cpf_usuario || '';
-                document.getElementById('cadastro-email').value = data.email_usuario || '';
-                document.getElementById('cadastro-cargo').value = data.id_cargo || '';
-                document.getElementById('cadastro-nivel').value = ''; // pode preencher se desejar
-                document.getElementById('cadastro-senha').value = '';
-                document.getElementById('cadastro-repetir-senha').value = '';
+                document.getElementById('editar-id-usuario').value = data.id_usuario || '';
+                document.getElementById('editar-nome').value = data.nome_usuario || '';
+                document.getElementById('editar-sobrenome').value = ''; // ajuste se tiver sobrenome separado
+                document.getElementById('editar-cpf').value = data.cpf_usuario || '';
+                document.getElementById('editar-email').value = data.email_usuario || '';
+                document.getElementById('editar-cargo').value = data.id_cargo || '';
+                document.getElementById('editar-nivel').value = ''; // pode preencher se desejar
+                document.getElementById('editar-senha').value = '';
+                document.getElementById('editar-repetir-senha').value = '';
                 // Novos campos
                 if (document.getElementById('cadastro-cep')) document.getElementById('cadastro-cep').value = data.cep || '';
                 if (document.getElementById('cadastro-rua')) document.getElementById('cadastro-rua').value = data.rua || '';
