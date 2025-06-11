@@ -1,0 +1,113 @@
+/* Modal Editar Usuário - semelhante aos outros modais */
+
+.modal-overlay#modal-editar-usuario {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.hidden#modal-editar-usuario {
+    display: none;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 32px 28px;
+    min-width: 350px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    animation: modalFadeIn 0.2s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-30px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+.modal-close.close-modal-editar {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.modal-close.close-modal-editar:hover {
+    color: #222;
+}
+
+.modal-header {
+    margin-bottom: 18px;
+}
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #222;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-box label {
+    font-size: 0.97rem;
+    color: #444;
+    font-weight: 500;
+}
+
+.input-box input,
+.input-box select {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f9f9f9;
+    transition: border 0.2s;
+}
+
+.input-box input:focus,
+.input-box select:focus {
+    border-color: #7b3ff2;
+    outline: none;
+    background: #fff;
+}
+
+.criar-btn {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.criar-btn button {
+    background: #7b3ff2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.criar-btn button:hover {
+    background: #5c2db3;
+}
