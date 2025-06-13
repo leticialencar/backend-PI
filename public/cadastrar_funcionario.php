@@ -106,7 +106,7 @@ try {
         <main class="main">
             <div id="msg-erro" style="color: red; margin-bottom: 10px;"></div>
             <form id="form-dados" class="form-grid" method="POST" action="../src/funcionario/salvar-funcionario.php">
-                <input name="nome" type="text" placeholder="*Nome" required>
+                <input name="nome" type="text" placeholder="Nome" required>
                 <input id="rg" name="rg" type="text" placeholder="RG" pattern="\d+" title="Por favor, insira apenas números" required>
                 <input name="cpf" type="number" placeholder="CPF" required>
                 <input name="endereço" type="text" placeholder="Endereço" required>
