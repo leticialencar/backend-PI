@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bairro = $_POST['bairro'];
     $cidade = $_POST['cidade'];
 
-    $ddd = $_POST['ddd'];
     $telefone = $_POST['telefone'];
 
     try {
@@ -35,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtEndereco->execute([$cep, $rua, $numero, $bairro, $cidade, $id]);
 
         $stmtTelefone = $conn->prepare("UPDATE telefone_funcionario SET
-            ddd_funcionario = ?, num_telefone_funcionario = ?
+            num_telefone_funcionario = ?
             WHERE id_funcionario = ?");
-        $stmtTelefone->execute([$ddd, $telefone, $id]);
+        $stmtTelefone->execute([$telefone, $id]);
 
         echo "Funcionário atualizado com sucesso!";
     } catch (PDOException $e) {

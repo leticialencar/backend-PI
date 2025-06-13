@@ -139,10 +139,10 @@ try {
 
             <div class="nav-filter-category">
                 
-            <form method="GET" action="funcionarios.php" class="barra-pesquisa">
+            <form id="form-pesquisa" class="barra-pesquisa">
                 <input type="text" name="busca" id="busca" placeholder="Pesquise por nome ou função do funcionário">
                 <button type="submit" class="pesquisar-button">Pesquisar</button>
-            </form>
+                </form>
 
             <div class="reajuste-salarial">
                 <label for="percentualReajuste">Reajuste Salarial (%):</label>
@@ -151,21 +151,21 @@ try {
             </div>
 
             <table>
-                <tbody>
-                    <?php foreach ($funcionarios as $funcionario): ?>
+                <tbody id="resultado-funcionarios">
+                <?php foreach ($funcionarios as $funcionario): ?>
                     <tr>
-                        <td>
-                            <a href="folha_de_pagamento.php?id=<?= $funcionario['id_funcionario'] ?>">
-                                <?= htmlspecialchars($funcionario['nome_funcionario']) ?>
-                            </a>
-                        </td>
-                        <td><?= htmlspecialchars($funcionario['nome_cargo']) ?></td>
-                        <td class="actions">
-                            <button class="open-modal" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-cadastro">Editar</button>
-                            <button class="btn-desativar-conta js-open-modal-desativar" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-1">Desativar</button>
-                        </td>
+                    <td>
+                        <a href="folha_de_pagamento.php?id=<?= $funcionario['id_funcionario'] ?>">
+                        <?= htmlspecialchars($funcionario['nome_funcionario']) ?>
+                        </a>
+                    </td>
+                    <td><?= htmlspecialchars($funcionario['nome_cargo']) ?></td>
+                    <td class="actions">
+                        <button class="open-modal" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-cadastro">Editar</button>
+                        <button class="btn-desativar-conta js-open-modal-desativar" data-id="<?= $funcionario['id_funcionario'] ?>" data-modal="modal-1">Desativar</button>
+                    </td>
                     </tr>
-                    <?php endforeach; ?>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -287,6 +287,9 @@ try {
                         <button type="submit">Salvar edições</button>
                     </div>
                 </form>
+
+                <div id="mensagem-sucesso" style="display:none; color: green; margin-top: 10px;"></div>
+
             </div>
         </div>
     </div>
@@ -438,9 +441,6 @@ document.querySelectorAll('.close-modal-cadastro').forEach(btn => {
             });
             </script>
 
-            JS FUNCIONARIO
-
-<!-- JavaScript -->
         <script>
             document.querySelectorAll(".open-modal").forEach(button => {
                 button.addEventListener("click", () => {
@@ -592,6 +592,23 @@ document.querySelectorAll('.close-modal-cadastro').forEach(btn => {
         });
     });
     </script>
+
+    <script>
+document.getElementById('form-pesquisa').addEventListener('submit', function(e) {
+  e.preventDefault(); // evita o envio tradicional do formulário
+  const busca = document.getElementById('busca').value;
+
+  fetch('../src/funcionario/buscar-funcionario.php?busca=' + encodeURIComponent(busca))
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('resultado-funcionarios').innerHTML = html;
+    })
+    .catch(error => {
+      console.error('Erro ao buscar funcionários:', error);
+    });
+});
+</script>
+
 
     <script src="../assets/js/inatividade.js"></script>
 
