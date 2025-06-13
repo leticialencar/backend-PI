@@ -187,7 +187,6 @@ $formas_pagamento = $queryPag->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="criar-btn">
                     <button type="submit" class="btn-cadastrar">Cadastrar</button>
-                    <button class="btn-excluir abrir-modal-excluir" data-modal="modal-excluir-receita">Excluir</button>
                 </div>
             </form>
         </div>

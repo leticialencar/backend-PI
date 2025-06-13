@@ -124,7 +124,6 @@
 
                 <div class="criar-btn">
                     <button type="submit" class="btn-cadastrar">Cadastrar</button>
-                    <button type="button" class="btn-excluir abrir-modal-excluir" data-modal="modal-excluir-receita">Excluir</button>
                 </div>
             </form>
         </div>
