@@ -165,7 +165,7 @@ try {
                 <ul>
                     <li><a href="../public/despesas_fixas.php">Fixos</a></li>
                     <li class="active"><a href="despesa_produto.php">Produto</a></li>
-                    <a href="../public/despesas_variadas.php"><li>Variados</li></a>
+                    <li><a href="../public/despesas_variadas.php">Variados</a></li>
                 </ul>
             </nav>
         </div>

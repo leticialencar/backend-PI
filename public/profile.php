@@ -87,10 +87,10 @@ if (isset($_GET['getUserById'])) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="../assets/css/modalsair.css">
-  <link rel="stylesheet" href="../assets/css/modalcadastro.css">
+    <link rel="stylesheet" href="../assets/css/modalcadastro.css">
   <link rel="stylesheet" href="../assets/css/modaldesativar.css">
   <link rel="stylesheet" href="../assets/css/modaleditarusuario.css">
+  <link rel="stylesheet" href="../assets/css/modalsair.css">
 </head>
 
 <body>
@@ -250,8 +250,8 @@ if (isset($_GET['getUserById'])) {
   </div>
 
 <!-- Modal de Cadastro -->
-<div class="modal-overlay hidden" id="modal-cadastro">
-  <div class="modal-box">
+<div class="modal-cadastro-overlay hidden" id="modal-cadastro">
+  <div class="modal-cadastro-box">
       <button class="modal-close close-modal close-modal-cadastro" type="button">
           <i class="fa-solid fa-xmark"></i>
       </button>
@@ -323,8 +323,8 @@ if (isset($_GET['getUserById'])) {
 </div>
 
 <!-- Novo Modal Editar Usuário -->
-<div class="modal-overlay hidden" id="modal-editar-usuario">
-  <div class="modal-box">
+<div class="modal-cadastro-overlay hidden" id="modal-editar-usuario">
+  <div class="modal-cadastro-box">
       <button class="modal-close close-modal close-modal-editar" type="button">
           <i class="fa-solid fa-xmark"></i>
       </button>
@@ -418,18 +418,25 @@ if (isset($_GET['getUserById'])) {
     </div>
 
     <script>
-        document.querySelectorAll(".open-modal").forEach(button => {
-            button.addEventListener("click", () => {
-                const modalId = button.getAttribute("data-modal");
-                document.getElementById(modalId).classList.remove("hidden");
-            });
-        });
-    
-        document.querySelectorAll(".close-modal").forEach(button => {
-            button.addEventListener("click", () => {
-                button.closest(".modal-overlay").classList.add("hidden");
-            });
-        });
+        // Para abrir/fechar o modal de cadastro e editar, use .modal-cadastro-overlay e .modal-cadastro-box
+document.querySelectorAll(".open-modal").forEach(button => {
+    button.addEventListener("click", () => {
+        const modalId = button.getAttribute("data-modal");
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
+    });
+});
+
+document.querySelectorAll(".close-modal, .close-modal-cadastro, .close-modal-editar").forEach(button => {
+    button.addEventListener("click", () => {
+        const modal = button.closest(".modal-overlay, .modal-cadastro-overlay");
+        if (modal) {
+            modal.classList.add("hidden");
+        }
+    });
+});
 
         window.addEventListener("click", (e) => {
             if (e.target.classList.contains("modal-overlay")) {

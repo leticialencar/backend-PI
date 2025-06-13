@@ -25,9 +25,10 @@ body {
 }
 
 .user p {
+    text-decoration: none;
     font-size: 14px;
     font-style: italic;
-    margin: 80px;
+    margin:0 80px;
 }
 
 .menu {

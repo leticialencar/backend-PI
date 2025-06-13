@@ -42,9 +42,9 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="../assets/css/modalsair.css">
-    <link rel="stylesheet" href="../assets/css/modalcadastro.css">
     <link rel="stylesheet" href="../assets/css/modaldesativar.css">
+    <link rel="stylesheet" href="../assets/css/modalcadastro.css">
+    <link rel="stylesheet" href="../assets/css/modalsair.css">
 </head>
 
 <body>
@@ -170,9 +170,8 @@ try {
             </table>
         </div>
     </div>
-
         <!-- Modal de Sair -->
-        <div class="modal-overlay hidden" id="modal-sair">
+    <div class="modal-overlay hidden" id="modal-sair">
             <div class="modal-box">
                 <button class="modal-close close-modal" type="button">
                     <i class="fa-solid fa-xmark"></i>
@@ -195,12 +194,12 @@ try {
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
 
 <!-- Modal de Atualização -->
-<div class="modal-overlay hidden" id="modal-cadastro">
-    <div class="modal-box">
-        <button class="modal-close close-modal close-modal-cadastro" type="button">
+<div class="modal-cadastro-overlay hidden" id="modal-cadastro">
+    <div class="modal-cadastro-box">
+        <button class="modal-close close-modal-cadastro" type="button">
             <i class="fa-solid fa-xmark"></i>
         </button>
 

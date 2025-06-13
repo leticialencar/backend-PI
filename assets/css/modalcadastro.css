@@ -1,4 +1,7 @@
-.modal-overlay {
+/* Não defina .modal-overlay ou .modal-box neste arquivo! */
+/* Use apenas as classes abaixo para o modal de cadastro: */
+
+.modal-cadastro-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -14,12 +17,12 @@
     transition: opacity 0.3s ease;
 }
 
-.modal-overlay:not(.hidden) {
+.modal-cadastro-overlay:not(.hidden) {
     opacity: 1;
     pointer-events: all;
 }
 
-.modal-box {
+.modal-cadastro-box {
     font-family: "Inter", sans-serif;
     background: #FFFFFF;
     color: #000000;

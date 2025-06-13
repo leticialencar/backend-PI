@@ -185,8 +185,8 @@ try {
       <nav class="nav-options">
         <ul>
           <li class="active"><a href="../public/receitas_kibon.php">Kibon</a></li>
-          <li><a href="../public/receitas_nestle.php">Nestlé</a></li>
-          <a href="../public/receitas_mareni.php"><li>Mareni</li></a>
+          <li><a href="../public/receitas_nestle.php">Nestlé</a> </li>
+          <li><a href="../public/receitas_mareni.php">Mareni</a></li>
         </ul>
       </nav>
     </div>
