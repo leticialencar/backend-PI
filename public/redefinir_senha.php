@@ -1,4 +1,3 @@
-
 <?php include '../src/login/verify-session.php'; ?>
 
 <!DOCTYPE html>
@@ -12,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/reset.css">
-    <link rel="stylesheet" href="../assets/css/redefinir_senha.css">
     <link rel="stylesheet" href="../assets/css/modalrecover.css">
+    <link rel="stylesheet" href="../assets/css/redefinir_senha.css">
      <!-- LINKS DO "X" PRA FECHAR O MODAL E DA FOLHA DE ESTILO DO MODAL -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
      <link rel="stylesheet" href="../assets/css/modal_redefinir_senha.css">
@@ -140,6 +139,7 @@
         </div>
         
     </div>
+    
     <!-- Modal de redefinição de senha -->
     <div id="meuModal2" class="modal2-overlay hidden">
         <div class="modal2-box">
