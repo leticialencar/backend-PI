@@ -75,7 +75,7 @@ $formas_pagamento = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <ul>
         <li class="active"><a href="../public/cadastrar_despesas_fixas.php">Fixos</a></li>
         <li><a href="../public/cadastrar_despesas_produtos.php">Produtos</a></li>
-        <a href="../public/cadastrar_despesas_variados.php"><li>Variados</li></a>
+        <li><a href="../public/cadastrar_despesas_variados.php">Variados</li></a>
       </ul>
     </nav>
   </div>
