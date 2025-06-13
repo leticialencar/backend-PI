@@ -263,12 +263,15 @@ $progressoDespesa = min(100, $metaDespesa > 0 ? round(($totalDespesas / $metaDes
             <button class="modal-close close-modal-detalhes" type="button">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div class="modal-header">
-                <h3>Detalhes da Movimentação</h3>
+            <div class="modal-detalhes-subject">
+                <div class="modal-header">
+                    <h3>Detalhes da Movimentação</h3>
+                </div>
+                <div class="modal-body" id="detalhes-body">
+                    <!-- Conteúdo preenchido via JS -->
+                </div>
             </div>
-            <div class="modal-body" id="detalhes-body">
-                <!-- Conteúdo preenchido via JS -->
-            </div>
+
         </div>
     </div>
 
