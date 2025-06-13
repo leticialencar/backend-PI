@@ -241,7 +241,6 @@ $totalFiltrado = $resultTotal['total'] ?? 0;
     <div class="final-tabela">
       <div class="acoes">
         <div class="botoes">
-          <p>* Selecionar pra excluir</p>
           <button class="btn-imprimir"><i class="fa fa-print"></i> Imprimir</button>
         </div>
       </div>
