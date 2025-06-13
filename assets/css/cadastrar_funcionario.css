@@ -295,6 +295,7 @@ input[type="text"], input[type="email"], input[type="date"], input[type="number"
     transition: background-color 0.3s ease;
     font-size: 14px;
     width: 80px;
+    margin-left: 375px;
 }
 
 .btn:hover {
